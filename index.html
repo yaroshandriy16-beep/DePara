@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ВНАУ Студент</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --bg-color: var(--tg-theme-bg-color, #121212);
+            --text-color: var(--tg-theme-text-color, #ffffff);
+            --hint-color: var(--tg-theme-hint-color, #aaaaaa);
+            --card-bg: var(--tg-theme-secondary-bg-color, #1e1e1e);
+            --accent-color: var(--tg-theme-button-color, #2ea6ff);
+            --accent-text: var(--tg-theme-button-text-color, #ffffff);
+            --border-color: #2c2c2e;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            padding-bottom: 70px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .header {
+            padding: 16px;
+            text-align: center;
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .container {
+            padding: 16px;
+        }
+
+        /* Фільтри */
+        .filters {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: var(--card-bg);
+            padding: 14px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .filter-group label {
+            font-size: 13px;
+            color: var(--hint-color);
+        }
+
+        select {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-size: 15px;
+            outline: none;
+        }
+
+        /* Картки розкладу */
+        .schedule-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .lesson-time {
+            font-size: 12px;
+            color: var(--accent-color);
+            font-weight: 600;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+
+        .lesson-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .lesson-details {
+            font-size: 13px;
+            color: var(--hint-color);
+        }
+
+        /* Навігація внизу */
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .tab-item {
+            flex: 1;
+            text-align: center;
+            font-size: 12px;
+            color: var(--hint-color);
+            cursor: pointer;
+            padding: 8px 0;
+        }
+
+        .tab-item.active {
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--hint-color);
+            padding: 30px 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1 id="app-title">📚 ВНАУ Розклад</h1>
+    </div>
+
+    <div class="container">
+        <!-- Вкладка 1: Розклад -->
+        <div id="tab-schedule" class="tab-content active">
+            <div class="filters">
+                <div class="filter-group">
+                    <label for="faculty-select">Факультет:</label>
+                    <select id="faculty-select" onchange="onFacultyChange()">
+                        <option value="">Оберіть факультет...</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="course-select">Курс:</label>
+                    <select id="course-select" onchange="onCourseChange()" disabled>
+                        <option value="">Спочатку оберіть факультет</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="group-select">Група:</label>
+                    <select id="group-select" onchange="loadSchedule()" disabled>
+                        <option value="">Спочатку оберіть курс</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="schedule-container">
+                <div class="empty-state">Оберіть факультет, курс та групу, щоб побачити розклад</div>
+            </div>
+        </div>
+
+        <!-- Вкладка 2: Спільнота -->
+        <div id="tab-community" class="tab-content">
+            <h2>💬 Спільнота ВНАУ</h2>
+            <div class="schedule-card">
+                <div class="lesson-title">Студентський чат</div>
+                <div class="lesson-details">Обговорення пар, викладачів та студентського життя.</div>
+            </div>
+        </div>
+
+        <!-- Вкладка 3: Корисне -->
+        <div id="tab-useful" class="tab-content">
+            <h2>🔗 Корисні посилання</h2>
+            <div class="schedule-card">
+                <div class="lesson-title">Офіційний сайт ВНАУ</div>
+                <div class="lesson-details">vsau.org</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Нижня панель навігації -->
+    <div class="tab-bar">
+        <div class="tab-item active" onclick="switchTab('schedule', this)">📅 Розклад</div>
+        <div class="tab-item" onclick="switchTab('community', this)">💬 Спільнота</div>
+        <div class="tab-item" onclick="switchTab('useful', this)">🔗 Корисне</div>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
+        let globalData = null;
+
+        // Завантаження розкладу з хмари (schedule.json)
+        async function fetchScheduleData() {
+            try {
+                const response = await fetch('schedule.json?' + new Date().getTime());
+                globalData = await response.json();
+                initFaculties();
+            } catch (e) {
+                console.error("Помилка завантаження schedule.json", e);
+            }
+        }
+
+        function initFaculties() {
+            const facultySelect = document.getElementById('faculty-select');
+            facultySelect.innerHTML = '<option value="">Оберіть факультет...</option>';
+            
+            if (!globalData || !globalData.faculties) return;
+
+            globalData.faculties.forEach((faculty, index) => {
+                const opt = document.createElement('option');
+                opt.value = index;
+                opt.textContent = faculty.name;
+                facultySelect.appendChild(opt);
+            });
+        }
+
+        function onFacultyChange() {
+            const facultyIndex = document.getElementById('faculty-select').value;
+            const courseSelect = document.getElementById('course-select');
+            const groupSelect = document.getElementById('group-select');
+
+            courseSelect.innerHTML = '<option value="">Оберіть курс...</option>';
+            groupSelect.innerHTML = '<option value="">Спочатку оберіть курс</option>';
+            courseSelect.disabled = true;
+            groupSelect.disabled = true;
+            document.getElementById('schedule-container').innerHTML = '<div class="empty-state">Оберіть курс та групу</div>';
+
+            if (facultyIndex === "") return;
+
+            const faculty = globalData.faculties[facultyIndex];
+            if (faculty && faculty.courses) {
+                faculty.courses.forEach((courseObj, index) => {
+                    const opt = document.createElement('option');
+                    opt.value = index;
+                    opt.textContent = `${courseObj.course} курс`;
+                    courseSelect.appendChild(opt);
+                });
+                courseSelect.disabled = false;
+            }
+        }
+
+        function onCourseChange() {
+            const facultyIndex = document.getElementById('faculty-select').value;
+            const courseIndex = document.getElementById('course-select').value;
+            const groupSelect = document.getElementById('group-select');
+
+            groupSelect.innerHTML = '<option value="">Оберіть групу...</option>';
+            groupSelect.disabled = true;
+            document.getElementById('schedule-container').innerHTML = '<div class="empty-state">Оберіть групу</div>';
+
+            if (courseIndex === "") return;
+
+            const courseObj = globalData.faculties[facultyIndex].courses[courseIndex];
+            if (courseObj && courseObj.groups) {
+                courseObj.groups.forEach((groupObj, index) => {
+                    const opt = document.createElement('option');
+                    opt.value = index;
+                    opt.textContent = groupObj.group_name;
+                    groupSelect.appendChild(opt);
+                });
+                groupSelect.disabled = false;
+            }
+        }
+
+        function loadSchedule() {
+            const facultyIndex = document.getElementById('faculty-select').value;
+            const courseIndex = document.getElementById('course-select').value;
+            const groupIndex = document.getElementById('group-select').value;
+            const container = document.getElementById('schedule-container');
+
+            if (groupIndex === "") return;
+
+            const groupObj = globalData.faculties[facultyIndex].courses[courseIndex].groups[groupIndex];
+            const schedule = groupObj.schedule;
+
+            if (!schedule || Object.keys(schedule).length === 0) {
+                container.innerHTML = '<div class="empty-state">На цей тиждень немає пар</div>';
+                return;
+            }
+
+            let html = '';
+            for (const [day, lessons] of Object.entries(schedule)) {
+                html += `<h3 style="margin: 16px 0 8px 4px; font-size: 15px; color: var(--accent-color);">${day}</h3>`;
+                
+                if (lessons.length === 0) {
+                    html += `<div class="schedule-card"><div class="lesson-details">Вихідний / Пар немає</div></div>`;
+                } else {
+                    lessons.forEach(l => {
+                        html += `
+                            <div class="schedule-card">
+                                <div class="lesson-time">${l.time}</div>
+                                <div class="lesson-title">${l.lesson}</div>
+                                <div class="lesson-details">${l.type} • ${l.room}</div>
+                            </div>
+                        `;
+                    });
+                }
+            }
+            container.innerHTML = html;
+        }
+
+        function switchTab(tabName, element) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-item').forEach(el => el.classList.remove('active'));
+
+            document.getElementById('tab-' + tabName).classList.add('active');
+            element.classList.add('active');
+        }
+
+        // Завантажуємо дані при запуску
+        fetchScheduleData();
+    </script>
+</body>
+</html>
