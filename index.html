@@ -1,1087 +1,127 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="uk">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0d6741">
-<meta name="color-scheme" content="light">
-<title>ВНАУ — Розклад</title>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-<style>
-:root {
-  color-scheme: light;
-  --bg:#edf4ee;
-  --bg2:#dce9df;
-  --surface:rgba(255,255,255,.70);
-  --surface2:rgba(255,255,255,.48);
-  --text:#17271d;
-  --muted:#718078;
-  --border:rgba(30,85,51,.13);
-  --green:#116b43;
-  --green2:#218653;
-  --green3:#cce9d5;
-  --gold:#d7ad4e;
-  --danger:#c14e4e;
-  --shadow:0 12px 36px rgba(22,68,40,.09);
-  --glass-blur:20px;
-}
-:root[data-theme="dark"] {
-  color-scheme:dark;
-  --bg:#080d0a;
-  --bg2:#101b14;
-  --surface:rgba(24,35,28,.76);
-  --surface2:rgba(31,45,36,.62);
-  --text:#f2f7f2;
-  --muted:#9caea1;
-  --border:rgba(226,255,232,.11);
-  --green:#238657;
-  --green2:#42b87a;
-  --green3:#244a34;
-  --gold:#e6c36e;
-  --danger:#ff8989;
-  --shadow:0 14px 38px rgba(0,0,0,.24);
-}
-* {box-sizing:border-box}
-html {scroll-behavior:smooth;scroll-padding-top:18px}
-body {
-  margin:0;
-  min-height:100vh;
-  padding-bottom:calc(92px + env(safe-area-inset-bottom));
-  background:var(--bg);
-  color:var(--text);
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;
-  transition:background .4s,color .35s;
-  -webkit-tap-highlight-color:transparent;
-}
-button,input,select {font:inherit}
-button {cursor:pointer}
-button:focus-visible,input:focus-visible,select:focus-visible {
-  outline:2px solid var(--gold);outline-offset:3px
-}
-button:disabled {opacity:.5;cursor:default}
-.app {max-width:680px;margin:auto;overflow:hidden;animation:appIn .9s cubic-bezier(.16,1,.3,1) both}
-@keyframes appIn {from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
-@keyframes rise {from{opacity:0;transform:translateY(18px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
-@keyframes fade {from{opacity:0}to{opacity:1}}
-@keyframes pop {0%{transform:scale(.75);opacity:0}75%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
-@keyframes float {0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
-@keyframes shimmer {0%{transform:translateX(-150%) rotate(20deg)}100%{transform:translateX(230%) rotate(20deg)}}
-@keyframes glow {0%,100%{box-shadow:0 0 0 0 rgba(215,173,78,.12)}50%{box-shadow:0 0 0 9px rgba(215,173,78,0)}}
-@keyframes orbit {to{transform:rotate(360deg)}}
-@keyframes slideIn {from{opacity:0;transform:translateX(15px)}to{opacity:1;transform:translateX(0)}}
-@keyframes shineText {0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
-@keyframes spin {to{transform:rotate(360deg)}}
-@keyframes dotPulse {0%,100%{opacity:1}50%{opacity:.35}}
-@keyframes ripple {to{transform:scale(2.8);opacity:0}}
-
-.glass {
-  background:var(--surface);
-  border:1px solid var(--border);
-  box-shadow:var(--shadow);
-  backdrop-filter:blur(var(--glass-blur));
-  -webkit-backdrop-filter:blur(var(--glass-blur));
-  transition:background .35s,border-color .35s,box-shadow .35s;
-}
-.hero {
-  position:relative;
-  isolation:isolate;
-  overflow:hidden;
-  padding:calc(22px + env(safe-area-inset-top)) 20px 27px;
-  color:#fff;
-  background:linear-gradient(140deg,#08442d 0%,#0c7045 56%,#1a9860 100%);
-  border-radius:0 0 31px 31px;
-}
-.hero::before,.hero::after {
-  content:"";position:absolute;z-index:-1;pointer-events:none;border-radius:50%;
-}
-.hero::before {
-  width:290px;height:290px;right:-115px;top:-115px;
-  background:radial-gradient(circle,rgba(225,190,100,.30),rgba(225,190,100,0) 70%);
-  animation:float 8s ease-in-out infinite;
-}
-.hero::after {
-  width:210px;height:210px;left:-125px;bottom:-125px;
-  background:radial-gradient(circle,rgba(144,238,177,.22),transparent 70%);
-}
-.hero-orbit {
-  position:absolute;width:180px;height:180px;right:-90px;top:45px;
-  border:1px solid rgba(255,255,255,.12);border-radius:50%;
-  animation:orbit 35s linear infinite;pointer-events:none;
-}
-.hero-orbit::after {
-  content:"";position:absolute;left:17px;top:22px;width:10px;height:10px;
-  border-radius:50%;background:var(--gold);box-shadow:0 0 20px var(--gold);
-}
-.topbar {display:flex;align-items:center;justify-content:space-between;gap:12px;position:relative;z-index:1}
-.brand {display:flex;align-items:center;gap:11px;min-width:0}
-.logo {
-  width:49px;height:49px;flex-shrink:0;display:grid;place-items:center;
-  border:1px solid rgba(255,255,255,.24);border-radius:17px;
-  background:rgba(255,255,255,.14);font-size:26px;
-  backdrop-filter:blur(12px);animation:pop .85s .1s both;
-}
-.brand-title {font-weight:900;font-size:16px;letter-spacing:-.4px}
-.brand-sub {font-size:10px;color:rgba(255,255,255,.7);margin-top:4px}
-.theme-switch {display:flex;gap:3px;padding:4px;border-radius:14px;background:rgba(0,0,0,.17);border:1px solid rgba(255,255,255,.13)}
-.theme-btn {
-  width:34px;height:34px;border:0;border-radius:10px;
-  background:transparent;color:white;font-size:17px;transition:transform .25s,background .25s;
-}
-.theme-btn.active {background:rgba(255,255,255,.23);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}
-.hero-main {margin-top:27px;position:relative;z-index:1;animation:rise .8s .12s both}
-.eyebrow {font-size:10px;letter-spacing:2.1px;text-transform:uppercase;color:#f0d58b;font-weight:850}
-h1 {margin:10px 0 9px;font-size:clamp(31px,8vw,43px);line-height:1.04;letter-spacing:-1.5px;font-weight:950}
-.gradient-text {
-  background:linear-gradient(100deg,#fff 10%,#f1d991 45%,#fff 75%);
-  background-size:200% auto;background-clip:text;-webkit-background-clip:text;color:transparent;
-  animation:shineText 7s ease infinite;
-}
-.hero-description {margin:0;color:rgba(255,255,255,.76);font-size:13px;line-height:1.55;max-width:310px}
-.hero-bottom {display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:22px}
-.date-pill {display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:13px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.15);font-size:11px;font-weight:750}
-.live-dot {width:7px;height:7px;border-radius:50%;background:#a5f3bd;box-shadow:0 0 0 4px rgba(165,243,189,.12);animation:dotPulse 2.4s infinite}
-.hero-symbol {font-size:31px;animation:float 4s ease-in-out infinite}
-
-.content {padding:16px 15px 0}
-.section-head {display:flex;align-items:center;justify-content:space-between;gap:10px;margin:22px 2px 12px}
-.section-title {font-size:17px;font-weight:900;letter-spacing:-.4px}
-.section-caption {font-size:11px;color:var(--muted);line-height:1.5;margin-top:4px}
-.mini-tag {font-size:10px;color:var(--green2);background:var(--surface2);border:1px solid var(--border);padding:7px 9px;border-radius:10px;font-weight:850;white-space:nowrap}
-.panel {padding:15px;border-radius:22px;animation:rise .65s both}
-.field-label {display:block;margin:0 0 8px 2px;font-size:10px;letter-spacing:.8px;font-weight:850;color:var(--muted)}
-.select,.search-input {
-  width:100%;min-height:47px;border-radius:14px;padding:0 13px;
-  background:var(--surface2);border:1px solid var(--border);color:var(--text);outline:none;
-  transition:border-color .25s,box-shadow .25s,background .3s;
-}
-.select:focus,.search-input:focus {border-color:var(--green2);box-shadow:0 0 0 3px rgba(33,134,83,.13)}
-.group-row {display:flex;align-items:center;gap:11px;margin-top:12px;padding:12px;border-radius:16px;background:var(--surface2);border:1px solid var(--border)}
-.group-icon {width:42px;height:42px;display:grid;place-items:center;flex-shrink:0;border-radius:14px;background:linear-gradient(145deg,var(--green),var(--green2));color:white;font-size:20px;animation:glow 4s infinite}
-.group-copy {flex:1;min-width:0}
-.group-name {font-size:14px;font-weight:900;overflow-wrap:anywhere}
-.group-faculty {font-size:10px;color:var(--muted);margin-top:4px}
-.icon-btn {width:39px;height:39px;flex-shrink:0;display:grid;place-items:center;border-radius:13px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:18px;transition:transform .2s,color .2s}
-.icon-btn:active,.action-btn:active,.day-btn:active,.nav-item:active {transform:scale(.94)}
-.icon-btn.favorite {color:var(--gold);animation:pop .25s}
-
-.next-card {
-  position:relative;overflow:hidden;margin-top:15px;padding:17px;border-radius:23px;
-  background:linear-gradient(135deg,rgba(16,103,63,.96),rgba(28,143,83,.91));
-  border:1px solid rgba(255,255,255,.18);color:white;
-  box-shadow:0 13px 32px rgba(16,103,63,.18);animation:rise .7s .08s both;
-}
-.next-card::after {
-  content:"";position:absolute;top:-70%;left:-30%;width:35%;height:250%;
-  background:rgba(255,255,255,.08);transform:rotate(20deg);animation:shimmer 8s ease-in-out infinite;
-  pointer-events:none;
-}
-.next-top {display:flex;align-items:center;justify-content:space-between;gap:10px;position:relative;z-index:1}
-.next-label {font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:#d5f3df;font-weight:850}
-.next-status {font-size:10px;font-weight:850;padding:6px 8px;border-radius:9px;background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.15)}
-.next-subject {font-size:19px;font-weight:900;line-height:1.25;margin-top:13px;overflow-wrap:anywhere;position:relative;z-index:1}
-.next-meta {display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;position:relative;z-index:1}
-.next-chip {font-size:10px;padding:7px 9px;border-radius:10px;background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.12)}
-.countdown-row {display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:17px;padding-top:14px;border-top:1px solid rgba(255,255,255,.19);position:relative;z-index:1}
-.countdown-caption {font-size:10px;color:rgba(255,255,255,.75)}
-.countdown {font-size:21px;font-weight:950;letter-spacing:1px;font-variant-numeric:tabular-nums}
-.next-small {font-size:10px;color:rgba(255,255,255,.73);text-align:right;line-height:1.5}
-.next-empty {font-size:12px;line-height:1.6;color:rgba(255,255,255,.82);margin-top:11px}
-
-.tools-grid {display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
-.tool-tile {display:flex;align-items:center;gap:10px;min-width:0;padding:12px;border-radius:16px;background:var(--surface2);border:1px solid var(--border);color:var(--text);text-align:left;transition:transform .22s,border-color .22s,background .3s}
-.tool-tile:active {transform:scale(.97)}
-.tool-icon {width:35px;height:35px;display:grid;place-items:center;flex-shrink:0;border-radius:12px;background:var(--surface);font-size:17px}
-.tool-title {font-size:11px;font-weight:850}
-.tool-sub {font-size:9px;color:var(--muted);margin-top:4px;line-height:1.4}
-
-.search-wrap {position:relative}
-.search-wrap .search-input {padding-right:42px}
-.search-clear {position:absolute;right:7px;top:7px;width:33px;height:33px;border:0;border-radius:10px;background:transparent;color:var(--muted);font-size:18px}
-.search-hint {font-size:10px;color:var(--muted);margin:9px 2px 0;line-height:1.5}
-.search-results {display:grid;gap:9px;margin-top:12px}
-.result-card {padding:12px;border-radius:15px;background:var(--surface2);border:1px solid var(--border);animation:slideIn .3s both}
-.result-title {font-size:12px;font-weight:850;line-height:1.4}
-.result-meta {font-size:10px;color:var(--muted);margin-top:5px;line-height:1.5}
-.result-open {margin-top:9px;padding:8px 10px;border-radius:10px;border:0;background:var(--green);color:white;font-size:10px;font-weight:850}
-
-.week-bar {display:flex;align-items:center;justify-content:space-between;gap:8px;margin:22px 1px 12px}
-.week-button {width:38px;height:38px;border-radius:13px;background:var(--surface);border:1px solid var(--border);color:var(--text);font-size:21px;box-shadow:var(--shadow);transition:transform .2s}
-.week-center {text-align:center}
-.week-label {font-size:12px;font-weight:900}
-.week-sub {font-size:10px;color:var(--muted);margin-top:4px}
-.days {display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
-.day-btn {min-width:0;padding:10px 0 9px;border-radius:14px;border:1px solid transparent;background:transparent;color:var(--muted);transition:transform .22s,background .25s,color .25s}
-.day-short {display:block;font-size:9px;font-weight:850}
-.day-number {display:block;font-size:15px;font-weight:900;margin-top:7px}
-.day-btn.active {background:var(--green);color:#fff;box-shadow:0 7px 18px rgba(17,107,67,.2);animation:pop .24s}
-.day-btn.today:not(.active) {border-color:var(--gold);color:var(--green2)}
-.day-btn.has-classes:not(.active)::after {content:"";display:block;width:4px;height:4px;margin:5px auto -9px;border-radius:50%;background:var(--gold)}
-
-.schedule-head {display:flex;align-items:center;justify-content:space-between;gap:10px;margin:24px 2px 12px}
-.count {padding:7px 10px;border-radius:10px;background:var(--surface2);color:var(--green2);font-size:10px;font-weight:900;white-space:nowrap}
-.lessons {display:grid;gap:10px}
-.lesson {
-  display:grid;grid-template-columns:56px minmax(0,1fr);gap:11px;
-  position:relative;overflow:hidden;padding:14px 12px;
-  border-radius:19px;animation:rise .4s both;
-}
-.lesson::before {content:"";position:absolute;left:0;top:13px;bottom:13px;width:3px;border-radius:0 4px 4px 0;background:var(--green2)}
-.lesson:nth-child(even)::before {background:var(--gold)}
-.lesson.next-lesson {border-color:var(--gold);box-shadow:0 0 0 1px rgba(215,173,78,.13),var(--shadow)}
-.lesson-time {text-align:center;padding-top:3px}
-.lesson-number {width:28px;height:28px;margin:0 auto 8px;display:grid;place-items:center;border-radius:10px;background:var(--surface2);color:var(--green2);font-size:11px;font-weight:950}
-.time {font-size:10px;font-weight:850;line-height:1.6;white-space:nowrap}
-.lesson-main {min-width:0}
-.lesson-type {display:inline-block;padding:5px 8px;border-radius:7px;background:var(--surface2);color:var(--green2);font-size:9px;font-weight:900;margin-bottom:7px}
-.lesson-title {font-size:13px;font-weight:900;line-height:1.45;overflow-wrap:anywhere}
-.lesson-detail {display:flex;align-items:flex-start;gap:7px;margin-top:8px;color:var(--muted);font-size:10px;line-height:1.5;overflow-wrap:anywhere}
-.lesson-detail span:first-child {flex-shrink:0}
-.empty {padding:28px 18px;text-align:center;border-radius:21px;animation:rise .4s both}
-.empty-icon {font-size:37px;animation:float 4s ease-in-out infinite}
-.empty-title {font-size:14px;font-weight:900;margin-top:11px}
-.empty-text {max-width:285px;margin:8px auto 0;font-size:11px;color:var(--muted);line-height:1.65}
-.spinner {display:inline-block;width:15px;height:15px;border:2px solid var(--border);border-top-color:var(--green2);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle}
-
-.calendar-panel {padding:13px;border-radius:21px}
-.calendar-head {display:flex;align-items:center;justify-content:space-between;gap:10px;padding:4px 2px 13px}
-.calendar-month {font-size:14px;font-weight:900}
-.calendar-grid {display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
-.cal-weekday {text-align:center;color:var(--muted);font-size:9px;font-weight:900;padding:8px 0}
-.cal-day {position:relative;min-height:40px;border-radius:11px;border:1px solid transparent;background:transparent;color:var(--text);font-size:11px;font-weight:750;transition:background .2s,transform .2s}
-.cal-day.outside {opacity:.32}
-.cal-day.today {border-color:var(--gold)}
-.cal-day.selected {background:var(--green);color:white;box-shadow:0 4px 12px rgba(17,107,67,.2);animation:pop .2s}
-.cal-day.has-classes:not(.selected)::after {content:"";position:absolute;bottom:4px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--gold)}
-.calendar-note {font-size:10px;color:var(--muted);margin:12px 3px 2px;line-height:1.5}
-
-.action-row {display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:22px}
-.action-btn {min-height:46px;border-radius:14px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:11px;font-weight:850;transition:transform .2s,background .3s}
-.action-btn.primary {background:var(--green);color:white;border-color:transparent}
-.footer {padding:23px 8px 8px;text-align:center;color:var(--muted);font-size:10px;line-height:1.9}
-.footer strong {color:var(--text)}
-.bottom-nav {
-  position:fixed;z-index:20;bottom:0;left:0;right:0;
-  padding:8px 12px calc(8px + env(safe-area-inset-bottom));
-  background:var(--surface);border-top:1px solid var(--border);
-  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
-  transition:background .35s;
-}
-.nav-inner {display:grid;grid-template-columns:repeat(4,1fr);gap:5px;max-width:620px;margin:auto}
-.nav-item {display:grid;place-items:center;gap:4px;padding:6px 2px;border:0;border-radius:13px;background:transparent;color:var(--muted);font-size:9px;font-weight:800;transition:transform .2s,color .2s,background .2s}
-.nav-item.active {color:var(--green2);background:var(--surface2)}
-.nav-icon {font-size:18px}
-.toast {
-  position:fixed;z-index:40;bottom:calc(91px + env(safe-area-inset-bottom));left:50%;
-  width:max-content;max-width:calc(100% - 30px);padding:12px 15px;border-radius:14px;
-  background:var(--text);color:var(--bg);font-size:11px;font-weight:800;text-align:center;
-  opacity:0;pointer-events:none;transform:translate(-50%,12px);
-  transition:opacity .25s,transform .25s;box-shadow:var(--shadow)
-}
-.toast.show {opacity:1;transform:translate(-50%,0)}
-.error {font-size:11px;color:var(--danger);line-height:1.5;margin-top:10px}
-[hidden] {display:none!important}
-@media(min-width:520px) {
-  .hero {border-radius:0 0 35px 35px;padding-left:25px;padding-right:25px}
-  .content {padding-left:22px;padding-right:22px}
-  .days {gap:8px}
-  .day-btn {padding-top:12px;padding-bottom:11px}
-  .lesson {grid-template-columns:64px minmax(0,1fr);padding:16px}
-}
-@media(prefers-reduced-motion:reduce) {
-  *,*::before,*::after {animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
-}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#07110e">
+  <meta name="description" content="Зручний розклад занять ВНАУ">
+  <title>VNAU • Розклад</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
-
 <body>
-<div class="app">
-  <header class="hero" id="top">
-    <div class="hero-orbit"></div>
-    <div class="topbar">
-      <div class="brand">
-        <div class="logo">🎓</div>
-        <div>
-          <div class="brand-title">ВНАУ · Розклад</div>
-          <div class="brand-sub">Твій навчальний простір</div>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="На головну">
+        <span class="brand-mark">V</span>
+        <span><strong>VNAU</strong><small>STUDENT SPACE</small></span>
+      </a>
+      <div class="top-actions">
+        <span id="connectionPill" class="status-pill"><i></i> Перевірка…</span>
+        <button id="themeToggle" class="icon-button" aria-label="Змінити тему" title="Змінити тему">☼</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero glass">
+        <div class="hero-orb orb-one"></div><div class="hero-orb orb-two"></div>
+        <p class="eyebrow">ТВІЙ НАВЧАЛЬНИЙ ПРОСТІР</p>
+        <h1>Твій день.<br><span>Твій темп.</span></h1>
+        <p class="hero-copy">Розклад, наступна пара та важливе — в одному місці.</p>
+        <div class="hero-meta">
+          <span class="live-dot"></span><span id="todayLabel">Сьогодні</span>
+          <span class="meta-separator">•</span><span id="selectedGroupLabel">ЕІ 23-1</span>
         </div>
-      </div>
-      <div class="theme-switch">
-        <button class="theme-btn active" id="lightTheme" aria-label="Світла тема">☀️</button>
-        <button class="theme-btn" id="darkTheme" aria-label="Темна тема">🌙</button>
-      </div>
-    </div>
-    <div class="hero-main">
-      <div class="eyebrow">Твій ритм навчання</div>
-      <h1><span class="gradient-text">Навчайся.</span><br>Плануй. Встигай.</h1>
-      <p class="hero-description">Усі пари, викладачі та аудиторії — у твоєму телефоні.</p>
-      <div class="hero-bottom">
-        <div class="date-pill"><span class="live-dot"></span><span id="todayLabel">Завантаження дати…</span></div>
-        <div class="hero-symbol">📚</div>
-      </div>
-    </div>
-  </header>
+      </section>
 
-  <main class="content">
-    <section id="groupSection">
-      <div class="section-head">
-        <div><div class="section-title">Моя група</div><div class="section-caption">Твій персональний розклад</div></div>
-        <span class="mini-tag">ВНАУ</span>
-      </div>
-      <div class="panel glass">
-        <label class="field-label" for="groupSelect">НАВЧАЛЬНА ГРУПА</label>
-        <select class="select" id="groupSelect"><option value="ЕІ 23-1">ЕІ 23-1</option></select>
-        <div class="group-row">
-          <div class="group-icon">🎓</div>
-          <div class="group-copy">
-            <div class="group-name" id="selectedGroup">ЕІ 23-1</div>
-            <div class="group-faculty" id="selectedFaculty">Технологічний факультет · ВНАУ</div>
-          </div>
-          <button class="icon-btn" id="favoriteBtn" title="Зберегти улюблену групу" aria-label="Зберегти улюблену групу">☆</button>
+      <section class="section-heading">
+        <div><p class="eyebrow">ПЕРСОНАЛІЗАЦІЯ</p><h2>Моя група</h2></div>
+        <span class="section-icon">⌘</span>
+      </section>
+      <section class="glass selector-card">
+        <label>Факультет
+          <select id="facultySelect">
+            <option value="Технологічний факультет">Технологічний факультет</option>
+            <option value="Факультет агрономії та лісівництва">Факультет агрономії та лісівництва</option>
+            <option value="Факультет економіки та підприємництва">Факультет економіки та підприємництва</option>
+            <option value="Інший факультет">Інший факультет</option>
+          </select>
+        </label>
+        <div class="select-row">
+          <label>Курс
+            <select id="courseSelect">
+              <option value="">Не вказано</option>
+              <option value="1">1 курс</option><option value="2">2 курс</option>
+              <option value="3">3 курс</option><option value="4">4 курс</option>
+              <option value="5">5 курс</option><option value="6">6 курс</option>
+            </select>
+          </label>
+          <label>Група
+            <input id="groupInput" type="text" value="ЕІ 23-1" maxlength="40" autocomplete="off" placeholder="Напр. ЕІ 23-1">
+          </label>
         </div>
-        <div class="error" id="loadError" hidden></div>
-      </div>
-    </section>
+        <button id="applyGroup" class="button button-primary button-full">Застосувати групу <span>↗</span></button>
+      </section>
 
-    <section id="nextSection">
-      <div class="section-head">
-        <div><div class="section-title">Що далі?</div><div class="section-caption">Твоя наступна пара</div></div>
-        <span class="mini-tag">LIVE</span>
-      </div>
-      <div class="next-card" id="nextCard">
-        <div class="next-top"><span class="next-label">Наступне заняття</span><span class="next-status" id="nextStatus">Планування</span></div>
-        <div class="next-subject" id="nextSubject">Завантажуємо розклад…</div>
-        <div class="next-meta" id="nextMeta"></div>
-        <div class="countdown-row">
-          <div><div class="countdown-caption" id="countdownCaption">До початку пари</div><div class="countdown" id="countdown">--:--:--</div></div>
-          <div class="next-small" id="nextSmall">ВНАУ<br>Твій навчальний день</div>
+      <section class="section-heading">
+        <div><p class="eyebrow">ПРЯМО ЗАРАЗ</p><h2>Найближча пара</h2></div>
+        <span class="section-icon">◷</span>
+      </section>
+      <section id="nextLessonCard" class="glass next-card">
+        <div class="next-card-top"><span class="mini-tag"><span class="live-dot"></span> НАСТУПНА ПОДІЯ</span><span id="nextDate" class="muted">—</span></div>
+        <h3 id="nextSubject">Розклад ще не додано</h3>
+        <p id="nextDetails" class="muted">Імпортуй файл schedule.json з актуальними заняттями.</p>
+        <div class="countdown-wrap">
+          <div><strong id="countDays">--</strong><small>днів</small></div>
+          <div><strong id="countHours">--</strong><small>годин</small></div>
+          <div><strong id="countMinutes">--</strong><small>хвилин</small></div>
+          <div><strong id="countSeconds">--</strong><small>секунд</small></div>
         </div>
-      </div>
-    </section>
+        <div class="next-card-bottom"><span id="nextRoom">Аудиторія —</span><span id="nextType" class="muted">Очікуємо дані</span></div>
+      </section>
 
-    <section id="toolsSection">
-      <div class="tools-grid">
-        <button class="tool-tile" id="goSearch"><span class="tool-icon">⌕</span><span><div class="tool-title">Пошук</div><div class="tool-sub">Предмети та викладачі</div></span></button>
-        <button class="tool-tile" id="goCalendar"><span class="tool-icon">▦</span><span><div class="tool-title">Календар</div><div class="tool-sub">Вибір дати занять</div></span></button>
-      </div>
-    </section>
-
-    <section id="searchSection">
-      <div class="section-head">
-        <div><div class="section-title">Знайти заняття</div><div class="section-caption">Пошук за предметом, викладачем або аудиторією</div></div>
-      </div>
-      <div class="panel glass">
-        <div class="search-wrap">
-          <input class="search-input" id="searchInput" type="search" placeholder="Наприклад, електротехніка…" autocomplete="off">
-          <button class="search-clear" id="clearSearch" aria-label="Очистити пошук" hidden>×</button>
+      <section class="section-heading schedule-heading">
+        <div><p class="eyebrow">ТВІЙ НАВЧАЛЬНИЙ ТИЖДЕНЬ</p><h2>Розклад</h2></div>
+        <button id="refreshButton" class="small-button">↻ Оновити</button>
+      </section>
+      <section class="glass schedule-card">
+        <div class="search-box"><span>⌕</span><input id="searchInput" type="search" placeholder="Пошук предмета, викладача, аудиторії…" aria-label="Пошук розкладу"></div>
+        <div class="filter-row">
+          <label class="date-filter">Дата <input id="dateFilter" type="date"></label>
+          <button id="clearDate" class="text-button">Увесь розклад</button>
         </div>
-        <div class="search-hint" id="searchHint">Пошук по всіх заняттях вибраної групи.</div>
-        <div class="search-results" id="searchResults" hidden></div>
-      </div>
-    </section>
-
-    <section id="scheduleSection">
-      <div class="week-bar">
-        <button class="week-button" id="prevWeek" aria-label="Попередній тиждень">‹</button>
-        <div class="week-center"><div class="week-label" id="weekLabel">Поточний тиждень</div><div class="week-sub" id="weekSub">Обери день</div></div>
-        <button class="week-button" id="nextWeek" aria-label="Наступний тиждень">›</button>
-      </div>
-      <div class="days" id="days"></div>
-      <div class="schedule-head">
-        <div><div class="section-title" id="scheduleDayTitle">Розклад на день</div><div class="section-caption" id="scheduleDate">Твої заняття</div></div>
-        <div class="count" id="lessonCount">0 пар</div>
-      </div>
-      <div class="lessons" id="lessons"><div class="empty glass"><div class="empty-icon">📖</div><div class="empty-title">Завантажуємо розклад</div><div class="empty-text"><span class="spinner"></span> Зачекай кілька секунд…</div></div></div>
-    </section>
-
-    <section id="calendarSection">
-      <div class="section-head">
-        <div><div class="section-title">Календар занять</div><div class="section-caption">Натисни дату, щоб побачити розклад</div></div>
-      </div>
-      <div class="calendar-panel glass">
-        <div class="calendar-head">
-          <button class="week-button" id="prevMonth" aria-label="Попередній місяць">‹</button>
-          <div class="calendar-month" id="calendarMonth">Місяць</div>
-          <button class="week-button" id="nextMonth" aria-label="Наступний місяць">›</button>
+        <div id="scheduleList" class="schedule-list">
+          <div class="empty-state"><span class="empty-icon">▦</span><strong>Поки немає занять</strong><p>Додай актуальні дані через JSON-файл. Ми не підставляємо вигаданий розклад.</p></div>
         </div>
-        <div class="calendar-grid" id="calendarGrid"></div>
-        <div class="calendar-note">Золоті точки позначають дати, для яких у файлі розкладу є заняття. Повторювані дні тижня відображаються за структурою schedule.json.</div>
-      </div>
-    </section>
+        <div class="import-area">
+          <label class="button button-secondary button-full import-button">Імпортувати JSON <span>＋</span>
+            <input id="importFile" type="file" accept=".json,application/json" hidden>
+          </label>
+          <p>Імпорт замінює розклад на цьому пристрої. Для публікації всім користувачам онови файл <code>schedule.json</code> у GitHub.</p>
+        </div>
+      </section>
 
-    <div class="action-row">
-      <button class="action-btn primary" id="refreshBtn">↻ Оновити розклад</button>
-      <button class="action-btn" id="shareBtn">↗ Поділитися</button>
-    </div>
+      <section class="section-heading">
+        <div><p class="eyebrow">ПЕРЕВІРКА ДАНИХ</p><h2>Центр надійності</h2></div>
+        <span class="section-icon">◈</span>
+      </section>
+      <section class="glass reliability-card">
+        <div class="reliability-row"><span class="reliability-icon">◎</span><div><strong>Статус розкладу</strong><small id="dataStatus">Очікує завантаження</small></div><span id="dataStatusBadge" class="tag tag-warning">Немає даних</span></div>
+        <div class="reliability-row"><span class="reliability-icon">↻</span><div><strong>Остання перевірка</strong><small id="lastChecked">Ще не перевіряли</small></div></div>
+        <div class="reliability-row"><span class="reliability-icon">▤</span><div><strong>Джерело даних</strong><small id="dataSource">schedule.json • локальний файл проєкту</small></div></div>
+        <div class="reliability-row"><span class="reliability-icon">◉</span><div><strong>Збережена копія</strong><small id="cacheStatus">Кеш ще не створено</small></div></div>
+        <div class="reliability-note"><strong>Зверни увагу</strong><p>Якщо дані старі або відсутні, перевір офіційне джерело розкладу. Кеш допомагає переглядати вже завантажений розклад офлайн, але не підтверджує його актуальність.</p></div>
+      </section>
+    </main>
 
-    <footer class="footer"><strong>ВНАУ · Розклад</strong><br>Навчання в одному місці<br><span id="updatedLabel">Очікуємо дані…</span></footer>
-  </main>
-</div>
-
-<nav class="bottom-nav">
-  <div class="nav-inner">
-    <button class="nav-item active" data-target="top"><span class="nav-icon">⌂</span><span>Головна</span></button>
-    <button class="nav-item" data-target="groupSection"><span class="nav-icon">🎓</span><span>Моя група</span></button>
-    <button class="nav-item" data-target="scheduleSection"><span class="nav-icon">▦</span><span>Розклад</span></button>
-    <button class="nav-item" data-target="calendarSection"><span class="nav-icon">◷</span><span>Календар</span></button>
+    <footer class="footer"><span class="brand-mark small-mark">V</span><span>VNAU Student Space</span><span id="appVersion">v0.1.0</span></footer>
+    <nav class="bottom-nav" aria-label="Основна навігація">
+      <a href="#top" class="nav-item active" data-nav="home"><span>⌂</span><small>Головна</small></a>
+      <a href="#scheduleList" class="nav-item" data-nav="schedule"><span>▦</span><small>Розклад</small></a>
+      <a href="#reliability-card" class="nav-item" data-nav="status"><span>◈</span><small>Надійність</small></a>
+    </nav>
   </div>
-</nav>
-<div class="toast" id="toast" role="status"></div>
-
-<script>
-(() => {
-  "use strict";
-
-  const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
-  if (tg) {
-    tg.ready();
-    tg.expand();
-    try { tg.setHeaderColor("#0d6741"); tg.setBackgroundColor("#edf4ee"); } catch (_) {}
-  }
-
-  const $ = id => document.getElementById(id);
-  const DAYS = [
-    {name:"Понеділок",short:"ПН"},
-    {name:"Вівторок",short:"ВТ"},
-    {name:"Середа",short:"СР"},
-    {name:"Четвер",short:"ЧТ"},
-    {name:"П’ятниця",short:"ПТ"},
-    {name:"Субота",short:"СБ"},
-    {name:"Неділя",short:"НД"}
-  ];
-  const DAY_ALIASES = {
-    "понеділок":0,"понеділка":0,"пн":0,
-    "вівторок":1,"вівторка":1,"вт":1,
-    "середа":2,"середи":2,"ср":2,
-    "четвер":3,"четверга":3,"чт":3,
-    "п’ятниця":4,"п'ятниця":4,"пятниця":4,"пт":4,
-    "субота":5,"суботи":5,"сб":5,
-    "неділя":6,"неділі":6,"нд":6
-  };
-
-  let data = {groups:{}};
-  let weekOffset = 0;
-  let selectedDay = (new Date().getDay()+6)%7;
-  let selectedDate = new Date();
-  selectedDate.setHours(12,0,0,0);
-  let calendarMonth = new Date(selectedDate.getFullYear(),selectedDate.getMonth(),1,12);
-  let toastTimer = null;
-  let clockTimer = null;
-  let currentTheme = "light";
-  let nextLessonKey = "";
-
-  function safeGet(key) {
-    try { return localStorage.getItem(key); } catch (_) { return null; }
-  }
-  function safeSet(key,value) {
-    try { localStorage.setItem(key,value); } catch (_) {}
-  }
-  function fmtDate(date,options={day:"numeric",month:"long"}) {
-    return new Intl.DateTimeFormat("uk-UA",options).format(date);
-  }
-  function dateKey(date) {
-    return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`;
-  }
-  function mondayOf(date) {
-    const d = new Date(date);
-    d.setHours(12,0,0,0);
-    d.setDate(d.getDate()-((d.getDay()+6)%7));
-    return d;
-  }
-  function dateForDay(index) {
-    const d = mondayOf(new Date());
-    d.setDate(d.getDate()+weekOffset*7+index);
-    return d;
-  }
-  function showToast(message) {
-    const el = $("toast");
-    el.textContent = message;
-    el.classList.add("show");
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(()=>el.classList.remove("show"),2500);
-  }
-  function setTheme(theme,notify=false) {
-    currentTheme = theme === "dark" ? "dark" : "light";
-    document.documentElement.dataset.theme = currentTheme;
-    $("lightTheme").classList.toggle("active",currentTheme==="light");
-    $("darkTheme").classList.toggle("active",currentTheme==="dark");
-    const color = currentTheme==="dark" ? "#080d0a" : "#0d6741";
-    const bg = currentTheme==="dark" ? "#080d0a" : "#edf4ee";
-    document.querySelector('meta[name="theme-color"]').content = color;
-    safeSet("vnau-theme",currentTheme);
-    if (tg) {
-      try { tg.setHeaderColor(color); tg.setBackgroundColor(bg); } catch (_) {}
-    }
-    if (notify) showToast(currentTheme==="dark" ? "🌙 Темну тему ввімкнено" : "☀️ Світлу тему ввімкнено");
-  }
-  $("lightTheme").addEventListener("click",()=>setTheme("light",true));
-  $("darkTheme").addEventListener("click",()=>setTheme("dark",true));
-  setTheme(safeGet("vnau-theme") || "light");
-
-  function selectedGroupName() { return $("groupSelect").value; }
-  function selectedGroup() { return (data.groups || {})[selectedGroupName()] || null; }
-  function groupSchedule(group=selectedGroup()) { return group && group.schedule && typeof group.schedule==="object" ? group.schedule : {}; }
-
-  function normalizedDay(key) {
-    const lower = String(key).toLocaleLowerCase("uk-UA").trim();
-    if (DAY_ALIASES[lower] !== undefined) return DAY_ALIASES[lower];
-    const cleaned = lower.replace(/['’`]/g,"");
-    return DAY_ALIASES[cleaned] !== undefined ? DAY_ALIASES[cleaned] : -1;
-  }
-
-  function lessonsForDate(date,group=selectedGroup()) {
-    if (!group) return [];
-    const schedule = groupSchedule(group);
-    const exact = schedule[dateKey(date)];
-    if (Array.isArray(exact)) return exact;
-
-    const wanted = (date.getDay()+6)%7;
-    for (const [key,value] of Object.entries(schedule)) {
-      if (Array.isArray(value) && normalizedDay(key)===wanted) return value;
-    }
-    return [];
-  }
-
-  function parseStartTime(lesson) {
-    const text = String(lesson.time || "");
-    const match = text.match(/(\d{1,2})[:.](\d{2})/);
-    if (!match) return null;
-    const h = Number(match[1]), m = Number(match[2]);
-    if (h>23 || m>59) return null;
-    return {h,m};
-  }
-
-  function parseEndTime(lesson) {
-    const text = String(lesson.time || "");
-    const matches = [...text.matchAll(/(\d{1,2})[:.](\d{2})/g)];
-    if (matches.length<2) return null;
-    const last = matches[matches.length-1];
-    const h = Number(last[1]), m = Number(last[2]);
-    if (h>23 || m>59) return null;
-    return {h,m};
-  }
-
-  function lessonDateTime(date,lesson,end=false) {
-    const t = end ? parseEndTime(lesson) : parseStartTime(lesson);
-    if (!t) return null;
-    const d = new Date(date);
-    d.setHours(t.h,t.m,0,0);
-    return d;
-  }
-
-  function sortedLessons(date) {
-    return lessonsForDate(date).map((lesson,index)=>({lesson,index}))
-      .sort((a,b)=>{
-        const ta = parseStartTime(a.lesson), tb = parseStartTime(b.lesson);
-        if (!ta && !tb) return Number(a.lesson.number||a.index)-Number(b.lesson.number||b.index);
-        if (!ta) return 1;
-        if (!tb) return -1;
-        return (ta.h*60+ta.m)-(tb.h*60+tb.m);
-      });
-  }
-
-  function renderGroupOptions() {
-    const select = $("groupSelect");
-    const old = safeGet("vnau-group") || select.value;
-    const names = Object.keys(data.groups || {});
-    select.innerHTML = "";
-
-    if (!names.length) {
-      const opt = document.createElement("option");
-      opt.value = "";
-      opt.textContent = "Немає груп у файлі";
-      select.appendChild(opt);
-      updateGroupInfo();
-      return;
-    }
-
-    names.forEach(name=>{
-      const opt = document.createElement("option");
-      opt.value = name;
-      opt.textContent = name;
-      select.appendChild(opt);
-    });
-
-    select.value = names.includes(old) ? old : names.includes("ЕІ 23-1") ? "ЕІ 23-1" : names[0];
-    safeSet("vnau-group",select.value);
-    updateGroupInfo();
-  }
-
-  function updateGroupInfo() {
-    const group = selectedGroup();
-    const name = selectedGroupName();
-    $("selectedGroup").textContent = name || "Групу не вибрано";
-    $("selectedFaculty").textContent = `${group?.faculty || "Факультет ВНАУ"} · ВНАУ`;
-    const favorite = safeGet("vnau-favorite");
-    const isFavorite = !!name && name===favorite;
-    $("favoriteBtn").textContent = isFavorite ? "★" : "☆";
-    $("favoriteBtn").classList.toggle("favorite",isFavorite);
-    $("favoriteBtn").setAttribute("aria-pressed",String(isFavorite));
-    renderDays();
-    renderLessons();
-    renderCalendar();
-    renderSearch();
-    updateNextCard();
-  }
-
-  $("groupSelect").addEventListener("change",()=>{
-    safeSet("vnau-group",selectedGroupName());
-    updateGroupInfo();
-    showToast("Групу змінено");
-  });
-
-  $("favoriteBtn").addEventListener("click",()=>{
-    const name = selectedGroupName();
-    if (!name) return;
-    if (safeGet("vnau-favorite")===name) {
-      safeSet("vnau-favorite","");
-      showToast("Групу прибрано з улюблених");
-    } else {
-      safeSet("vnau-favorite",name);
-      safeSet("vnau-group",name);
-      showToast("★ Улюблену групу збережено");
-    }
-    updateGroupInfo();
-  });
-
-  function renderDays() {
-    const start = mondayOf(dateForDay(0));
-    const end = new Date(start);
-    end.setDate(end.getDate()+6);
-    $("weekLabel").textContent = weekOffset===0 ? "Поточний тиждень" :
-      weekOffset===1 ? "Наступний тиждень" :
-      weekOffset===-1 ? "Минулий тиждень" :
-      `${weekOffset>0?"+":""}${weekOffset} тиж.`;
-    $("weekSub").textContent = `${fmtDate(start,{day:"numeric",month:"short"})} – ${fmtDate(end,{day:"numeric",month:"short"})}`;
-
-    const container = $("days");
-    container.innerHTML = "";
-    DAYS.forEach((day,index)=>{
-      const date = dateForDay(index);
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "day-btn";
-      if (dateKey(date)===dateKey(selectedDate)) btn.classList.add("active");
-      if (dateKey(date)===dateKey(new Date())) btn.classList.add("today");
-      if (lessonsForDate(date).length) btn.classList.add("has-classes");
-      const short = document.createElement("span");
-      short.className = "day-short";
-      short.textContent = day.short;
-      const number = document.createElement("span");
-      number.className = "day-number";
-      number.textContent = date.getDate();
-      btn.append(short,number);
-      btn.addEventListener("click",()=>{
-        selectedDay = index;
-        selectedDate = dateForDay(index);
-        renderDays();
-        renderLessons();
-        renderCalendar();
-        updateNextCard();
-      });
-      container.appendChild(btn);
-    });
-  }
-
-  function makeDetail(icon,value) {
-    if (!value) return null;
-    const row = document.createElement("div");
-    row.className = "lesson-detail";
-    const ico = document.createElement("span");
-    ico.textContent = icon;
-    const txt = document.createElement("span");
-    txt.textContent = value;
-    row.append(ico,txt);
-    return row;
-  }
-
-  function renderLessons() {
-    const dayIndex = (selectedDate.getDay()+6)%7;
-    const dayName = DAYS[dayIndex].name;
-    const lessons = sortedLessons(selectedDate);
-    const container = $("lessons");
-    $("scheduleDayTitle").textContent = dayName;
-    $("scheduleDate").textContent = fmtDate(selectedDate,{day:"numeric",month:"long",year:"numeric"});
-    $("lessonCount").textContent = `${lessons.length} ${lessons.length===1?"пара":lessons.length>=2&&lessons.length<=4?"пари":"пар"}`;
-    container.innerHTML = "";
-
-    if (!lessons.length) {
-      const empty = document.createElement("div");
-      empty.className = "empty glass";
-      const icon = document.createElement("div");
-      icon.className = "empty-icon";
-      icon.textContent = dayIndex>=5 ? "🌿" : "☕";
-      const title = document.createElement("div");
-      title.className = "empty-title";
-      title.textContent = dayIndex>=5 ? "Час відпочити!" : "Пар не знайдено";
-      const text = document.createElement("div");
-      text.className = "empty-text";
-      text.textContent = "У schedule.json немає занять на цю дату. Якщо заняття мають бути, перевір дані у файлі.";
-      empty.append(icon,title,text);
-      container.appendChild(empty);
-      return;
-    }
-
-    lessons.forEach(({lesson,index},i)=>{
-      const card = document.createElement("article");
-      card.className = "lesson glass";
-      card.style.animationDelay = `${Math.min(i*65,350)}ms`;
-
-      const start = lessonDateTime(selectedDate,lesson);
-      const end = lessonDateTime(selectedDate,lesson,true);
-      const now = new Date();
-      if (start && end && now>=start && now<end) card.classList.add("next-lesson");
-
-      const timeCol = document.createElement("div");
-      timeCol.className = "lesson-time";
-      const number = document.createElement("div");
-      number.className = "lesson-number";
-      number.textContent = lesson.number || i+1;
-      const time = document.createElement("div");
-      time.className = "time";
-      time.textContent = lesson.time || "Час не вказано";
-      timeCol.append(number,time);
-
-      const main = document.createElement("div");
-      main.className = "lesson-main";
-      const type = document.createElement("span");
-      type.className = "lesson-type";
-      type.textContent = lesson.type || "Заняття";
-      const title = document.createElement("div");
-      title.className = "lesson-title";
-      title.textContent = lesson.subject || "Назву предмета не вказано";
-      main.append(type,title);
-      const teacher = makeDetail("👤",lesson.teacher);
-      const room = makeDetail("📍",lesson.room);
-      const note = makeDetail("ℹ️",lesson.note);
-      if (teacher) main.appendChild(teacher);
-      if (room) main.appendChild(room);
-      if (note) main.appendChild(note);
-      card.append(timeCol,main);
-      container.appendChild(card);
-    });
-  }
-
-  function findNextLesson() {
-    const now = new Date();
-    // Шукаємо заняття протягом наступних 14 днів.
-    // Якщо розклад заданий за днями тижня, він повторюється щотижня.
-    for (let offset=0;offset<14;offset++) {
-      const date = new Date(now);
-      date.setDate(date.getDate()+offset);
-      date.setHours(12,0,0,0);
-      const entries = sortedLessons(date);
-      for (const item of entries) {
-        const start = lessonDateTime(date,item.lesson);
-        const end = lessonDateTime(date,item.lesson,true);
-        if (!start) continue;
-        if (end && now>=start && now<end) {
-          return { ...item,date,start,end,status:"ongoing" };
-        }
-        if (start>now) return { ...item,date,start,end,status:"upcoming" };
-      }
-    }
-    return null;
-  }
-
-  function updateNextCard() {
-    const next = findNextLesson();
-    const subject = $("nextSubject");
-    const meta = $("nextMeta");
-    meta.innerHTML = "";
-    if (!next) {
-      subject.textContent = "Немає найближчих пар";
-      $("nextStatus").textContent = "Вільний час";
-      $("countdownCaption").textContent = "Немає запланованих занять";
-      $("countdown").textContent = "—";
-      $("nextSmall").textContent = "Перевір schedule.json";
-      const chip = document.createElement("span");
-      chip.className = "next-chip";
-      chip.textContent = "Розклад не знайдено";
-      meta.appendChild(chip);
-      nextLessonKey = "";
-      return;
-    }
-
-    subject.textContent = next.lesson.subject || "Заняття";
-    $("nextStatus").textContent = next.status==="ongoing" ? "● Зараз триває" : "Наступна пара";
-    $("countdownCaption").textContent = next.status==="ongoing" ? "До завершення пари" : "До початку пари";
-    $("nextSmall").textContent = `${fmtDate(next.date,{weekday:"short",day:"numeric",month:"short"})}\n${next.lesson.time || ""}`;
-
-    const chips = [
-      next.lesson.time ? "◷ "+next.lesson.time : "",
-      next.lesson.room ? "⌖ "+next.lesson.room : "",
-      next.lesson.teacher ? "♙ "+next.lesson.teacher : ""
-    ].filter(Boolean);
-    chips.forEach(text=>{
-      const chip = document.createElement("span");
-      chip.className = "next-chip";
-      chip.textContent = text;
-      meta.appendChild(chip);
-    });
-    nextLessonKey = `${dateKey(next.date)}-${next.lesson.number||next.index}-${next.lesson.subject||""}`;
-    updateCountdown(next);
-  }
-
-  function updateCountdown(next=findNextLesson()) {
-    if (!next) return;
-    const now = new Date();
-    let target;
-    if (next.status==="ongoing" && next.end) target = next.end;
-    else target = next.start;
-    const seconds = Math.max(0,Math.floor((target-now)/1000));
-    const days = Math.floor(seconds/86400);
-    const hours = Math.floor((seconds%86400)/3600);
-    const minutes = Math.floor((seconds%3600)/60);
-    const secs = seconds%60;
-    const two = n=>String(n).padStart(2,"0");
-    $("countdown").textContent = days>0
-      ? `${days}д ${two(hours)}:${two(minutes)}:${two(secs)}`
-      : `${two(hours)}:${two(minutes)}:${two(secs)}`;
-  }
-
-  function renderSearch() {
-    const query = $("searchInput").value.trim().toLocaleLowerCase("uk-UA");
-    const results = $("searchResults");
-    $("clearSearch").hidden = !query;
-    results.innerHTML = "";
-    if (!query) {
-      results.hidden = true;
-      $("searchHint").textContent = "Пошук по всіх заняттях вибраної групи.";
-      return;
-    }
-
-    const group = selectedGroup();
-    const schedule = groupSchedule(group);
-    const found = [];
-    const seen = new Set();
-
-    for (const [key,lessons] of Object.entries(schedule)) {
-      if (!Array.isArray(lessons)) continue;
-      let dayLabel = key;
-      let date = null;
-      if (/^\d{4}-\d{2}-\d{2}$/.test(key)) {
-        date = new Date(key+"T12:00:00");
-        dayLabel = fmtDate(date,{weekday:"long",day:"numeric",month:"short"});
-      }
-      lessons.forEach((lesson,index)=>{
-        const haystack = [lesson.subject,lesson.teacher,lesson.room,lesson.type,lesson.note]
-          .filter(Boolean).join(" ").toLocaleLowerCase("uk-UA");
-        if (!haystack.includes(query)) return;
-        const id = `${key}-${index}-${lesson.subject}`;
-        if (seen.has(id)) return;
-        seen.add(id);
-        found.push({key,dayLabel,date,lesson,index});
-      });
-    }
-
-    $("searchHint").textContent = found.length
-      ? `Знайдено занять: ${found.length}`
-      : "Нічого не знайдено. Спробуй інше слово.";
-    results.hidden = false;
-
-    found.slice(0,40).forEach((item,i)=>{
-      const card = document.createElement("div");
-      card.className = "result-card";
-      card.style.animationDelay = `${Math.min(i*25,200)}ms`;
-      const title = document.createElement("div");
-      title.className = "result-title";
-      title.textContent = item.lesson.subject || "Заняття";
-      const meta = document.createElement("div");
-      meta.className = "result-meta";
-      meta.textContent = `${item.dayLabel} · ${item.lesson.time||"Час не вказано"} · ${item.lesson.teacher||"Викладач не вказаний"} · ${item.lesson.room||"Аудиторія не вказана"}`;
-      const open = document.createElement("button");
-      open.className = "result-open";
-      open.textContent = "Показати в розкладі";
-      open.addEventListener("click",()=>{
-        let date;
-        if (item.date) {
-          date = new Date(item.date);
-          weekOffset = Math.round((mondayOf(date)-mondayOf(new Date()))/(7*86400000));
-          selectedDay = (date.getDay()+6)%7;
-        } else {
-          const index = normalizedDay(item.key);
-          if (index<0) {
-            showToast("Це заняття задане за датою в schedule.json");
-            return;
-          }
-          weekOffset = 0;
-          selectedDay = index;
-          date = dateForDay(index);
-        }
-        selectedDate = date;
-        renderDays();
-        renderLessons();
-        renderCalendar();
-        updateNextCard();
-        $("scheduleSection").scrollIntoView({behavior:"smooth",block:"start"});
-      });
-      card.append(title,meta,open);
-      results.appendChild(card);
-    });
-    if (found.length>40) {
-      const more = document.createElement("div");
-      more.className = "search-hint";
-      more.textContent = "Показано перші 40 результатів. Уточни запит.";
-      results.appendChild(more);
-    }
-  }
-
-  $("searchInput").addEventListener("input",renderSearch);
-  $("clearSearch").addEventListener("click",()=>{
-    $("searchInput").value = "";
-    renderSearch();
-    $("searchInput").focus();
-  });
-
-  function renderCalendar() {
-    const grid = $("calendarGrid");
-    grid.innerHTML = "";
-    $("calendarMonth").textContent = fmtDate(calendarMonth,{month:"long",year:"numeric"});
-    ["ПН","ВТ","СР","ЧТ","ПТ","СБ","НД"].forEach(label=>{
-      const el = document.createElement("div");
-      el.className = "cal-weekday";
-      el.textContent = label;
-      grid.appendChild(el);
-    });
-
-    const first = new Date(calendarMonth.getFullYear(),calendarMonth.getMonth(),1,12);
-    const offset = (first.getDay()+6)%7;
-    const start = new Date(first);
-    start.setDate(first.getDate()-offset);
-
-    for (let i=0;i<42;i++) {
-      const date = new Date(start);
-      date.setDate(start.getDate()+i);
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "cal-day";
-      btn.textContent = date.getDate();
-      if (date.getMonth()!==calendarMonth.getMonth()) btn.classList.add("outside");
-      if (dateKey(date)===dateKey(new Date())) btn.classList.add("today");
-      if (dateKey(date)===dateKey(selectedDate)) btn.classList.add("selected");
-      if (lessonsForDate(date).length) btn.classList.add("has-classes");
-      btn.setAttribute("aria-label",fmtDate(date,{day:"numeric",month:"long",year:"numeric"}));
-      btn.addEventListener("click",()=>{
-        selectedDate = new Date(date);
-        selectedDate.setHours(12,0,0,0);
-        calendarMonth = new Date(date.getFullYear(),date.getMonth(),1,12);
-        weekOffset = Math.round((mondayOf(date)-mondayOf(new Date()))/(7*86400000));
-        selectedDay = (date.getDay()+6)%7;
-        renderCalendar();
-        renderDays();
-        renderLessons();
-        updateNextCard();
-        showToast("Обрано "+fmtDate(date,{day:"numeric",month:"long"}));
-      });
-      grid.appendChild(btn);
-    }
-  }
-
-  $("prevWeek").addEventListener("click",()=>{
-    weekOffset--;
-    selectedDate = dateForDay(selectedDay);
-    renderDays();renderLessons();renderCalendar();
-  });
-  $("nextWeek").addEventListener("click",()=>{
-    weekOffset++;
-    selectedDate = dateForDay(selectedDay);
-    renderDays();renderLessons();renderCalendar();
-  });
-  $("prevMonth").addEventListener("click",()=>{
-    calendarMonth.setMonth(calendarMonth.getMonth()-1);
-    renderCalendar();
-  });
-  $("nextMonth").addEventListener("click",()=>{
-    calendarMonth.setMonth(calendarMonth.getMonth()+1);
-    renderCalendar();
-  });
-
-  $("goSearch").addEventListener("click",()=>{
-    $("searchSection").scrollIntoView({behavior:"smooth",block:"start"});
-    setTimeout(()=>$("searchInput").focus(),350);
-  });
-  $("goCalendar").addEventListener("click",()=>{
-    $("calendarSection").scrollIntoView({behavior:"smooth",block:"start"});
-  });
-
-  document.querySelectorAll(".nav-item").forEach(button=>{
-    button.addEventListener("click",()=>{
-      document.querySelectorAll(".nav-item").forEach(item=>item.classList.remove("active"));
-      button.classList.add("active");
-      const target = $(button.dataset.target);
-      if (target) target.scrollIntoView({behavior:"smooth",block:"start"});
-    });
-  });
-
-  async function loadSchedule() {
-    const error = $("loadError");
-    const refresh = $("refreshBtn");
-    refresh.disabled = true;
-    refresh.textContent = "Завантаження…";
-    error.hidden = true;
-    try {
-      const response = await fetch("./schedule.json?v="+Date.now(),{cache:"no-store"});
-      if (!response.ok) throw new Error("HTTP "+response.status);
-      const incoming = await response.json();
-      if (!incoming || !incoming.groups || typeof incoming.groups!=="object") {
-        throw new Error("Неправильна структура groups у schedule.json");
-      }
-      data = incoming;
-      renderGroupOptions();
-      $("updatedLabel").textContent = data.updated
-        ? "Оновлено: "+data.updated
-        : "Дані завантажено з GitHub";
-      showToast("✓ Розклад оновлено");
-    } catch (err) {
-      error.textContent = "Не вдалося завантажити schedule.json. Переконайся, що файл існує поруч із index.html і GitHub Pages опубліковано.";
-      error.hidden = false;
-      $("updatedLabel").textContent = "Помилка завантаження даних";
-      renderGroupOptions();
-    } finally {
-      refresh.disabled = false;
-      refresh.textContent = "↻ Оновити розклад";
-    }
-  }
-
-  $("refreshBtn").addEventListener("click",loadSchedule);
-  $("shareBtn").addEventListener("click",async()=>{
-    const message = `Розклад ВНАУ — група ${selectedGroupName()}`;
-    const url = location.href;
-    if (tg && tg.openTelegramLink) {
-      tg.openTelegramLink("https://t.me/share/url?url="+encodeURIComponent(url)+"&text="+encodeURIComponent(message));
-      return;
-    }
-    if (navigator.share) {
-      try { await navigator.share({title:"Розклад ВНАУ",text:message,url}); } catch (_) {}
-    } else {
-      try {
-        await navigator.clipboard.writeText(message+"\n"+url);
-        showToast("Посилання скопійовано");
-      } catch (_) { showToast(message); }
-    }
-  });
-
-  $("todayLabel").textContent = fmtDate(new Date(),{weekday:"long",day:"numeric",month:"long"});
-  renderDays();
-  renderLessons();
-  renderCalendar();
-  updateNextCard();
-  loadSchedule();
-
-  clearInterval(clockTimer);
-  clockTimer = setInterval(()=>{
-    const next = findNextLesson();
-    if (!next) {
-      $("countdown").textContent = "—";
-      return;
-    }
-    updateCountdown(next);
-    const key = `${dateKey(next.date)}-${next.lesson.number||next.index}-${next.lesson.subject||""}`;
-    if (key!==nextLessonKey) updateNextCard();
-  },1000);
-})();
-</script>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
 </body>
 </html>
