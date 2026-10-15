@@ -1,0 +1,22 @@
+name: Auto Update Schedule
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - run: pip install requests beautifulsoup4
+      - run: python parser.py
+      - run: |
+          git config --global user.name "VNAU Bot"
+          git config --global user.email "bot@users.noreply.github.com"
+          git add schedule.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Daily schedule update" && git push)
