@@ -1,342 +1,1239 @@
+
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ВНАУ Студент</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        :root {
-            --bg-color: var(--tg-theme-bg-color, #121212);
-            --text-color: var(--tg-theme-text-color, #ffffff);
-            --hint-color: var(--tg-theme-hint-color, #aaaaaa);
-            --card-bg: var(--tg-theme-secondary-bg-color, #1e1e1e);
-            --accent-color: var(--tg-theme-button-color, #2ea6ff);
-            --accent-text: var(--tg-theme-button-text-color, #ffffff);
-            --border-color: #2c2c2e;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#116b43">
+  <title>Розклад ВНАУ</title>
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 0;
-            padding-bottom: 70px;
-            -webkit-font-smoothing: antialiased;
-        }
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-        .header {
-            padding: 16px;
-            text-align: center;
-            background: var(--card-bg);
-            border-bottom: 1px solid var(--border-color);
-        }
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f3f6f3;
+      --surface: #ffffff;
+      --surface2: #eaf2ec;
+      --text: #17231b;
+      --muted: #758278;
+      --border: rgba(24, 75, 46, .12);
+      --green: #116b43;
+      --green2: #198653;
+      --gold: #e7bd61;
+      --shadow: 0 10px 35px rgba(23, 64, 40, .08);
+      --nav: rgba(255,255,255,.88);
+    }
 
-        .header h1 {
-            margin: 0;
-            font-size: 20px;
-            font-weight: 600;
-        }
+    [data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #090c0a;
+      --surface: #151a17;
+      --surface2: #202923;
+      --text: #f1f6f2;
+      --muted: #9aa89e;
+      --border: rgba(220,255,229,.10);
+      --green: #218a59;
+      --green2: #32a66e;
+      --gold: #e7bd61;
+      --shadow: 0 12px 35px rgba(0,0,0,.22);
+      --nav: rgba(21,26,23,.92);
+    }
 
-        .container {
-            padding: 16px;
-        }
+    * { box-sizing: border-box; }
 
-        /* Фільтри */
-        .filters {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            background: var(--card-bg);
-            padding: 14px;
-            border-radius: 12px;
-            margin-bottom: 16px;
-            border: 1px solid var(--border-color);
-        }
+    html { scroll-behavior: smooth; }
 
-        .filter-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 0 0 calc(105px + env(safe-area-inset-bottom));
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      transition: background .35s ease, color .35s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-        .filter-group label {
-            font-size: 13px;
-            color: var(--hint-color);
-        }
+    button, select { font: inherit; }
+    button { cursor: pointer; }
 
-        select {
-            width: 100%;
-            padding: 10px 12px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            background: var(--bg-color);
-            color: var(--text-color);
-            font-size: 15px;
-            outline: none;
-        }
+    .app {
+      max-width: 650px;
+      margin: 0 auto;
+      overflow: hidden;
+      animation: appEnter .75s cubic-bezier(.2,.8,.2,1) both;
+    }
 
-        /* Картки розкладу */
-        .schedule-card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 14px;
-            margin-bottom: 12px;
-            border: 1px solid var(--border-color);
-        }
+    @keyframes appEnter {
+      from { opacity: 0; transform: translateY(22px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
-        .lesson-time {
-            font-size: 12px;
-            color: var(--accent-color);
-            font-weight: 600;
-            margin-bottom: 4px;
-            text-transform: uppercase;
-        }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
-        .lesson-title {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 6px;
-        }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
 
-        .lesson-details {
-            font-size: 13px;
-            color: var(--hint-color);
-        }
+    @keyframes logoIn {
+      0% { opacity: 0; transform: scale(.65) rotate(-12deg); }
+      70% { transform: scale(1.08) rotate(3deg); }
+      100% { opacity: 1; transform: scale(1) rotate(0); }
+    }
 
-        /* Навігація внизу */
-        .tab-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 60px;
-            background: var(--card-bg);
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            z-index: 100;
-        }
+    @keyframes shine {
+      from { transform: translateX(-150%) rotate(18deg); }
+      to { transform: translateX(250%) rotate(18deg); }
+    }
 
-        .tab-item {
-            flex: 1;
-            text-align: center;
-            font-size: 12px;
-            color: var(--hint-color);
-            cursor: pointer;
-            padding: 8px 0;
-        }
+    @keyframes pulse {
+      0%,100% { box-shadow: 0 0 0 0 rgba(231,189,97,.15); }
+      50% { box-shadow: 0 0 0 8px rgba(231,189,97,0); }
+    }
 
-        .tab-item.active {
-            color: var(--accent-color);
-            font-weight: 600;
-        }
+    @keyframes float {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
 
-        .tab-content {
-            display: none;
-        }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-        .tab-content.active {
-            display: block;
-        }
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: calc(25px + env(safe-area-inset-top)) 22px 28px;
+      color: white;
+      background:
+        radial-gradient(circle at 90% 5%, rgba(231,189,97,.27), transparent 28%),
+        linear-gradient(135deg, #0b5033, #11794b 58%, #20945b);
+      border-radius: 0 0 30px 30px;
+    }
 
-        .empty-state {
-            text-align: center;
-            color: var(--hint-color);
-            padding: 30px 0;
-            font-size: 14px;
-        }
-    </style>
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 150px;
+      height: 300px;
+      top: -90px;
+      right: 10%;
+      background: rgba(255,255,255,.06);
+      transform: rotate(35deg);
+      pointer-events: none;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .logo {
+      width: 51px;
+      height: 51px;
+      flex: 0 0 51px;
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,.14);
+      border: 1px solid rgba(255,255,255,.23);
+      border-radius: 17px;
+      font-size: 28px;
+      animation: logoIn .9s .1s both;
+      backdrop-filter: blur(10px);
+    }
+
+    .brand-title {
+      font-size: 17px;
+      font-weight: 850;
+      letter-spacing: -.4px;
+    }
+
+    .brand-sub {
+      font-size: 11px;
+      opacity: .76;
+      margin-top: 4px;
+    }
+
+    .theme-switch {
+      display: flex;
+      gap: 4px;
+      padding: 4px;
+      border-radius: 15px;
+      background: rgba(0,0,0,.16);
+      border: 1px solid rgba(255,255,255,.13);
+      flex-shrink: 0;
+    }
+
+    .theme-btn {
+      width: 35px;
+      height: 35px;
+      border: 0;
+      border-radius: 11px;
+      background: transparent;
+      color: white;
+      font-size: 17px;
+      transition: transform .2s, background .25s;
+    }
+
+    .theme-btn.active {
+      background: rgba(255,255,255,.22);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.15);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      margin-top: 28px;
+      animation: fadeUp .7s .15s both;
+    }
+
+    .eyebrow {
+      color: #f1d995;
+      text-transform: uppercase;
+      font-size: 10px;
+      letter-spacing: 2px;
+      font-weight: 800;
+    }
+
+    .hero h1 {
+      font-size: clamp(29px, 7vw, 39px);
+      line-height: 1.08;
+      letter-spacing: -1.4px;
+      margin: 9px 0;
+      font-weight: 900;
+    }
+
+    .hero-description {
+      margin: 0;
+      max-width: 290px;
+      color: rgba(255,255,255,.78);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .hero-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 10px;
+      margin-top: 22px;
+    }
+
+    .date-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.1);
+      border-radius: 13px;
+      padding: 10px 12px;
+      font-size: 12px;
+      font-weight: 650;
+      backdrop-filter: blur(8px);
+    }
+
+    .live-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #b7f6c9;
+      box-shadow: 0 0 0 4px rgba(183,246,201,.12);
+    }
+
+    .content {
+      padding: 20px 16px 0;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin: 22px 2px 12px;
+    }
+
+    .section-title {
+      font-size: 17px;
+      font-weight: 850;
+      letter-spacing: -.35px;
+    }
+
+    .section-caption {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+      transition: background .35s, border-color .35s, transform .25s;
+      animation: fadeUp .55s both;
+    }
+
+    .field-label {
+      display: block;
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 750;
+      margin: 0 0 8px 2px;
+    }
+
+    .select {
+      width: 100%;
+      min-height: 49px;
+      padding: 0 13px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      color: var(--text);
+      background: var(--surface2);
+      outline: none;
+      transition: border-color .2s, box-shadow .2s, background .35s;
+    }
+
+    .select:focus {
+      border-color: var(--green2);
+      box-shadow: 0 0 0 3px rgba(32,148,91,.13);
+    }
+
+    .group-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 13px;
+      padding: 13px;
+      border-radius: 15px;
+      background: var(--surface2);
+      transition: background .35s;
+    }
+
+    .group-icon {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 13px;
+      background: var(--green);
+      color: white;
+      font-size: 20px;
+      animation: pulse 3s infinite;
+    }
+
+    .group-name { font-size: 14px; font-weight: 850; }
+    .group-faculty { color: var(--muted); font-size: 11px; margin-top: 4px; }
+
+    .week-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin: 20px 1px 13px;
+    }
+
+    .week-button {
+      width: 37px;
+      height: 37px;
+      flex: 0 0 37px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      background: var(--surface);
+      transition: transform .2s, background .3s;
+    }
+
+    .week-button:active, .theme-btn:active, .day-btn:active,
+    .action-btn:active { transform: scale(.94); }
+
+    .week-label { text-align: center; font-size: 12px; font-weight: 800; }
+    .week-sub { font-size: 10px; color: var(--muted); margin-top: 4px; }
+
+    .days {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0,1fr));
+      gap: 5px;
+    }
+
+    .day-btn {
+      min-width: 0;
+      border: 1px solid transparent;
+      background: transparent;
+      border-radius: 14px;
+      padding: 10px 0 9px;
+      color: var(--muted);
+      transition: transform .2s, color .25s, background .25s;
+    }
+
+    .day-short { display: block; font-size: 10px; font-weight: 750; }
+    .day-number { display: block; font-size: 15px; font-weight: 850; margin-top: 7px; }
+
+    .day-btn.active {
+      color: white;
+      background: var(--green);
+      box-shadow: 0 6px 15px rgba(17,107,67,.2);
+      animation: fadeIn .25s;
+    }
+
+    .day-btn.today:not(.active) {
+      border-color: var(--green2);
+      color: var(--green2);
+    }
+
+    .day-btn.has-classes:not(.active)::after {
+      content: "";
+      display: block;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      margin: 5px auto -9px;
+      background: var(--gold);
+    }
+
+    .schedule-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin: 25px 2px 12px;
+    }
+
+    .count {
+      background: var(--surface2);
+      color: var(--green2);
+      padding: 7px 10px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+
+    .lessons {
+      display: grid;
+      gap: 11px;
+    }
+
+    .lesson {
+      position: relative;
+      display: grid;
+      grid-template-columns: 62px minmax(0,1fr);
+      gap: 12px;
+      padding: 15px 13px;
+      overflow: hidden;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 19px;
+      box-shadow: var(--shadow);
+      animation: fadeUp .45s both;
+      transition: background .35s, transform .25s, border-color .35s;
+    }
+
+    .lesson:active { transform: scale(.985); }
+
+    .lesson::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 13px;
+      bottom: 13px;
+      width: 3px;
+      border-radius: 0 4px 4px 0;
+      background: var(--green2);
+    }
+
+    .lesson:nth-child(2n)::before { background: var(--gold); }
+
+    .lesson-time {
+      text-align: center;
+      padding-top: 3px;
+    }
+
+    .lesson-number {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      margin: 0 auto 9px;
+      background: var(--surface2);
+      border-radius: 10px;
+      color: var(--green2);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .time {
+      font-size: 10px;
+      font-weight: 800;
+      line-height: 1.6;
+      white-space: nowrap;
+    }
+
+    .lesson-main { min-width: 0; }
+
+    .lesson-type {
+      display: inline-block;
+      padding: 5px 8px;
+      background: var(--surface2);
+      color: var(--green2);
+      border-radius: 7px;
+      font-size: 9px;
+      font-weight: 850;
+      margin-bottom: 8px;
+    }
+
+    .lesson-title {
+      font-size: 14px;
+      font-weight: 850;
+      line-height: 1.4;
+      overflow-wrap: anywhere;
+    }
+
+    .lesson-detail {
+      display: flex;
+      align-items: flex-start;
+      gap: 7px;
+      margin-top: 9px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.45;
+      overflow-wrap: anywhere;
+    }
+
+    .empty {
+      padding: 30px 20px;
+      text-align: center;
+      background: var(--surface);
+      border: 1px dashed var(--border);
+      border-radius: 22px;
+      animation: fadeUp .4s both;
+    }
+
+    .empty-icon {
+      font-size: 38px;
+      margin-bottom: 13px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    .empty-title { font-weight: 850; font-size: 15px; }
+    .empty-text {
+      margin: 8px auto 0;
+      max-width: 260px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .error {
+      margin-top: 10px;
+      color: #c94a4a;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .bottom-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 24px 0 10px;
+    }
+
+    .action-btn {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      min-height: 47px;
+      border-radius: 15px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 800;
+      transition: transform .2s, background .3s;
+    }
+
+    .action-btn.primary {
+      background: var(--green);
+      color: white;
+      border-color: transparent;
+    }
+
+    .footer {
+      padding: 22px 10px 8px;
+      text-align: center;
+      font-size: 10px;
+      line-height: 1.8;
+      color: var(--muted);
+    }
+
+    .bottom-nav {
+      position: fixed;
+      z-index: 10;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      padding: 9px 14px calc(9px + env(safe-area-inset-bottom));
+      background: var(--nav);
+      border-top: 1px solid var(--border);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      transition: background .35s;
+    }
+
+    .nav-inner {
+      width: 100%;
+      max-width: 600px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 7px;
+    }
+
+    .nav-item {
+      display: grid;
+      place-items: center;
+      gap: 4px;
+      padding: 5px 0;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 10px;
+      font-weight: 750;
+      border-radius: 12px;
+      transition: color .2s, background .2s, transform .2s;
+    }
+
+    .nav-item.active {
+      color: var(--green2);
+      background: var(--surface2);
+    }
+
+    .nav-icon { font-size: 19px; }
+
+    .toast {
+      position: fixed;
+      z-index: 30;
+      left: 50%;
+      bottom: calc(92px + env(safe-area-inset-bottom));
+      transform: translate(-50%, 15px);
+      width: max-content;
+      max-width: calc(100% - 32px);
+      padding: 12px 16px;
+      border-radius: 14px;
+      background: var(--text);
+      color: var(--bg);
+      font-size: 12px;
+      font-weight: 700;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s, transform .25s;
+      box-shadow: var(--shadow);
+    }
+
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+    .loading {
+      display: inline-block;
+      width: 15px;
+      height: 15px;
+      border: 2px solid var(--border);
+      border-top-color: var(--green2);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+
+    @media (min-width: 500px) {
+      .hero { border-radius: 0 0 34px 34px; }
+      .content { padding-left: 22px; padding-right: 22px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+      }
+    }
+  </style>
 </head>
+
 <body>
-
-    <div class="header">
-        <h1 id="app-title">📚 ВНАУ Розклад</h1>
-    </div>
-
-    <div class="container">
-        <!-- Вкладка 1: Розклад -->
-        <div id="tab-schedule" class="tab-content active">
-            <div class="filters">
-                <div class="filter-group">
-                    <label for="faculty-select">Факультет:</label>
-                    <select id="faculty-select" onchange="onFacultyChange()">
-                        <option value="">Оберіть факультет...</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label for="course-select">Курс:</label>
-                    <select id="course-select" onchange="onCourseChange()" disabled>
-                        <option value="">Спочатку оберіть факультет</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label for="group-select">Група:</label>
-                    <select id="group-select" onchange="loadSchedule()" disabled>
-                        <option value="">Спочатку оберіть курс</option>
-                    </select>
-                </div>
-            </div>
-
-            <div id="schedule-container">
-                <div class="empty-state">Оберіть факультет, курс та групу, щоб побачити розклад</div>
-            </div>
+  <div class="app">
+    <header class="hero" id="top">
+      <div class="topbar">
+        <div class="brand">
+          <div class="logo">🎓</div>
+          <div>
+            <div class="brand-title">ВНАУ • Розклад</div>
+            <div class="brand-sub">Твій навчальний помічник</div>
+          </div>
         </div>
 
-        <!-- Вкладка 2: Спільнота -->
-        <div id="tab-community" class="tab-content">
-            <h2>💬 Спільнота ВНАУ</h2>
-            <div class="schedule-card">
-                <div class="lesson-title">Студентський чат</div>
-                <div class="lesson-details">Обговорення пар, викладачів та студентського життя.</div>
-            </div>
+        <div class="theme-switch" aria-label="Вибір теми">
+          <button class="theme-btn" id="lightTheme" aria-label="Біла тема" title="Біла тема">☀️</button>
+          <button class="theme-btn" id="darkTheme" aria-label="Чорна тема" title="Чорна тема">🌙</button>
+        </div>
+      </div>
+
+      <div class="hero-content">
+        <div class="eyebrow">Навчання простіше</div>
+        <h1>Твій розклад.<br>Твій ритм.</h1>
+        <p class="hero-description">
+          Пари, час і аудиторії — усе необхідне в одному місці.
+        </p>
+        <div class="hero-bottom">
+          <div class="date-pill">
+            <span class="live-dot"></span>
+            <span id="todayLabel">Завантажуємо дату…</span>
+          </div>
+          <div style="font-size:29px; animation:float 4s ease-in-out infinite">📚</div>
+        </div>
+      </div>
+    </header>
+
+    <main class="content">
+      <section id="groupSection">
+        <div class="section-head">
+          <div>
+            <div class="section-title">Твоя група</div>
+            <div class="section-caption">Обери свою групу для перегляду пар</div>
+          </div>
+          <span style="font-size:23px">🎯</span>
         </div>
 
-        <!-- Вкладка 3: Корисне -->
-        <div id="tab-useful" class="tab-content">
-            <h2>🔗 Корисні посилання</h2>
-            <div class="schedule-card">
-                <div class="lesson-title">Офіційний сайт ВНАУ</div>
-                <div class="lesson-details">vsau.org</div>
+        <div class="panel">
+          <label class="field-label" for="groupSelect">НАВЧАЛЬНА ГРУПА</label>
+          <select class="select" id="groupSelect">
+            <option value="ЕІ 23-1">ЕІ 23-1</option>
+          </select>
+
+          <div class="group-info">
+            <div class="group-icon">🎓</div>
+            <div>
+              <div class="group-name" id="selectedGroup">ЕІ 23-1</div>
+              <div class="group-faculty" id="selectedFaculty">Технологічний факультет • ВНАУ</div>
             </div>
+          </div>
+          <div class="error" id="loadError" hidden></div>
         </div>
+      </section>
+
+      <section id="scheduleSection">
+        <div class="week-bar">
+          <button class="week-button" id="prevWeek" aria-label="Попередній тиждень">‹</button>
+          <div class="week-label">
+            <div id="weekLabel">Навчальний тиждень</div>
+            <div class="week-sub" id="weekSub">Обери день нижче</div>
+          </div>
+          <button class="week-button" id="nextWeek" aria-label="Наступний тиждень">›</button>
+        </div>
+
+        <div class="days" id="days"></div>
+
+        <div class="schedule-top">
+          <div>
+            <div class="section-title" id="scheduleDayTitle">Розклад на день</div>
+            <div class="section-caption" id="scheduleDate">Твої заняття</div>
+          </div>
+          <div class="count" id="lessonCount">0 пар</div>
+        </div>
+
+        <div class="lessons" id="lessons">
+          <div class="empty">
+            <div class="empty-icon">📖</div>
+            <div class="empty-title">Завантажуємо розклад</div>
+            <div class="empty-text"><span class="loading"></span>Зачекай кілька секунд…</div>
+          </div>
+        </div>
+      </section>
+
+      <div class="bottom-actions">
+        <button class="action-btn primary" id="refreshBtn">↻ Оновити розклад</button>
+        <button class="action-btn" id="shareBtn">↗ Поділитися</button>
+      </div>
+
+      <div class="footer">
+        <strong>ВНАУ • Розклад занять</strong><br>
+        Зручний доступ до навчального розкладу<br>
+        <span id="updatedLabel">Перевіряємо оновлення…</span>
+      </div>
+    </main>
+  </div>
+
+  <nav class="bottom-nav">
+    <div class="nav-inner">
+      <a class="nav-item active" href="#top">
+        <span class="nav-icon">⌂</span>
+        <span>Головна</span>
+      </a>
+      <a class="nav-item" href="#groupSection">
+        <span class="nav-icon">🎓</span>
+        <span>Моя група</span>
+      </a>
+      <a class="nav-item" href="#scheduleSection">
+        <span class="nav-icon">▦</span>
+        <span>Розклад</span>
+      </a>
     </div>
+  </nav>
 
-    <!-- Нижня панель навігації -->
-    <div class="tab-bar">
-        <div class="tab-item active" onclick="switchTab('schedule', this)">📅 Розклад</div>
-        <div class="tab-item" onclick="switchTab('community', this)">💬 Спільнота</div>
-        <div class="tab-item" onclick="switchTab('useful', this)">🔗 Корисне</div>
-    </div>
+  <div class="toast" id="toast" role="status"></div>
 
-    <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
+  <script>
+    const tg = window.Telegram && window.Telegram.WebApp
+      ? window.Telegram.WebApp
+      : null;
 
-        let globalData = null;
+    if (tg) {
+      tg.ready();
+      tg.expand();
+    }
 
-        // Завантаження розкладу з хмари (schedule.json)
-        async function fetchScheduleData() {
-            try {
-                const response = await fetch('schedule.json?' + new Date().getTime());
-                globalData = await response.json();
-                initFaculties();
-            } catch (e) {
-                console.error("Помилка завантаження schedule.json", e);
-            }
+    const DAYS = [
+      { name: "Понеділок", short: "ПН" },
+      { name: "Вівторок", short: "ВТ" },
+      { name: "Середа", short: "СР" },
+      { name: "Четвер", short: "ЧТ" },
+      { name: "П’ятниця", short: "ПТ" },
+      { name: "Субота", short: "СБ" },
+      { name: "Неділя", short: "НД" }
+    ];
+
+    const $ = id => document.getElementById(id);
+
+    let scheduleData = { groups: {} };
+    let selectedDay = 0;
+    let weekOffset = 0;
+    let toastTimer;
+    let currentTheme = "light";
+
+    function localDate(date) {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, "0");
+      const d = String(date.getDate()).padStart(2, "0");
+      return `${y}-${m}-${d}`;
+    }
+
+    function mondayOf(date) {
+      const result = new Date(date);
+      result.setHours(12, 0, 0, 0);
+      const day = (result.getDay() + 6) % 7;
+      result.setDate(result.getDate() - day);
+      return result;
+    }
+
+    function weekStart() {
+      const date = mondayOf(new Date());
+      date.setDate(date.getDate() + weekOffset * 7);
+      return date;
+    }
+
+    function dateForDay(index) {
+      const date = weekStart();
+      date.setDate(date.getDate() + index);
+      return date;
+    }
+
+    function formatDate(date, options = { day: "numeric", month: "long" }) {
+      return new Intl.DateTimeFormat("uk-UA", options).format(date);
+    }
+
+    function showToast(message) {
+      const toast = $("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove("show"), 2600);
+    }
+
+    function applyTheme(theme) {
+      currentTheme = theme === "dark" ? "dark" : "light";
+      document.documentElement.dataset.theme = currentTheme;
+
+      $("lightTheme").classList.toggle("active", currentTheme === "light");
+      $("darkTheme").classList.toggle("active", currentTheme === "dark");
+
+      const meta = document.querySelector('meta[name="theme-color"]');
+      meta.content = currentTheme === "dark" ? "#090c0a" : "#116b43";
+
+      try {
+        localStorage.setItem("vnau-theme", currentTheme);
+      } catch (_) {}
+
+      if (tg) {
+        try {
+          tg.setHeaderColor(currentTheme === "dark" ? "#090c0a" : "#116b43");
+          tg.setBackgroundColor(currentTheme === "dark" ? "#090c0a" : "#f3f6f3");
+        } catch (_) {}
+      }
+    }
+
+    $("lightTheme").addEventListener("click", () => {
+      applyTheme("light");
+      showToast("☀️ Увімкнено білу тему");
+    });
+
+    $("darkTheme").addEventListener("click", () => {
+      applyTheme("dark");
+      showToast("🌙 Увімкнено чорну тему");
+    });
+
+    try {
+      const savedTheme = localStorage.getItem("vnau-theme");
+      applyTheme(savedTheme || "light");
+    } catch (_) {
+      applyTheme("light");
+    }
+
+    function getGroupNames() {
+      return Object.keys(scheduleData.groups || {});
+    }
+
+    function getSelectedGroup() {
+      const name = $("groupSelect").value;
+      return (scheduleData.groups || {})[name] || null;
+    }
+
+    function getLessons(group, dayName, date) {
+      if (!group) return [];
+
+      const schedule = group.schedule || {};
+
+      // Підтримуються як звичайні дні тижня, так і дати YYYY-MM-DD.
+      const exactDate = schedule[localDate(date)];
+      if (Array.isArray(exactDate)) return exactDate;
+
+      const dayValue = schedule[dayName];
+      if (Array.isArray(dayValue)) return dayValue;
+
+      return [];
+    }
+
+    function renderGroupOptions() {
+      const select = $("groupSelect");
+      const previous = select.value;
+      const names = getGroupNames();
+
+      select.innerHTML = "";
+
+      if (!names.length) {
+        const option = document.createElement("option");
+        option.value = "";
+        option.textContent = "Немає груп у файлі";
+        select.appendChild(option);
+        updateGroupInfo();
+        return;
+      }
+
+      names.forEach(name => {
+        const option = document.createElement("option");
+        option.value = name;
+        option.textContent = name;
+        select.appendChild(option);
+      });
+
+      select.value = names.includes(previous)
+        ? previous
+        : names.includes("ЕІ 23-1") ? "ЕІ 23-1" : names[0];
+
+      updateGroupInfo();
+    }
+
+    function updateGroupInfo() {
+      const name = $("groupSelect").value;
+      const group = getSelectedGroup();
+
+      $("selectedGroup").textContent = name || "Групу не вибрано";
+      $("selectedFaculty").textContent =
+        `${group?.faculty || "Факультет ВНАУ"} • ВНАУ`;
+
+      renderDays();
+      renderLessons();
+    }
+
+    function renderWeekInfo() {
+      const start = weekStart();
+      const end = new Date(start);
+      end.setDate(end.getDate() + 6);
+
+      $("weekLabel").textContent =
+        weekOffset === 0 ? "Поточний тиждень"
+        : weekOffset === 1 ? "Наступний тиждень"
+        : weekOffset === -1 ? "Минулий тиждень"
+        : `${weekOffset > 0 ? "+" : ""}${weekOffset} тиж.`;
+
+      $("weekSub").textContent =
+        `${formatDate(start, { day: "numeric", month: "short" })} – ` +
+        `${formatDate(end, { day: "numeric", month: "short" })}`;
+    }
+
+    function renderDays() {
+      renderWeekInfo();
+
+      const container = $("days");
+      container.innerHTML = "";
+
+      DAYS.forEach((day, index) => {
+        const date = dateForDay(index);
+        const btn = document.createElement("button");
+        btn.className = "day-btn";
+        btn.type = "button";
+
+        if (index === selectedDay) btn.classList.add("active");
+        if (localDate(date) === localDate(new Date())) btn.classList.add("today");
+
+        const group = getSelectedGroup();
+        if (getLessons(group, day.name, date).length) {
+          btn.classList.add("has-classes");
         }
 
-        function initFaculties() {
-            const facultySelect = document.getElementById('faculty-select');
-            facultySelect.innerHTML = '<option value="">Оберіть факультет...</option>';
-            
-            if (!globalData || !globalData.faculties) return;
+        const short = document.createElement("span");
+        short.className = "day-short";
+        short.textContent = day.short;
 
-            globalData.faculties.forEach((faculty, index) => {
-                const opt = document.createElement('option');
-                opt.value = index;
-                opt.textContent = faculty.name;
-                facultySelect.appendChild(opt);
-            });
+        const number = document.createElement("span");
+        number.className = "day-number";
+        number.textContent = date.getDate();
+
+        btn.append(short, number);
+        btn.addEventListener("click", () => {
+          selectedDay = index;
+          renderDays();
+          renderLessons();
+        });
+
+        container.appendChild(btn);
+      });
+    }
+
+    function makeDetail(icon, value) {
+      if (!value) return null;
+
+      const row = document.createElement("div");
+      row.className = "lesson-detail";
+
+      const symbol = document.createElement("span");
+      symbol.textContent = icon;
+
+      const text = document.createElement("span");
+      text.textContent = value;
+
+      row.append(symbol, text);
+      return row;
+    }
+
+    function renderLessons() {
+      const group = getSelectedGroup();
+      const day = DAYS[selectedDay];
+      const date = dateForDay(selectedDay);
+      const lessons = getLessons(group, day.name, date);
+      const container = $("lessons");
+
+      $("scheduleDayTitle").textContent = day.name;
+      $("scheduleDate").textContent = formatDate(date, {
+        day: "numeric", month: "long", year: "numeric"
+      });
+      $("lessonCount").textContent =
+        `${lessons.length} ${lessons.length === 1 ? "пара" :
+          lessons.length >= 2 && lessons.length <= 4 ? "пари" : "пар"}`;
+
+      container.innerHTML = "";
+
+      if (!lessons.length) {
+        const empty = document.createElement("div");
+        empty.className = "empty";
+
+        const icon = document.createElement("div");
+        icon.className = "empty-icon";
+        icon.textContent = selectedDay >= 5 ? "🌿" : "☕";
+
+        const title = document.createElement("div");
+        title.className = "empty-title";
+        title.textContent = selectedDay >= 5
+          ? "Час відпочити!"
+          : "Пар не знайдено";
+
+        const description = document.createElement("div");
+        description.className = "empty-text";
+        description.textContent =
+          "У файлі schedule.json немає занять на цей день. " +
+          "Якщо розклад має бути, перевір дані у файлі GitHub.";
+
+        empty.append(icon, title, description);
+        container.appendChild(empty);
+        return;
+      }
+
+      lessons.forEach((lesson, index) => {
+        const card = document.createElement("article");
+        card.className = "lesson";
+        card.style.animationDelay = `${Math.min(index * 65, 350)}ms`;
+
+        const timeCol = document.createElement("div");
+        timeCol.className = "lesson-time";
+
+        const number = document.createElement("div");
+        number.className = "lesson-number";
+        number.textContent = lesson.number || index + 1;
+
+        const time = document.createElement("div");
+        time.className = "time";
+        time.textContent = lesson.time || "Час не вказано";
+
+        timeCol.append(number, time);
+
+        const main = document.createElement("div");
+        main.className = "lesson-main";
+
+        const type = document.createElement("span");
+        type.className = "lesson-type";
+        type.textContent = lesson.type || "Заняття";
+
+        const title = document.createElement("div");
+        title.className = "lesson-title";
+        title.textContent = lesson.subject || "Назву предмета не вказано";
+
+        main.append(type, title);
+
+        const teacher = makeDetail("👤", lesson.teacher);
+        const room = makeDetail("📍", lesson.room);
+        const note = makeDetail("ℹ️", lesson.note);
+
+        if (teacher) main.appendChild(teacher);
+        if (room) main.appendChild(room);
+        if (note) main.appendChild(note);
+
+        card.append(timeCol, main);
+        container.appendChild(card);
+      });
+    }
+
+    async function loadSchedule() {
+      const error = $("loadError");
+      const refresh = $("refreshBtn");
+
+      refresh.disabled = true;
+      refresh.innerHTML = '<span class="loading"></span>Завантаження';
+      error.hidden = true;
+
+      try {
+        // Файл має лежати поруч з index.html у репозиторії.
+        const response = await fetch("./schedule.json?v=" + Date.now(), {
+          cache: "no-store"
+        });
+
+        if (!response.ok) {
+          throw new Error("Не вдалося завантажити schedule.json");
         }
 
-        function onFacultyChange() {
-            const facultyIndex = document.getElementById('faculty-select').value;
-            const courseSelect = document.getElementById('course-select');
-            const groupSelect = document.getElementById('group-select');
+        const data = await response.json();
 
-            courseSelect.innerHTML = '<option value="">Оберіть курс...</option>';
-            groupSelect.innerHTML = '<option value="">Спочатку оберіть курс</option>';
-            courseSelect.disabled = true;
-            groupSelect.disabled = true;
-            document.getElementById('schedule-container').innerHTML = '<div class="empty-state">Оберіть курс та групу</div>';
-
-            if (facultyIndex === "") return;
-
-            const faculty = globalData.faculties[facultyIndex];
-            if (faculty && faculty.courses) {
-                faculty.courses.forEach((courseObj, index) => {
-                    const opt = document.createElement('option');
-                    opt.value = index;
-                    opt.textContent = `${courseObj.course} курс`;
-                    courseSelect.appendChild(opt);
-                });
-                courseSelect.disabled = false;
-            }
+        if (!data || typeof data.groups !== "object" || !data.groups) {
+          throw new Error("Перевір структуру schedule.json");
         }
 
-        function onCourseChange() {
-            const facultyIndex = document.getElementById('faculty-select').value;
-            const courseIndex = document.getElementById('course-select').value;
-            const groupSelect = document.getElementById('group-select');
+        scheduleData = data;
+        renderGroupOptions();
 
-            groupSelect.innerHTML = '<option value="">Оберіть групу...</option>';
-            groupSelect.disabled = true;
-            document.getElementById('schedule-container').innerHTML = '<div class="empty-state">Оберіть групу</div>';
+        $("updatedLabel").textContent = data.updated
+          ? `Дані розкладу: ${data.updated}`
+          : "Дані завантажено з GitHub";
 
-            if (courseIndex === "") return;
+        showToast("✓ Розклад оновлено");
+      } catch (err) {
+        error.textContent =
+          "Не вдалося завантажити schedule.json. Перевір, чи файл існує " +
+          "у тому самому репозиторії та чи збережений він у GitHub.";
+        error.hidden = false;
 
-            const courseObj = globalData.faculties[facultyIndex].courses[courseIndex];
-            if (courseObj && courseObj.groups) {
-                courseObj.groups.forEach((groupObj, index) => {
-                    const opt = document.createElement('option');
-                    opt.value = index;
-                    opt.textContent = groupObj.group_name;
-                    groupSelect.appendChild(opt);
-                });
-                groupSelect.disabled = false;
-            }
+        $("updatedLabel").textContent = "Не вдалося оновити дані";
+        renderGroupOptions();
+      } finally {
+        refresh.disabled = false;
+        refresh.textContent = "↻ Оновити розклад";
+      }
+    }
+
+    $("groupSelect").addEventListener("change", updateGroupInfo);
+
+    $("prevWeek").addEventListener("click", () => {
+      weekOffset--;
+      renderDays();
+      renderLessons();
+    });
+
+    $("nextWeek").addEventListener("click", () => {
+      weekOffset++;
+      renderDays();
+      renderLessons();
+    });
+
+    $("refreshBtn").addEventListener("click", loadSchedule);
+
+    $("shareBtn").addEventListener("click", async () => {
+      const group = $("groupSelect").value;
+      const message = `Мій розклад ВНАУ — група ${group}`;
+
+      if (tg && tg.openTelegramLink) {
+        tg.openTelegramLink(
+          "https://t.me/share/url?url=" +
+          encodeURIComponent(location.href) +
+          "&text=" + encodeURIComponent(message)
+        );
+        return;
+      }
+
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: "Розклад ВНАУ", text: message, url: location.href });
+        } catch (_) {}
+      } else if (navigator.clipboard && navigator.clipboard.writeText) {
+        try {
+          await navigator.clipboard.writeText(message + "\n" + location.href);
+          showToast("Посилання скопійовано");
+        } catch (_) {
+          showToast(message);
         }
+      } else {
+        showToast(message);
+      }
+    });
 
-        function loadSchedule() {
-            const facultyIndex = document.getElementById('faculty-select').value;
-            const courseIndex = document.getElementById('course-select').value;
-            const groupIndex = document.getElementById('group-select').value;
-            const container = document.getElementById('schedule-container');
+    document.querySelectorAll(".nav-item").forEach(item => {
+      item.addEventListener("click", () => {
+        document.querySelectorAll(".nav-item").forEach(nav =>
+          nav.classList.remove("active")
+        );
+        item.classList.add("active");
+      });
+    });
 
-            if (groupIndex === "") return;
+    $("todayLabel").textContent = formatDate(new Date(), {
+      weekday: "long", day: "numeric", month: "long"
+    });
 
-            const groupObj = globalData.faculties[facultyIndex].courses[courseIndex].groups[groupIndex];
-            const schedule = groupObj.schedule;
-
-            if (!schedule || Object.keys(schedule).length === 0) {
-                container.innerHTML = '<div class="empty-state">На цей тиждень немає пар</div>';
-                return;
-            }
-
-            let html = '';
-            for (const [day, lessons] of Object.entries(schedule)) {
-                html += `<h3 style="margin: 16px 0 8px 4px; font-size: 15px; color: var(--accent-color);">${day}</h3>`;
-                
-                if (lessons.length === 0) {
-                    html += `<div class="schedule-card"><div class="lesson-details">Вихідний / Пар немає</div></div>`;
-                } else {
-                    lessons.forEach(l => {
-                        html += `
-                            <div class="schedule-card">
-                                <div class="lesson-time">${l.time}</div>
-                                <div class="lesson-title">${l.lesson}</div>
-                                <div class="lesson-details">${l.type} • ${l.room}</div>
-                            </div>
-                        `;
-                    });
-                }
-            }
-            container.innerHTML = html;
-        }
-
-        function switchTab(tabName, element) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-item').forEach(el => el.classList.remove('active'));
-
-            document.getElementById('tab-' + tabName).classList.add('active');
-            element.classList.add('active');
-        }
-
-        // Завантажуємо дані при запуску
-        fetchScheduleData();
-    </script>
+    selectedDay = (new Date().getDay() + 6) % 7;
+    renderDays();
+    renderLessons();
+    loadSchedule();
+  </script>
 </body>
 </html>
