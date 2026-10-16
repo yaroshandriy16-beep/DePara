@@ -41,23 +41,17 @@
       <section class="glass selector-card">
         <label>Факультет
           <select id="facultySelect">
-            <option value="Технологічний факультет">Технологічний факультет</option>
-            <option value="Факультет агрономії та лісівництва">Факультет агрономії та лісівництва</option>
-            <option value="Факультет економіки та підприємництва">Факультет економіки та підприємництва</option>
-            <option value="Інший факультет">Інший факультет</option>
+            <option value="">Завантаження факультетів…</option>
           </select>
         </label>
         <div class="select-row">
           <label>Курс
             <select id="courseSelect">
-              <option value="">Не вказано</option>
-              <option value="1">1 курс</option><option value="2">2 курс</option>
-              <option value="3">3 курс</option><option value="4">4 курс</option>
-              <option value="5">5 курс</option><option value="6">6 курс</option>
+              <option value="">Виберіть курс</option>
             </select>
           </label>
           <label>Група
-            <input id="groupInput" type="text" value="ЕІ 23-1" maxlength="40" autocomplete="off" placeholder="Напр. ЕІ 23-1">
+            <select id="groupInput"><option value="">Виберіть групу</option></select>
           </label>
         </div>
         <button id="applyGroup" class="button button-primary button-full">Застосувати групу <span>↗</span></button>
@@ -70,7 +64,7 @@
       <section id="nextLessonCard" class="glass next-card">
         <div class="next-card-top"><span class="mini-tag"><span class="live-dot"></span> НАСТУПНА ПОДІЯ</span><span id="nextDate" class="muted">—</span></div>
         <h3 id="nextSubject">Розклад ще не додано</h3>
-        <p id="nextDetails" class="muted">Імпортуй файл schedule.json з актуальними заняттями.</p>
+        <p id="nextDetails" class="muted">Оберіть групу, щоб переглянути заняття.</p>
         <div class="countdown-wrap">
           <div><strong id="countDays">--</strong><small>днів</small></div>
           <div><strong id="countHours">--</strong><small>годин</small></div>
@@ -97,7 +91,7 @@
           <label class="button button-secondary button-full import-button">Імпортувати JSON <span>＋</span>
             <input id="importFile" type="file" accept=".json,application/json" hidden>
           </label>
-          <p>Імпорт замінює розклад на цьому пристрої. Для публікації всім користувачам онови файл <code>schedule.json</code> у GitHub.</p>
+          <p>Імпорт тимчасово замінює розклад вибраної групи лише на цьому пристрої. Основні дані оновлюються автоматично з GitHub.</p>
         </div>
       </section>
 
@@ -108,13 +102,13 @@
       <section class="glass reliability-card">
         <div class="reliability-row"><span class="reliability-icon">◎</span><div><strong>Статус розкладу</strong><small id="dataStatus">Очікує завантаження</small></div><span id="dataStatusBadge" class="tag tag-warning">Немає даних</span></div>
         <div class="reliability-row"><span class="reliability-icon">↻</span><div><strong>Остання перевірка</strong><small id="lastChecked">Ще не перевіряли</small></div></div>
-        <div class="reliability-row"><span class="reliability-icon">▤</span><div><strong>Джерело даних</strong><small id="dataSource">schedule.json • локальний файл проєкту</small></div></div>
+        <div class="reliability-row"><span class="reliability-icon">▤</span><div><strong>Джерело даних</strong><small id="dataSource">data/groups/ID.json • GitHub</small></div></div>
         <div class="reliability-row"><span class="reliability-icon">◉</span><div><strong>Збережена копія</strong><small id="cacheStatus">Кеш ще не створено</small></div></div>
         <div class="reliability-note"><strong>Зверни увагу</strong><p>Якщо дані старі або відсутні, перевір офіційне джерело розкладу. Кеш допомагає переглядати вже завантажений розклад офлайн, але не підтверджує його актуальність.</p></div>
       </section>
     </main>
 
-    <footer class="footer"><span class="brand-mark small-mark">V</span><span>VNAU Student Space</span><span id="appVersion">v0.1.0</span></footer>
+    <footer class="footer"><span class="brand-mark small-mark">V</span><span>VNAU Student Space</span><span id="appVersion">v0.2.0</span></footer>
     <nav class="bottom-nav" aria-label="Основна навігація">
       <a href="#top" class="nav-item active" data-nav="home"><span>⌂</span><small>Головна</small></a>
       <a href="#scheduleList" class="nav-item" data-nav="schedule"><span>▦</span><small>Розклад</small></a>
