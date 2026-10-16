@@ -1,0 +1,40 @@
+name: Probe VNAU teachers
+on:
+  workflow_dispatch:
+    inputs:
+      teacher_id:
+        description: 'Optional sample teacher ID'
+        required: false
+        default: '1998'
+      chair_id:
+        description: 'Optional sample department ID'
+        required: false
+        default: '145'
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: python -m pip install requests beautifulsoup4
+      - name: Probe official teacher form
+        env:
+          TEACHER_ID: ${{ inputs.teacher_id }}
+          TEACHER_CHAIR_ID: ${{ inputs.chair_id }}
+        run: python scripts/probe_teachers.py
+      - name: Upload diagnostics (not committed)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vnau-teacher-diagnostics
+          path: |
+            teacher-diagnostics/
+            data/teachers/initial-options.json
+          if-no-files-found: warn
+          retention-days: 7
