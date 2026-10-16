@@ -2,18 +2,8 @@ name: Update VNAU free classrooms
 
 on:
   workflow_dispatch:
-    inputs:
-      date:
-        description: 'Date YYYY-MM-DD (blank = today in Kyiv)'
-        required: false
-        type: string
-      pair:
-        description: 'Pair number (1-12)'
-        required: false
-        default: '2'
-        type: string
   schedule:
-    - cron: '17 */2 * * *'
+    - cron: '17 4,10,16,22 * * *'
 
 permissions:
   contents: write
@@ -25,34 +15,24 @@ concurrency:
 jobs:
   update:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 20
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          persist-credentials: true
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - name: Install dependencies
         run: python -m pip install -r scripts/requirements.txt
-      - name: Download official classroom status
-        env:
-          REQUESTED_DATE: ${{ inputs.date }}
-          REQUESTED_PAIR: ${{ inputs.pair }}
+      - name: Download classroom snapshots (3 days, pairs 1-6)
+        run: python scripts/fetch_room_calendar.py --days 3 --pairs 6
+      - name: Commit results
         run: |
-          DAY="${REQUESTED_DATE:-$(TZ=Europe/Kyiv date +%Y-%m-%d)}"
-          PAIR="${REQUESTED_PAIR:-2}"
-          python scripts/fetch_free_rooms.py --date "$DAY" --start-pair "$PAIR" --end-pair "$PAIR" --output data/campus/free-classrooms.json
-      - name: Commit updated JSON
-        run: |
-          if git diff --quiet -- data/campus/free-classrooms.json && [ -z "$(git ls-files --others --exclude-standard -- data/campus/free-classrooms.json)" ]; then
-            echo 'No changes to commit'
-            exit 0
-          fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add data/campus/free-classrooms.json
-          git commit -m 'Update VNAU free classrooms'
-          git push
+          git add data/campus/index.json data/campus/snapshots/
+          if git diff --cached --quiet; then
+            echo 'No updates'
+          else
+            git commit -m 'Update classroom snapshots by date and pair'
+            git push
+          fi
