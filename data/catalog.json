@@ -1,0 +1,2048 @@
+{
+  "updatedAt": "2026-10-16T02:19:22.310288+00:00",
+  "faculties": [
+    {
+      "id": "42",
+      "name": "Обліку, фінансів та аудиту",
+      "courses": [
+        {
+          "course": 1,
+          "groups": [
+            {
+              "id": "4134",
+              "name": "ОП-26-1",
+              "path": "data/groups/4134.json"
+            },
+            {
+              "id": "3966",
+              "name": "ФБС-26-1",
+              "path": "data/groups/3966.json"
+            },
+            {
+              "id": "4132",
+              "name": "ОП-26-1 з.",
+              "path": "data/groups/4132.json"
+            },
+            {
+              "id": "4139",
+              "name": "ФБС-26-1 з.",
+              "path": "data/groups/4139.json"
+            }
+          ]
+        },
+        {
+          "course": 2,
+          "groups": [
+            {
+              "id": "3974",
+              "name": "ОП-25-1",
+              "path": "data/groups/3974.json"
+            },
+            {
+              "id": "3978",
+              "name": "ФБС-25-1",
+              "path": "data/groups/3978.json"
+            },
+            {
+              "id": "4041",
+              "name": "ОП-25-1 з.",
+              "path": "data/groups/4041.json"
+            },
+            {
+              "id": "4138",
+              "name": "ОП-26-ТПК ступ.з.",
+              "path": "data/groups/4138.json"
+            },
+            {
+              "id": "4136",
+              "name": "ОП-26-ступ. Мог.Под.з.",
+              "path": "data/groups/4136.json"
+            },
+            {
+              "id": "4046",
+              "name": "ФБС-25-1 з.",
+              "path": "data/groups/4046.json"
+            }
+          ]
+        },
+        {
+          "course": 3,
+          "groups": [
+            {
+              "id": "3914",
+              "name": "ОП-24-1",
+              "path": "data/groups/3914.json"
+            },
+            {
+              "id": "3918",
+              "name": "ФБС-24-1",
+              "path": "data/groups/3918.json"
+            },
+            {
+              "id": "3915",
+              "name": "ОП-24-1 з.",
+              "path": "data/groups/3915.json"
+            },
+            {
+              "id": "4045",
+              "name": "ОП-25-ТПК ступ.з.",
+              "path": "data/groups/4045.json"
+            },
+            {
+              "id": "4044",
+              "name": "ОП-25-ступ. Мог.Под.з.",
+              "path": "data/groups/4044.json"
+            },
+            {
+              "id": "4043",
+              "name": "ОП-25ступ.Лад.з",
+              "path": "data/groups/4043.json"
+            },
+            {
+              "id": "3920",
+              "name": "ФБС-24-1 з.",
+              "path": "data/groups/3920.json"
+            }
+          ]
+        },
+        {
+          "course": 4,
+          "groups": [
+            {
+              "id": "3721",
+              "name": "ОП-23-1",
+              "path": "data/groups/3721.json"
+            },
+            {
+              "id": "3724",
+              "name": "ФБС-23-1",
+              "path": "data/groups/3724.json"
+            },
+            {
+              "id": "3746",
+              "name": "ОП-23-1 з.",
+              "path": "data/groups/3746.json"
+            },
+            {
+              "id": "3540",
+              "name": "ОП-24-ТПК ступ.з.",
+              "path": "data/groups/3540.json"
+            },
+            {
+              "id": "3925",
+              "name": "ОП-24-ступ. Мог.Под.з.",
+              "path": "data/groups/3925.json"
+            },
+            {
+              "id": "3923",
+              "name": "ОП-24ступ.Лад.з.",
+              "path": "data/groups/3923.json"
+            },
+            {
+              "id": "3754",
+              "name": "ФБС-23-1 з.",
+              "path": "data/groups/3754.json"
+            }
+          ]
+        },
+        {
+          "course": 5,
+          "groups": [
+            {
+              "id": "3850",
+              "name": "ОП-26-1 маг.",
+              "path": "data/groups/3850.json"
+            },
+            {
+              "id": "3972",
+              "name": "ФБС-26-1 маг.",
+              "path": "data/groups/3972.json"
+            }
+          ]
+        },
+        {
+          "course": 6,
+          "groups": [
+            {
+              "id": "3976",
+              "name": "ОП-25-1 маг.",
+              "path": "data/groups/3976.json"
+            },
+            {
+              "id": "3985",
+              "name": "ФБС-25-1 маг.",
+              "path": "data/groups/3985.json"
+            },
+            {
+              "id": "4137",
+              "name": "ОП-26-1 маг.з.",
+              "path": "data/groups/4137.json"
+            },
+            {
+              "id": "4140",
+              "name": "ФБС-26-1 маг.з.",
+              "path": "data/groups/4140.json"
+            }
+          ]
+        },
+        {
+          "course": 7,
+          "groups": [
+            {
+              "id": "4042",
+              "name": "ОП-25-1 маг.з.",
+              "path": "data/groups/4042.json"
+            },
+            {
+              "id": "4047",
+              "name": "ФБС-25-1 маг.з.",
+              "path": "data/groups/4047.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1",
+      "name": "Агрономії, садівництва та захисту рослин",
+      "courses": [
+        {
+          "course": 1,
+          "groups": [
+            {
+              "id": "4071",
+              "name": "А-26-1",
+              "path": "data/groups/4071.json"
+            },
+            {
+              "id": "4213",
+              "name": "А-26-10",
+              "path": "data/groups/4213.json"
+            },
+            {
+              "id": "4090",
+              "name": "А-26-2",
+              "path": "data/groups/4090.json"
+            },
+            {
+              "id": "4092",
+              "name": "А-26-3",
+              "path": "data/groups/4092.json"
+            },
+            {
+              "id": "4093",
+              "name": "А-26-4",
+              "path": "data/groups/4093.json"
+            },
+            {
+              "id": "4094",
+              "name": "А-26-5",
+              "path": "data/groups/4094.json"
+            },
+            {
+              "id": "4095",
+              "name": "А-26-6",
+              "path": "data/groups/4095.json"
+            },
+            {
+              "id": "4207",
+              "name": "А-26-7",
+              "path": "data/groups/4207.json"
+            },
+            {
+              "id": "4208",
+              "name": "А-26-8",
+              "path": "data/groups/4208.json"
+            },
+            {
+              "id": "4209",
+              "name": "А-26-9",
+              "path": "data/groups/4209.json"
+            },
+            {
+              "id": "4100",
+              "name": "Е-2026-1",
+              "path": "data/groups/4100.json"
+            },
+            {
+              "id": "4103",
+              "name": "ЗКР-2026-1",
+              "path": "data/groups/4103.json"
+            },
+            {
+              "id": "4104",
+              "name": "ЛГ-26-1",
+              "path": "data/groups/4104.json"
+            },
+            {
+              "id": "4210",
+              "name": "ЛГ-26-2",
+              "path": "data/groups/4210.json"
+            },
+            {
+              "id": "4108",
+              "name": "СПГ-2026-1",
+              "path": "data/groups/4108.json"
+            },
+            {
+              "id": "4211",
+              "name": "СПГ-2026-2",
+              "path": "data/groups/4211.json"
+            },
+            {
+              "id": "4113",
+              "name": "СіВ -26-1",
+              "path": "data/groups/4113.json"
+            },
+            {
+              "id": "4096",
+              "name": "А-26-1 з.",
+              "path": "data/groups/4096.json"
+            },
+            {
+              "id": "4215",
+              "name": "А-26-2 з.",
+              "path": "data/groups/4215.json"
+            },
+            {
+              "id": "4102",
+              "name": "Е-26-1 з.",
+              "path": "data/groups/4102.json"
+            },
+            {
+              "id": "4105",
+              "name": "ЛГ-26-1 з.",
+              "path": "data/groups/4105.json"
+            },
+            {
+              "id": "4110",
+              "name": "СПГ-2026-1 з.",
+              "path": "data/groups/4110.json"
+            },
+            {
+              "id": "4114",
+              "name": "СіВ-26-1 з.",
+              "path": "data/groups/4114.json"
+            }
+          ]
+        },
+        {
+          "course": 2,
+          "groups": [
+            {
+              "id": "3967",
+              "name": "А-25-1",
+              "path": "data/groups/3967.json"
+            },
+            {
+              "id": "3968",
+              "name": "А-25-2",
+              "path": "data/groups/3968.json"
+            },
+            {
+              "id": "3969",
+              "name": "А-25-3",
+              "path": "data/groups/3969.json"
+            },
+            {
+              "id": "3970",
+              "name": "А-25-4",
+              "path": "data/groups/3970.json"
+            },
+            {
+              "id": "3971",
+              "name": "А-25-5",
+              "path": "data/groups/3971.json"
+            },
+            {
+              "id": "4085",
+              "name": "А-25-6",
+              "path": "data/groups/4085.json"
+            },
+            {
+              "id": "4086",
+              "name": "А-25-7",
+              "path": "data/groups/4086.json"
+            },
+            {
+              "id": "3986",
+              "name": "Е-2025-1",
+              "path": "data/groups/3986.json"
+            },
+            {
+              "id": "3994",
+              "name": "ЗКР-2025-1",
+              "path": "data/groups/3994.json"
+            },
+            {
+              "id": "3997",
+              "name": "ЛГ-25-1",
+              "path": "data/groups/3997.json"
+            },
+            {
+              "id": "4007",
+              "name": "СПГ-2025-1",
+              "path": "data/groups/4007.json"
+            },
+            {
+              "id": "4010",
+              "name": "СіВ-25-1",
+              "path": "data/groups/4010.json"
+            },
+            {
+              "id": "4026",
+              "name": "А-25-1 з.",
+              "path": "data/groups/4026.json"
+            },
+            {
+              "id": "4029",
+              "name": "Е-25-1 з.",
+              "path": "data/groups/4029.json"
+            },
+            {
+              "id": "4031",
+              "name": "ЛГ-25-1з.",
+              "path": "data/groups/4031.json"
+            },
+            {
+              "id": "4034",
+              "name": "СПГ-2025-1 з.",
+              "path": "data/groups/4034.json"
+            },
+            {
+              "id": "4084",
+              "name": "СіВ-25-1з.",
+              "path": "data/groups/4084.json"
+            }
+          ]
+        },
+        {
+          "course": 3,
+          "groups": [
+            {
+              "id": "3807",
+              "name": "А-24-1",
+              "path": "data/groups/3807.json"
+            },
+            {
+              "id": "3808",
+              "name": "А-24-2",
+              "path": "data/groups/3808.json"
+            },
+            {
+              "id": "3809",
+              "name": "А-24-3",
+              "path": "data/groups/3809.json"
+            },
+            {
+              "id": "3810",
+              "name": "А-24-4",
+              "path": "data/groups/3810.json"
+            },
+            {
+              "id": "3811",
+              "name": "А-24-5",
+              "path": "data/groups/3811.json"
+            },
+            {
+              "id": "3932",
+              "name": "А-24-6",
+              "path": "data/groups/3932.json"
+            },
+            {
+              "id": "3973",
+              "name": "А-25-7 ступ",
+              "path": "data/groups/3973.json"
+            },
+            {
+              "id": "3817",
+              "name": "Е-2024-1",
+              "path": "data/groups/3817.json"
+            },
+            {
+              "id": "3820",
+              "name": "ЗКР-2024-1",
+              "path": "data/groups/3820.json"
+            },
+            {
+              "id": "3821",
+              "name": "ЛГ-24-1",
+              "path": "data/groups/3821.json"
+            },
+            {
+              "id": "3957",
+              "name": "СПВ-24-1",
+              "path": "data/groups/3957.json"
+            },
+            {
+              "id": "3823",
+              "name": "СПГ-2024-1",
+              "path": "data/groups/3823.json"
+            },
+            {
+              "id": "3833",
+              "name": "А-24-1 з.",
+              "path": "data/groups/3833.json"
+            },
+            {
+              "id": "4027",
+              "name": "А-25-1 ступ.з.",
+              "path": "data/groups/4027.json"
+            },
+            {
+              "id": "3955",
+              "name": "Е-24-1 з",
+              "path": "data/groups/3955.json"
+            },
+            {
+              "id": "3838",
+              "name": "ЛГ-24-1з.",
+              "path": "data/groups/3838.json"
+            },
+            {
+              "id": "3840",
+              "name": "СПГ-2024-1 з.",
+              "path": "data/groups/3840.json"
+            }
+          ]
+        },
+        {
+          "course": 4,
+          "groups": [
+            {
+              "id": "3690",
+              "name": "А-23-1",
+              "path": "data/groups/3690.json"
+            },
+            {
+              "id": "3691",
+              "name": "А-23-2",
+              "path": "data/groups/3691.json"
+            },
+            {
+              "id": "3692",
+              "name": "А-23-3",
+              "path": "data/groups/3692.json"
+            },
+            {
+              "id": "3693",
+              "name": "А-23-4",
+              "path": "data/groups/3693.json"
+            },
+            {
+              "id": "3694",
+              "name": "А-23-5",
+              "path": "data/groups/3694.json"
+            },
+            {
+              "id": "3695",
+              "name": "А-23-6",
+              "path": "data/groups/3695.json"
+            },
+            {
+              "id": "3818",
+              "name": "А-24-7 ступ",
+              "path": "data/groups/3818.json"
+            },
+            {
+              "id": "3652",
+              "name": "Е-2023-1",
+              "path": "data/groups/3652.json"
+            },
+            {
+              "id": "3704",
+              "name": "ЗКР-2023-1",
+              "path": "data/groups/3704.json"
+            },
+            {
+              "id": "3713",
+              "name": "ЛГ-23-1",
+              "path": "data/groups/3713.json"
+            },
+            {
+              "id": "3794",
+              "name": "ЛГ-23-2",
+              "path": "data/groups/3794.json"
+            },
+            {
+              "id": "3712",
+              "name": "СПВ-23-1",
+              "path": "data/groups/3712.json"
+            },
+            {
+              "id": "3715",
+              "name": "СПГ-2023-1",
+              "path": "data/groups/3715.json"
+            },
+            {
+              "id": "3730",
+              "name": "А-23-1 з.",
+              "path": "data/groups/3730.json"
+            },
+            {
+              "id": "3731",
+              "name": "А-24-1 ступ з.",
+              "path": "data/groups/3731.json"
+            },
+            {
+              "id": "3738",
+              "name": "Е-23-1 з.",
+              "path": "data/groups/3738.json"
+            },
+            {
+              "id": "3743",
+              "name": "ЛГ-23-1 з.",
+              "path": "data/groups/3743.json"
+            },
+            {
+              "id": "3744",
+              "name": "СПГ-2023-1 з.",
+              "path": "data/groups/3744.json"
+            },
+            {
+              "id": "3742",
+              "name": "СіВ-23-1 з.",
+              "path": "data/groups/3742.json"
+            }
+          ]
+        },
+        {
+          "course": 5,
+          "groups": [
+            {
+              "id": "4097",
+              "name": "А-26-1 маг.",
+              "path": "data/groups/4097.json"
+            },
+            {
+              "id": "4123",
+              "name": "А-26-2 маг.",
+              "path": "data/groups/4123.json"
+            },
+            {
+              "id": "4099",
+              "name": "Е-2026-1 маг.",
+              "path": "data/groups/4099.json"
+            },
+            {
+              "id": "4106",
+              "name": "ЛГ-26- маг.",
+              "path": "data/groups/4106.json"
+            },
+            {
+              "id": "4111",
+              "name": "СПГ-26-1 маг.",
+              "path": "data/groups/4111.json"
+            }
+          ]
+        },
+        {
+          "course": 6,
+          "groups": [
+            {
+              "id": "3980",
+              "name": "А-25-1 маг.",
+              "path": "data/groups/3980.json"
+            },
+            {
+              "id": "3981",
+              "name": "А-25-2 маг.",
+              "path": "data/groups/3981.json"
+            },
+            {
+              "id": "3982",
+              "name": "А-25-3 маг.",
+              "path": "data/groups/3982.json"
+            },
+            {
+              "id": "3990",
+              "name": "Е-2025-1 маг.",
+              "path": "data/groups/3990.json"
+            },
+            {
+              "id": "4005",
+              "name": "ЛГ -25 -маг",
+              "path": "data/groups/4005.json"
+            },
+            {
+              "id": "4009",
+              "name": "СПГ-25-1 маг.",
+              "path": "data/groups/4009.json"
+            },
+            {
+              "id": "4098",
+              "name": "А-26-1 маг.з.",
+              "path": "data/groups/4098.json"
+            },
+            {
+              "id": "4101",
+              "name": "Е-26-1 маг.з.",
+              "path": "data/groups/4101.json"
+            },
+            {
+              "id": "4109",
+              "name": "ЛГ-26-1 маг.з",
+              "path": "data/groups/4109.json"
+            }
+          ]
+        },
+        {
+          "course": 7,
+          "groups": [
+            {
+              "id": "4028",
+              "name": "А-25-1 маг.з.",
+              "path": "data/groups/4028.json"
+            },
+            {
+              "id": "4030",
+              "name": "Е-25-1 маг.з.",
+              "path": "data/groups/4030.json"
+            },
+            {
+              "id": "4033",
+              "name": "ЛГ-25-1 маг.з.",
+              "path": "data/groups/4033.json"
+            },
+            {
+              "id": "4036",
+              "name": "СПГ-25 маг.з.",
+              "path": "data/groups/4036.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "57",
+      "name": "Факультет ветеринарної медицини",
+      "courses": [
+        {
+          "course": 1,
+          "groups": [
+            {
+              "id": "4173",
+              "name": "Вм-26-1",
+              "path": "data/groups/4173.json"
+            },
+            {
+              "id": "4212",
+              "name": "Вм-26-2",
+              "path": "data/groups/4212.json"
+            }
+          ]
+        },
+        {
+          "course": 2,
+          "groups": [
+            {
+              "id": "4023",
+              "name": "Вм-25-1",
+              "path": "data/groups/4023.json"
+            }
+          ]
+        },
+        {
+          "course": 3,
+          "groups": [
+            {
+              "id": "3947",
+              "name": "Вм-24-1",
+              "path": "data/groups/3947.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "name": "Факультет технології виробництва, переробки та робототехніки у тваринництві",
+      "courses": [
+        {
+          "course": 1,
+          "groups": [
+            {
+              "id": "4115",
+              "name": "Т-26-1",
+              "path": "data/groups/4115.json"
+            },
+            {
+              "id": "4172",
+              "name": "ТЕхт-26",
+              "path": "data/groups/4172.json"
+            },
+            {
+              "id": "4119",
+              "name": "ХТІ-26-1",
+              "path": "data/groups/4119.json"
+            },
+            {
+              "id": "4203",
+              "name": "ХТІ-26-2",
+              "path": "data/groups/4203.json"
+            },
+            {
+              "id": "4116",
+              "name": "Т-26-1 з.",
+              "path": "data/groups/4116.json"
+            },
+            {
+              "id": "4120",
+              "name": "ХТІ-26-1 з.",
+              "path": "data/groups/4120.json"
+            }
+          ]
+        },
+        {
+          "course": 2,
+          "groups": [
+            {
+              "id": "4013",
+              "name": "Т-25-1",
+              "path": "data/groups/4013.json"
+            },
+            {
+              "id": "4018",
+              "name": "ТЕхт-25",
+              "path": "data/groups/4018.json"
+            },
+            {
+              "id": "4017",
+              "name": "ХТІ-25-1",
+              "path": "data/groups/4017.json"
+            },
+            {
+              "id": "4216",
+              "name": "ХТІ-25-2",
+              "path": "data/groups/4216.json"
+            },
+            {
+              "id": "4037",
+              "name": "Т-25-1 з.",
+              "path": "data/groups/4037.json"
+            },
+            {
+              "id": "4039",
+              "name": "ХТІ-25-1.з.",
+              "path": "data/groups/4039.json"
+            }
+          ]
+        },
+        {
+          "course": 3,
+          "groups": [
+            {
+              "id": "3846",
+              "name": "Т-24-1",
+              "path": "data/groups/3846.json"
+            },
+            {
+              "id": "3541",
+              "name": "ХТІ-24-1",
+              "path": "data/groups/3541.json"
+            },
+            {
+              "id": "4087",
+              "name": "ХТІ-25 -2 ступ",
+              "path": "data/groups/4087.json"
+            },
+            {
+              "id": "3861",
+              "name": "Т-24-1 з.",
+              "path": "data/groups/3861.json"
+            },
+            {
+              "id": "3927",
+              "name": "ХТІ-24-1 з.",
+              "path": "data/groups/3927.json"
+            }
+          ]
+        },
+        {
+          "course": 4,
+          "groups": [
+            {
+              "id": "3614",
+              "name": "ВМ-23-1",
+              "path": "data/groups/3614.json"
+            },
+            {
+              "id": "3656",
+              "name": "Т-23-1",
+              "path": "data/groups/3656.json"
+            },
+            {
+              "id": "3790",
+              "name": "Т-23-2",
+              "path": "data/groups/3790.json"
+            },
+            {
+              "id": "3663",
+              "name": "ХТІ-23-1",
+              "path": "data/groups/3663.json"
+            },
+            {
+              "id": "3792",
+              "name": "ХТІ-23-2",
+              "path": "data/groups/3792.json"
+            },
+            {
+              "id": "3703",
+              "name": "Т-23-1 з.",
+              "path": "data/groups/3703.json"
+            },
+            {
+              "id": "3707",
+              "name": "ХТІ-23-1 з.",
+              "path": "data/groups/3707.json"
+            }
+          ]
+        },
+        {
+          "course": 5,
+          "groups": [
+            {
+              "id": "4117",
+              "name": "Т-26-1 маг.",
+              "path": "data/groups/4117.json"
+            },
+            {
+              "id": "4121",
+              "name": "ХТІ-26-1 маг.",
+              "path": "data/groups/4121.json"
+            }
+          ]
+        },
+        {
+          "course": 6,
+          "groups": [
+            {
+              "id": "4016",
+              "name": "Т-25-1 маг.",
+              "path": "data/groups/4016.json"
+            },
+            {
+              "id": "4022",
+              "name": "ХТІ-25-1маг.",
+              "path": "data/groups/4022.json"
+            },
+            {
+              "id": "4118",
+              "name": "Т-26-1 маг.з.",
+              "path": "data/groups/4118.json"
+            },
+            {
+              "id": "4122",
+              "name": "ХТІ-26-маг.з.",
+              "path": "data/groups/4122.json"
+            }
+          ]
+        },
+        {
+          "course": 7,
+          "groups": [
+            {
+              "id": "4038",
+              "name": "Т-25-1 маг.з.",
+              "path": "data/groups/4038.json"
+            },
+            {
+              "id": "4074",
+              "name": "ХТІ -25-маг.з.",
+              "path": "data/groups/4074.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "7",
+      "name": "Інженерно-технологійний факультет",
+      "courses": [
+        {
+          "course": 1,
+          "groups": [
+            {
+              "id": "4126",
+              "name": "АІ-26-1",
+              "path": "data/groups/4126.json"
+            },
+            {
+              "id": "4127",
+              "name": "АІ-26-2",
+              "path": "data/groups/4127.json"
+            },
+            {
+              "id": "4191",
+              "name": "АІ-26-3",
+              "path": "data/groups/4191.json"
+            },
+            {
+              "id": "4204",
+              "name": "АІ-26-4",
+              "path": "data/groups/4204.json"
+            },
+            {
+              "id": "4205",
+              "name": "АІ-26-5",
+              "path": "data/groups/4205.json"
+            },
+            {
+              "id": "4214",
+              "name": "АІ-26-6",
+              "path": "data/groups/4214.json"
+            },
+            {
+              "id": "4128",
+              "name": "ГІТ-26",
+              "path": "data/groups/4128.json"
+            },
+            {
+              "id": "4124",
+              "name": "ЕІ-26-1",
+              "path": "data/groups/4124.json"
+            },
+            {
+              "id": "4206",
+              "name": "ЕІ-26-2",
+              "path": "data/groups/4206.json"
+            },
+            {
+              "id": "4125",
+              "name": "Маш- 26",
+              "path": "data/groups/4125.json"
+            },
+            {
+              "id": "4183",
+              "name": "АІ-26-1 з.",
+              "path": "data/groups/4183.json"
+            },
+            {
+              "id": "4187",
+              "name": "ЕІ-26-1 з.",
+              "path": "data/groups/4187.json"
+            },
+            {
+              "id": "4186",
+              "name": "Маш.-26-1 бак.з.",
+              "path": "data/groups/4186.json"
+            }
+          ]
+        },
+        {
+          "course": 2,
+          "groups": [
+            {
+              "id": "3991",
+              "name": "АІ-25-1",
+              "path": "data/groups/3991.json"
+            },
+            {
+              "id": "3992",
+              "name": "АІ-25-2",
+              "path": "data/groups/3992.json"
+            },
+            {
+              "id": "3993",
+              "name": "АІ-25-3",
+              "path": "data/groups/3993.json"
+            },
+            {
+              "id": "4012",
+              "name": "ГІТ-25",
+              "path": "data/groups/4012.json"
+            },
+            {
+              "id": "4020",
+              "name": "ЕІ-25-1",
+              "path": "data/groups/4020.json"
+            },
+            {
+              "id": "4014",
+              "name": "Маш.-25-1",
+              "path": "data/groups/4014.json"
+            },
+            {
+              "id": "4063",
+              "name": "АІ-25-1 з.",
+              "path": "data/groups/4063.json"
+            },
+            {
+              "id": "4184",
+              "name": "АІ-26-1 Черн.з.",
+              "path": "data/groups/4184.json"
+            },
+            {
+              "id": "4185",
+              "name": "АІ-26-Лад.з.",
+              "path": "data/groups/4185.json"
+            },
+            {
+              "id": "4067",
+              "name": "ЕІ-25-1з.",
+              "path": "data/groups/4067.json"
+            },
+            {
+              "id": "4069",
+              "name": "Маш.-25-1 бак.з.",
+              "path": "data/groups/4069.json"
+            }
+          ]
+        },
+        {
+          "course": 3,
+          "groups": [
+            {
+              "id": "3828",
+              "name": "АІ-24-1",
+              "path": "data/groups/3828.json"
+            },
+            {
+              "id": "3829",
+              "name": "АІ-24-2",
+              "path": "data/groups/3829.json"
+            },
+            {
+              "id": "3831",
+              "name": "АІ-24-3",
+              "path": "data/groups/3831.json"
+            },
+            {
+              "id": "3995",
+              "name": "АІ-25-4 ступ.",
+              "path": "data/groups/3995.json"
+            },
+            {
+              "id": "4083",
+              "name": "АІ-25-5 ступ.",
+              "path": "data/groups/4083.json"
+            },
+            {
+              "id": "3839",
+              "name": "ГІТ-24-1",
+              "path": "data/groups/3839.json"
+            },
+            {
+              "id": "3852",
+              "name": "ЕІ-24-1",
+              "path": "data/groups/3852.json"
+            },
+            {
+              "id": "4021",
+              "name": "ЕІ-25-2 ступ.",
+              "path": "data/groups/4021.json"
+            },
+            {
+              "id": "3841",
+              "name": "Маш-24-1",
+              "path": "data/groups/3841.json"
+            },
+            {
+              "id": "4015",
+              "name": "Маш-25-2 ступ.",
+              "path": "data/groups/4015.json"
+            },
+            {
+              "id": "3856",
+              "name": "АІ-24-1з.",
+              "path": "data/groups/3856.json"
+            },
+            {
+              "id": "4066",
+              "name": "АІ-25-1 Черн.з.",
+              "path": "data/groups/4066.json"
+            },
+            {
+              "id": "3864",
+              "name": "ЕІ-24-1з.",
+              "path": "data/groups/3864.json"
+            },
+            {
+              "id": "3862",
+              "name": "Маш.-24-1бак.з.",
+              "path": "data/groups/3862.json"
+            }
+          ]
+        },
+        {
+          "course": 4,
+          "groups": [
+            {
+              "id": "3640",
+              "name": "АІ-23-1",
+              "path": "data/groups/3640.json"
+            },
+            {
+              "id": "3653",
+              "name": "АІ-23-2",
+              "path": "data/groups/3653.json"
+            },
+            {
+              "id": "3654",
+              "name": "АІ-23-3",
+              "path": "data/groups/3654.json"
+            },
+            {
+              "id": "3651",
+              "name": "АІ-23-4",
+              "path": "data/groups/3651.json"
+            },
+            {
+              "id": "3837",
+              "name": "АІ-24-5ступ.",
+              "path": "data/groups/3837.json"
+            },
+            {
+              "id": "3487",
+              "name": "ГІТ-23-1",
+              "path": "data/groups/3487.json"
+            },
+            {
+              "id": "3641",
+              "name": "ЕІ-23-1",
+              "path": "data/groups/3641.json"
+            },
+            {
+              "id": "3669",
+              "name": "Маш-23-1",
+              "path": "data/groups/3669.json"
+            },
+            {
+              "id": "3847",
+              "name": "Маш-24-2к.ступ.",
+              "path": "data/groups/3847.json"
+            },
+            {
+              "id": "3709",
+              "name": "АІ-23-1з.",
+              "path": "data/groups/3709.json"
+            },
+            {
+              "id": "3860",
+              "name": "АІ-24-1 Черн.з.",
+              "path": "data/groups/3860.json"
+            },
+            {
+              "id": "3857",
+              "name": "АІ-24-Лад.з.",
+              "path": "data/groups/3857.json"
+            },
+            {
+              "id": "3741",
+              "name": "ЕІ-23-1з.",
+              "path": "data/groups/3741.json"
+            },
+            {
+              "id": "3739",
+              "name": "Маш.-23-1бак.з.",
+              "path": "data/groups/3739.json"
+            }
+          ]
+        },
+        {
+          "course": 5,
+          "groups": [
+            {
+              "id": "4131",
+              "name": "АІ-26 маг.",
+              "path": "data/groups/4131.json"
+            },
+            {
+              "id": "4129",
+              "name": "ЕІ-26-маг.",
+              "path": "data/groups/4129.json"
+            },
+            {
+              "id": "4130",
+              "name": "Маш-26 маг.",
+              "path": "data/groups/4130.json"
+            }
+          ]
+        },
+        {
+          "course": 6,
+          "groups": [
+            {
+              "id": "4006",
+              "name": "АІ-25 маг",
+              "path": "data/groups/4006.json"
+            },
+            {
+              "id": "4025",
+              "name": "ЕІ-25-маг.",
+              "path": "data/groups/4025.json"
+            },
+            {
+              "id": "4019",
+              "name": "Маш-25 маг.",
+              "path": "data/groups/4019.json"
+            },
+            {
+              "id": "4190",
+              "name": "АІ-26-1 маг.з.",
+              "path": "data/groups/4190.json"
+            },
+            {
+              "id": "4188",
+              "name": "ЕІ-26-1 Маг.з.",
+              "path": "data/groups/4188.json"
+            },
+            {
+              "id": "4189",
+              "name": "Маш-26-маг.з.",
+              "path": "data/groups/4189.json"
+            }
+          ]
+        },
+        {
+          "course": 7,
+          "groups": [
+            {
+              "id": "4065",
+              "name": "АІ-25-1 маг.з.",
+              "path": "data/groups/4065.json"
+            },
+            {
+              "id": "4068",
+              "name": "ЕІ-25-1 Маг.з.",
+              "path": "data/groups/4068.json"
+            },
+            {
+              "id": "4070",
+              "name": "Маш.-25-маг.з.",
+              "path": "data/groups/4070.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "6",
+      "name": "Менеджменту та права",
+      "courses": [
+        {
+          "course": 1,
+          "groups": [
+            {
+              "id": "4133",
+              "name": "МН-26-1",
+              "path": "data/groups/4133.json"
+            },
+            {
+              "id": "4176",
+              "name": "МН-26-2",
+              "path": "data/groups/4176.json"
+            },
+            {
+              "id": "4179",
+              "name": "Марк-26-1",
+              "path": "data/groups/4179.json"
+            },
+            {
+              "id": "4180",
+              "name": "ПР-26-1",
+              "path": "data/groups/4180.json"
+            },
+            {
+              "id": "4181",
+              "name": "ПУА-26",
+              "path": "data/groups/4181.json"
+            },
+            {
+              "id": "4193",
+              "name": "МН-26 з.",
+              "path": "data/groups/4193.json"
+            },
+            {
+              "id": "4201",
+              "name": "Марк-26 з.",
+              "path": "data/groups/4201.json"
+            },
+            {
+              "id": "4199",
+              "name": "ПР-26-1 з.",
+              "path": "data/groups/4199.json"
+            },
+            {
+              "id": "4202",
+              "name": "ПУА-26 з.",
+              "path": "data/groups/4202.json"
+            }
+          ]
+        },
+        {
+          "course": 2,
+          "groups": [
+            {
+              "id": "3965",
+              "name": "МН-25-1",
+              "path": "data/groups/3965.json"
+            },
+            {
+              "id": "3975",
+              "name": "Марк.-25-1",
+              "path": "data/groups/3975.json"
+            },
+            {
+              "id": "3979",
+              "name": "ПР-25-1",
+              "path": "data/groups/3979.json"
+            },
+            {
+              "id": "3977",
+              "name": "ПУА-25-1",
+              "path": "data/groups/3977.json"
+            },
+            {
+              "id": "4055",
+              "name": "МН-25 з.",
+              "path": "data/groups/4055.json"
+            },
+            {
+              "id": "4058",
+              "name": "Марк.-25 з.",
+              "path": "data/groups/4058.json"
+            },
+            {
+              "id": "4062",
+              "name": "ПР-25-1 з.",
+              "path": "data/groups/4062.json"
+            },
+            {
+              "id": "4060",
+              "name": "ПУА-25-1 з.",
+              "path": "data/groups/4060.json"
+            }
+          ]
+        },
+        {
+          "course": 3,
+          "groups": [
+            {
+              "id": "3805",
+              "name": "МН-24-1",
+              "path": "data/groups/3805.json"
+            },
+            {
+              "id": "3806",
+              "name": "МН-24-2",
+              "path": "data/groups/3806.json"
+            },
+            {
+              "id": "3946",
+              "name": "МН-24-3",
+              "path": "data/groups/3946.json"
+            },
+            {
+              "id": "3844",
+              "name": "Марк.-24-1",
+              "path": "data/groups/3844.json"
+            },
+            {
+              "id": "3848",
+              "name": "ПР-24-1",
+              "path": "data/groups/3848.json"
+            },
+            {
+              "id": "3845",
+              "name": "ПУА-24-1",
+              "path": "data/groups/3845.json"
+            },
+            {
+              "id": "3868",
+              "name": "МН-24 з.",
+              "path": "data/groups/3868.json"
+            },
+            {
+              "id": "4091",
+              "name": "МН-24-2 з ступ",
+              "path": "data/groups/4091.json"
+            },
+            {
+              "id": "3876",
+              "name": "Марк.-24 з.",
+              "path": "data/groups/3876.json"
+            },
+            {
+              "id": "3883",
+              "name": "ПР-24-1 з.",
+              "path": "data/groups/3883.json"
+            },
+            {
+              "id": "3880",
+              "name": "ПУА-24-1 з",
+              "path": "data/groups/3880.json"
+            }
+          ]
+        },
+        {
+          "course": 4,
+          "groups": [
+            {
+              "id": "3659",
+              "name": "МН-23-1",
+              "path": "data/groups/3659.json"
+            },
+            {
+              "id": "3666",
+              "name": "Марк.-23",
+              "path": "data/groups/3666.json"
+            },
+            {
+              "id": "3672",
+              "name": "ПР-23-1",
+              "path": "data/groups/3672.json"
+            },
+            {
+              "id": "3674",
+              "name": "ПР-23-2",
+              "path": "data/groups/3674.json"
+            },
+            {
+              "id": "3673",
+              "name": "ПУА-23-1",
+              "path": "data/groups/3673.json"
+            },
+            {
+              "id": "3688",
+              "name": "МН-23 з.",
+              "path": "data/groups/3688.json"
+            },
+            {
+              "id": "3701",
+              "name": "Марк.- 23 з.",
+              "path": "data/groups/3701.json"
+            },
+            {
+              "id": "3720",
+              "name": "ПР-23-1 з.",
+              "path": "data/groups/3720.json"
+            },
+            {
+              "id": "3705",
+              "name": "ПУА-23-1 з.",
+              "path": "data/groups/3705.json"
+            }
+          ]
+        },
+        {
+          "course": 5,
+          "groups": [
+            {
+              "id": "4178",
+              "name": "МН-26 маг",
+              "path": "data/groups/4178.json"
+            },
+            {
+              "id": "4073",
+              "name": "ПР-26 маг",
+              "path": "data/groups/4073.json"
+            },
+            {
+              "id": "4182",
+              "name": "ПУА-26 маг",
+              "path": "data/groups/4182.json"
+            }
+          ]
+        },
+        {
+          "course": 6,
+          "groups": [
+            {
+              "id": "3984",
+              "name": "МН-25 маг",
+              "path": "data/groups/3984.json"
+            },
+            {
+              "id": "3989",
+              "name": "ПР-25 маг",
+              "path": "data/groups/3989.json"
+            },
+            {
+              "id": "3987",
+              "name": "ПУА-25 маг",
+              "path": "data/groups/3987.json"
+            },
+            {
+              "id": "4194",
+              "name": "МН-26 маг.з.",
+              "path": "data/groups/4194.json"
+            },
+            {
+              "id": "4197",
+              "name": "ПР-26 маг.з.",
+              "path": "data/groups/4197.json"
+            },
+            {
+              "id": "4198",
+              "name": "ПУА-26 маг.з.",
+              "path": "data/groups/4198.json"
+            }
+          ]
+        },
+        {
+          "course": 7,
+          "groups": [
+            {
+              "id": "4057",
+              "name": "МН-25 маг.з.",
+              "path": "data/groups/4057.json"
+            },
+            {
+              "id": "4059",
+              "name": "ПР-25-1 маг.з.",
+              "path": "data/groups/4059.json"
+            },
+            {
+              "id": "4061",
+              "name": "ПУА-25-1 маг.з.",
+              "path": "data/groups/4061.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "5",
+      "name": "Економіки, інформаційних технологій та сфери обслуговування",
+      "courses": [
+        {
+          "course": 1,
+          "groups": [
+            {
+              "id": "4141",
+              "name": "ГРС-26-1",
+              "path": "data/groups/4141.json"
+            },
+            {
+              "id": "4144",
+              "name": "Екон.-26-1",
+              "path": "data/groups/4144.json"
+            },
+            {
+              "id": "4200",
+              "name": "КН-26-1",
+              "path": "data/groups/4200.json"
+            },
+            {
+              "id": "4151",
+              "name": "ПТ-26-1",
+              "path": "data/groups/4151.json"
+            },
+            {
+              "id": "4153",
+              "name": "ТУР-26-1",
+              "path": "data/groups/4153.json"
+            },
+            {
+              "id": "4000",
+              "name": "ГРС-26 з.",
+              "path": "data/groups/4000.json"
+            },
+            {
+              "id": "4146",
+              "name": "Екон.-26 з.",
+              "path": "data/groups/4146.json"
+            },
+            {
+              "id": "4149",
+              "name": "КН-26 з.",
+              "path": "data/groups/4149.json"
+            },
+            {
+              "id": "4154",
+              "name": "ПТ-26 з.",
+              "path": "data/groups/4154.json"
+            }
+          ]
+        },
+        {
+          "course": 2,
+          "groups": [
+            {
+              "id": "3999",
+              "name": "ГРС-25-1",
+              "path": "data/groups/3999.json"
+            },
+            {
+              "id": "3962",
+              "name": "Екон.-25-1",
+              "path": "data/groups/3962.json"
+            },
+            {
+              "id": "3963",
+              "name": "КН-25-1",
+              "path": "data/groups/3963.json"
+            },
+            {
+              "id": "3996",
+              "name": "ПТБД-25-1",
+              "path": "data/groups/3996.json"
+            },
+            {
+              "id": "4002",
+              "name": "ТУР-25-1",
+              "path": "data/groups/4002.json"
+            },
+            {
+              "id": "4054",
+              "name": "ГРС-25 з.",
+              "path": "data/groups/4054.json"
+            },
+            {
+              "id": "4048",
+              "name": "Екон.-25 з.",
+              "path": "data/groups/4048.json"
+            },
+            {
+              "id": "4051",
+              "name": "КН-25 з.",
+              "path": "data/groups/4051.json"
+            },
+            {
+              "id": "4050",
+              "name": "ПТБД-25 з.",
+              "path": "data/groups/4050.json"
+            }
+          ]
+        },
+        {
+          "course": 3,
+          "groups": [
+            {
+              "id": "3875",
+              "name": "ГРС-24-1",
+              "path": "data/groups/3875.json"
+            },
+            {
+              "id": "3948",
+              "name": "ГРС-24-2",
+              "path": "data/groups/3948.json"
+            },
+            {
+              "id": "3872",
+              "name": "Екон.-24-1",
+              "path": "data/groups/3872.json"
+            },
+            {
+              "id": "3878",
+              "name": "КН-24-1",
+              "path": "data/groups/3878.json"
+            },
+            {
+              "id": "3879",
+              "name": "КН-24-2",
+              "path": "data/groups/3879.json"
+            },
+            {
+              "id": "3930",
+              "name": "ПТБД-24-1",
+              "path": "data/groups/3930.json"
+            },
+            {
+              "id": "3929",
+              "name": "ТУР-24-1",
+              "path": "data/groups/3929.json"
+            },
+            {
+              "id": "3881",
+              "name": "Екон.-24 з.",
+              "path": "data/groups/3881.json"
+            },
+            {
+              "id": "3887",
+              "name": "КН-24 з.",
+              "path": "data/groups/3887.json"
+            },
+            {
+              "id": "3886",
+              "name": "ПТБД-24 з.",
+              "path": "data/groups/3886.json"
+            }
+          ]
+        },
+        {
+          "course": 4,
+          "groups": [
+            {
+              "id": "3675",
+              "name": "ГРС-23-1",
+              "path": "data/groups/3675.json"
+            },
+            {
+              "id": "3678",
+              "name": "Екон.-23-1",
+              "path": "data/groups/3678.json"
+            },
+            {
+              "id": "3687",
+              "name": "КН-23-1",
+              "path": "data/groups/3687.json"
+            },
+            {
+              "id": "3795",
+              "name": "КН-23-2",
+              "path": "data/groups/3795.json"
+            },
+            {
+              "id": "3689",
+              "name": "ПТБД-23-1",
+              "path": "data/groups/3689.json"
+            },
+            {
+              "id": "3696",
+              "name": "ТУР-23-1",
+              "path": "data/groups/3696.json"
+            },
+            {
+              "id": "3710",
+              "name": "Екон.-23-ЕП. з.",
+              "path": "data/groups/3710.json"
+            },
+            {
+              "id": "3718",
+              "name": "КН-23 з.",
+              "path": "data/groups/3718.json"
+            },
+            {
+              "id": "3722",
+              "name": "ПТБД-23 з.",
+              "path": "data/groups/3722.json"
+            }
+          ]
+        },
+        {
+          "course": 5,
+          "groups": [
+            {
+              "id": "4143",
+              "name": "ГРС-26-1 маг",
+              "path": "data/groups/4143.json"
+            },
+            {
+              "id": "4145",
+              "name": "Екон.-26 Маг.",
+              "path": "data/groups/4145.json"
+            },
+            {
+              "id": "4004",
+              "name": "КН-26-1 Маг.",
+              "path": "data/groups/4004.json"
+            }
+          ]
+        },
+        {
+          "course": 6,
+          "groups": [
+            {
+              "id": "3964",
+              "name": "Екон.-25 Маг.",
+              "path": "data/groups/3964.json"
+            },
+            {
+              "id": "4011",
+              "name": "КН-25-1 Маг.",
+              "path": "data/groups/4011.json"
+            },
+            {
+              "id": "4142",
+              "name": "ГРС-26 Маг. з.",
+              "path": "data/groups/4142.json"
+            },
+            {
+              "id": "4147",
+              "name": "Екон-26 Маг.з",
+              "path": "data/groups/4147.json"
+            },
+            {
+              "id": "4150",
+              "name": "КН-26 Маг.з",
+              "path": "data/groups/4150.json"
+            }
+          ]
+        },
+        {
+          "course": 7,
+          "groups": [
+            {
+              "id": "4052",
+              "name": "ГРС-25 Маг. з.",
+              "path": "data/groups/4052.json"
+            },
+            {
+              "id": "4049",
+              "name": "Екон-25-ЕП.Маг.з.",
+              "path": "data/groups/4049.json"
+            },
+            {
+              "id": "4056",
+              "name": "КН-25 Маг.з",
+              "path": "data/groups/4056.json"
+            },
+            {
+              "id": "4053",
+              "name": "ТУР-25 Маг.з.",
+              "path": "data/groups/4053.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "name": "Аспірантура",
+      "courses": [
+        {
+          "course": 1,
+          "groups": [
+            {
+              "id": "4157",
+              "name": "АСП - 26",
+              "path": "data/groups/4157.json"
+            },
+            {
+              "id": "4162",
+              "name": "АСП- 26 Т",
+              "path": "data/groups/4162.json"
+            },
+            {
+              "id": "4158",
+              "name": "АСП-26 Е",
+              "path": "data/groups/4158.json"
+            },
+            {
+              "id": "4160",
+              "name": "АСП-26 М",
+              "path": "data/groups/4160.json"
+            },
+            {
+              "id": "4159",
+              "name": "АСП-26 ОО",
+              "path": "data/groups/4159.json"
+            },
+            {
+              "id": "4161",
+              "name": "АСП-26 ХТ",
+              "path": "data/groups/4161.json"
+            },
+            {
+              "id": "4164",
+              "name": "АСП-26-А",
+              "path": "data/groups/4164.json"
+            },
+            {
+              "id": "4223",
+              "name": "АСП-26 з",
+              "path": "data/groups/4223.json"
+            },
+            {
+              "id": "4224",
+              "name": "Асп-26-Е з",
+              "path": "data/groups/4224.json"
+            }
+          ]
+        },
+        {
+          "course": 2,
+          "groups": [
+            {
+              "id": "4080",
+              "name": "АСП-25-А",
+              "path": "data/groups/4080.json"
+            },
+            {
+              "id": "4075",
+              "name": "Асп - 25",
+              "path": "data/groups/4075.json"
+            },
+            {
+              "id": "4076",
+              "name": "Асп - 25-Е",
+              "path": "data/groups/4076.json"
+            },
+            {
+              "id": "4077",
+              "name": "Асп- 25-ОО",
+              "path": "data/groups/4077.json"
+            },
+            {
+              "id": "4082",
+              "name": "Асп-25-ВМ",
+              "path": "data/groups/4082.json"
+            },
+            {
+              "id": "4079",
+              "name": "Асп-25-ХТ",
+              "path": "data/groups/4079.json"
+            },
+            {
+              "id": "4089",
+              "name": "АСП-25 Ез",
+              "path": "data/groups/4089.json"
+            },
+            {
+              "id": "4088",
+              "name": "АСП-25з",
+              "path": "data/groups/4088.json"
+            }
+          ]
+        },
+        {
+          "course": 3,
+          "groups": [
+            {
+              "id": "3893",
+              "name": "АСП-24-2",
+              "path": "data/groups/3893.json"
+            },
+            {
+              "id": "3898",
+              "name": "Асп-24-2 А",
+              "path": "data/groups/3898.json"
+            },
+            {
+              "id": "3900",
+              "name": "Асп-24-2 ВМ",
+              "path": "data/groups/3900.json"
+            },
+            {
+              "id": "3896",
+              "name": "Асп-24-2 ГМ",
+              "path": "data/groups/3896.json"
+            },
+            {
+              "id": "3894",
+              "name": "Асп-24-2 Е",
+              "path": "data/groups/3894.json"
+            },
+            {
+              "id": "3895",
+              "name": "Асп-24-2 ОО",
+              "path": "data/groups/3895.json"
+            },
+            {
+              "id": "3899",
+              "name": "Асп-24-2 ТВППТ",
+              "path": "data/groups/3899.json"
+            },
+            {
+              "id": "3897",
+              "name": "Асп-24-2 ХТ",
+              "path": "data/groups/3897.json"
+            },
+            {
+              "id": "3954",
+              "name": "Асп-24-2 Ез",
+              "path": "data/groups/3954.json"
+            },
+            {
+              "id": "3953",
+              "name": "Асп-24-2 з",
+              "path": "data/groups/3953.json"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
