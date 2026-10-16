@@ -3,57 +3,42 @@
 'use strict';
 
 const $ = id => document.getElementById(id);
-const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({
-  '&':'&amp;', '<':'&lt;', '>':'&gt;',
-  '"':'&quot;', "'":'&#39;'
+const esc = s => String(s ?? '').replace(/[&<>"']/g,c=>({
+  '&':'&amp;','<':'&lt;','>':'&gt;',
+  '"':'&quot;',"'":'&#39;'
 }[c]));
 
 let snapshot = null;
-let index = null;
 let loadError = '';
 let requestId = 0;
 
-const valid = j =>
-  j &&
-  /^\d{4}-\d{2}-\d{2}$/.test(j.date || '') &&
-  Number.isInteger(Number(j.startPair)) &&
-  Array.isArray(j.rooms) &&
-  j.rooms.every(r =>
-    r &&
-    typeof r.name === 'string' &&
-    typeof r.available === 'boolean'
-  );
+function valid(j) {
+  return j &&
+    /^\d{4}-\d{2}-\d{2}$/.test(j.date || '') &&
+    Number.isInteger(Number(j.startPair)) &&
+    Array.isArray(j.rooms) &&
+    j.rooms.every(r =>
+      r && typeof r.name === 'string' &&
+      typeof r.available === 'boolean'
+    );
+}
 
 function formatTime(t) {
   if (!t) return 'невідомо';
   const d = new Date(t);
   return Number.isNaN(d.getTime())
     ? 'невідомо'
-    : d.toLocaleString('uk-UA', {
+    : d.toLocaleString('uk-UA',{
         timeZone:'Europe/Kyiv',
-        day:'2-digit',
-        month:'2-digit',
-        year:'numeric',
-        hour:'2-digit',
-        minute:'2-digit'
+        day:'2-digit',month:'2-digit',
+        year:'numeric',hour:'2-digit',minute:'2-digit'
       }) + ' (Київ)';
-}
-
-function controls() {
-  const date = $('roomsDate');
-  const pair = $('roomsPair');
-
-  return {
-    date: date ? date.value : '',
-    pair: pair ? Number(pair.value) : 0
-  };
 }
 
 function render() {
   const info = $('roomsSnapshot');
   const count = $('roomsCount');
   const list = $('roomsList');
-
   if (!info || !count || !list) return;
 
   if (!snapshot) {
@@ -65,17 +50,15 @@ function render() {
 
   const j = snapshot;
   const rooms = j.rooms;
-
   const q = ($('roomsSearch')?.value || '')
     .trim().toLocaleLowerCase('uk-UA');
-
   const min = Number($('roomsCapacity')?.value || 0);
   const free = $('roomsFreeOnly')?.checked || false;
 
   const filtered = rooms.filter(r =>
     (!free || r.available) &&
     (!min || Number(r.capacity) >= min) &&
-    (!q || [r.name, r.note].some(x =>
+    (!q || [r.name,r.note].some(x =>
       String(x || '').toLocaleLowerCase('uk-UA').includes(q)
     ))
   );
@@ -89,7 +72,7 @@ function render() {
   `;
 
   count.textContent =
-    `${available} вільних · ${rooms.length - available} зайнятих · показано ${filtered.length}`;
+    `${available} вільних · ${rooms.length-available} зайнятих · показано ${filtered.length}`;
 
   list.innerHTML = filtered.length
     ? filtered.map(r => `
@@ -112,19 +95,18 @@ function render() {
 }
 
 async function getJSON(path) {
-  const separator = path.includes('?') ? '&' : '?';
   const response = await fetch(
-    path + separator + 't=' + Date.now(),
-    { cache:'no-store' }
+    path + '?t=' + Date.now(),
+    {cache:'no-store'}
   );
-
   if (!response.ok) throw Error('HTTP ' + response.status);
   return response.json();
 }
 
 async function load() {
   const id = ++requestId;
-  const {date, pair} = controls();
+  const date = $('roomsDate')?.value || '';
+  const pair = Number($('roomsPair')?.value || 0);
 
   snapshot = null;
   loadError = '';
@@ -137,8 +119,7 @@ async function load() {
   }
 
   try {
-    index = await getJSON('./data/campus/index.json');
-
+    const index = await getJSON('./data/campus/index.json');
     if (id !== requestId) return;
 
     if (!Array.isArray(index.snapshots)) {
@@ -155,10 +136,9 @@ async function load() {
       return;
     }
 
-    const filename = `${date}_pair-${pair}.json`;
-    const path = './data/campus/snapshots/' + filename;
-
-    const data = await getJSON(path);
+    const data = await getJSON(
+      `./data/campus/snapshots/${date}/pair-${pair}.json`
+    );
 
     if (id !== requestId) return;
 
@@ -171,7 +151,7 @@ async function load() {
     }
 
     snapshot = data;
-  } catch (e) {
+  } catch(e) {
     if (id !== requestId) return;
     loadError = 'Не вдалося завантажити аудиторії: ' + e.message;
   }
@@ -182,34 +162,33 @@ async function load() {
 function init() {
   if (!$('roomsView')) return;
 
-  ['roomsSearch','roomsCapacity','roomsFreeOnly']
-    .forEach(id => {
-      const el = $(id);
-      if (el) el.addEventListener(
-        id === 'roomsSearch' ? 'input' : 'change',
-        render
-      );
-    });
+  ['roomsSearch','roomsCapacity','roomsFreeOnly'].forEach(id => {
+    const el = $(id);
+    if (el) el.addEventListener(
+      id === 'roomsSearch' ? 'input' : 'change',
+      render
+    );
+  });
 
   ['roomsDate','roomsPair'].forEach(id => {
     const el = $(id);
-    if (el) el.addEventListener('change', load);
+    if (el) el.addEventListener('change',load);
   });
 
-  $('roomsRefresh')?.addEventListener('click', load);
+  $('roomsRefresh')?.addEventListener('click',load);
 
   load();
 
-  document.addEventListener('visibilitychange', () => {
-    if (!document.hidden && $('roomsView')?.classList.contains('active')) {
-      load();
-    }
+  document.addEventListener('visibilitychange',()=>{
+    if (!document.hidden &&
+        $('roomsView')?.classList.contains('active')) load();
   });
 }
 
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', init);
+  document.addEventListener('DOMContentLoaded',init);
 } else {
   init();
 }
 })();
+  
