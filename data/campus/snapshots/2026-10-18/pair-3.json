@@ -1,0 +1,1380 @@
+{
+  "source": "http://81.30.162.30/time-table/free-classroom",
+  "date": "2026-10-18",
+  "startPair": 3,
+  "endPair": 3,
+  "structureId": "0",
+  "corpusId": "",
+  "fetchedAt": "2026-10-16T05:45:20.423063+00:00",
+  "status": "official-site-snapshot",
+  "rooms": [
+    {
+      "id": "433",
+      "name": "040",
+      "capacity": 30,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=433"
+    },
+    {
+      "id": "436",
+      "name": "041",
+      "capacity": 24,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=436"
+    },
+    {
+      "id": "434",
+      "name": "042",
+      "capacity": 18,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=434"
+    },
+    {
+      "id": "435",
+      "name": "043",
+      "capacity": 26,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=435"
+    },
+    {
+      "id": "51",
+      "name": "1",
+      "capacity": 100,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=51"
+    },
+    {
+      "id": "490",
+      "name": "1004",
+      "capacity": 18,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=490"
+    },
+    {
+      "id": "57",
+      "name": "1104",
+      "capacity": 46,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=57"
+    },
+    {
+      "id": "56",
+      "name": "1108",
+      "capacity": 50,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=56"
+    },
+    {
+      "id": "512",
+      "name": "11а",
+      "capacity": 30,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=512"
+    },
+    {
+      "id": "437",
+      "name": "11б",
+      "capacity": 15,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=437"
+    },
+    {
+      "id": "324",
+      "name": "1206",
+      "capacity": 46,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=324"
+    },
+    {
+      "id": "73",
+      "name": "1207",
+      "capacity": 28,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=73"
+    },
+    {
+      "id": "58",
+      "name": "1301",
+      "capacity": 115,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=58"
+    },
+    {
+      "id": "68",
+      "name": "1304",
+      "capacity": 50,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=68"
+    },
+    {
+      "id": "74",
+      "name": "1306",
+      "capacity": 20,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=74"
+    },
+    {
+      "id": "325",
+      "name": "1403",
+      "capacity": 28,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=325"
+    },
+    {
+      "id": "75",
+      "name": "1407",
+      "capacity": 32,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=75"
+    },
+    {
+      "id": "77",
+      "name": "1408",
+      "capacity": 30,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=77"
+    },
+    {
+      "id": "134",
+      "name": "16",
+      "capacity": 24,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=134"
+    },
+    {
+      "id": "520",
+      "name": "17",
+      "capacity": 15,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=520"
+    },
+    {
+      "id": "244",
+      "name": "19",
+      "capacity": 20,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=244"
+    },
+    {
+      "id": "552",
+      "name": "2002",
+      "capacity": 80,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=552"
+    },
+    {
+      "id": "553",
+      "name": "2003",
+      "capacity": 40,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=553"
+    },
+    {
+      "id": "517",
+      "name": "2004",
+      "capacity": 28,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=517"
+    },
+    {
+      "id": "516",
+      "name": "210",
+      "capacity": 15,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=516"
+    },
+    {
+      "id": "95",
+      "name": "2101",
+      "capacity": 15,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=95"
+    },
+    {
+      "id": "48",
+      "name": "2102",
+      "capacity": 28,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=48"
+    },
+    {
+      "id": "49",
+      "name": "2111",
+      "capacity": 24,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=49"
+    },
+    {
+      "id": "82",
+      "name": "2113",
+      "capacity": 18,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=82"
+    },
+    {
+      "id": "288",
+      "name": "2118",
+      "capacity": 22,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=288"
+    },
+    {
+      "id": "308",
+      "name": "2120",
+      "capacity": 16,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=308"
+    },
+    {
+      "id": "81",
+      "name": "2124",
+      "capacity": 20,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=81"
+    },
+    {
+      "id": "513",
+      "name": "2128",
+      "capacity": 12,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=513"
+    },
+    {
+      "id": "63",
+      "name": "2220",
+      "capacity": 190,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=63"
+    },
+    {
+      "id": "486",
+      "name": "2222",
+      "capacity": 24,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=486"
+    },
+    {
+      "id": "559",
+      "name": "2226-А",
+      "capacity": 8,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=559"
+    },
+    {
+      "id": "506",
+      "name": "2230",
+      "capacity": 16,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=506"
+    },
+    {
+      "id": "26",
+      "name": "2301",
+      "capacity": 14,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=26"
+    },
+    {
+      "id": "27",
+      "name": "2302",
+      "capacity": 18,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=27"
+    },
+    {
+      "id": "209",
+      "name": "2313",
+      "capacity": 18,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=209"
+    },
+    {
+      "id": "29",
+      "name": "2314",
+      "capacity": 18,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=29"
+    },
+    {
+      "id": "30",
+      "name": "2315",
+      "capacity": 16,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=30"
+    },
+    {
+      "id": "35",
+      "name": "2316",
+      "capacity": 16,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=35"
+    },
+    {
+      "id": "538",
+      "name": "2317",
+      "capacity": 18,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=538"
+    },
+    {
+      "id": "32",
+      "name": "2319",
+      "capacity": 84,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=32"
+    },
+    {
+      "id": "131",
+      "name": "2324",
+      "capacity": 24,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=131"
+    },
+    {
+      "id": "31",
+      "name": "2327",
+      "capacity": 76,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=31"
+    },
+    {
+      "id": "240",
+      "name": "2328",
+      "capacity": 24,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=240"
+    },
+    {
+      "id": "5",
+      "name": "2401",
+      "capacity": 30,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=5"
+    },
+    {
+      "id": "6",
+      "name": "2402",
+      "capacity": 28,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=6"
+    },
+    {
+      "id": "331",
+      "name": "2404",
+      "capacity": 16,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=331"
+    },
+    {
+      "id": "7",
+      "name": "2408",
+      "capacity": 24,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=7"
+    },
+    {
+      "id": "137",
+      "name": "2412",
+      "capacity": 15,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=137"
+    },
+    {
+      "id": "8",
+      "name": "2413",
+      "capacity": 26,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=8"
+    },
+    {
+      "id": "4",
+      "name": "2414",
+      "capacity": 30,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=4"
+    },
+    {
+      "id": "3",
+      "name": "2415",
+      "capacity": 32,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=3"
+    },
+    {
+      "id": "20",
+      "name": "2420",
+      "capacity": 17,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=20"
+    },
+    {
+      "id": "18",
+      "name": "2421",
+      "capacity": 112,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=18"
+    },
+    {
+      "id": "16",
+      "name": "2422",
+      "capacity": 36,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=16"
+    },
+    {
+      "id": "17",
+      "name": "2429",
+      "capacity": 32,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=17"
+    },
+    {
+      "id": "23",
+      "name": "2501",
+      "capacity": 16,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=23"
+    },
+    {
+      "id": "24",
+      "name": "2502",
+      "capacity": 20,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=24"
+    },
+    {
+      "id": "21",
+      "name": "2512",
+      "capacity": 90,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=21"
+    },
+    {
+      "id": "13",
+      "name": "2513",
+      "capacity": 24,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=13"
+    },
+    {
+      "id": "12",
+      "name": "2515",
+      "capacity": 30,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=12"
+    },
+    {
+      "id": "22",
+      "name": "2516",
+      "capacity": 30,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=22"
+    },
+    {
+      "id": "525",
+      "name": "2519",
+      "capacity": 20,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=525"
+    },
+    {
+      "id": "10",
+      "name": "2521",
+      "capacity": 76,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=10"
+    },
+    {
+      "id": "14",
+      "name": "2522",
+      "capacity": 24,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=14"
+    },
+    {
+      "id": "11",
+      "name": "2524",
+      "capacity": 24,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=11"
+    },
+    {
+      "id": "9",
+      "name": "2531",
+      "capacity": 30,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=9"
+    },
+    {
+      "id": "123",
+      "name": "26",
+      "capacity": 24,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=123"
+    },
+    {
+      "id": "232",
+      "name": "2602",
+      "capacity": 100,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=232"
+    },
+    {
+      "id": "352",
+      "name": "2602*",
+      "capacity": 100,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=352"
+    },
+    {
+      "id": "186",
+      "name": "28",
+      "capacity": 24,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=186"
+    },
+    {
+      "id": "515",
+      "name": "3001",
+      "capacity": 0,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=515"
+    },
+    {
+      "id": "483",
+      "name": "3005",
+      "capacity": 20,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=483"
+    },
+    {
+      "id": "125",
+      "name": "31",
+      "capacity": 24,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=125"
+    },
+    {
+      "id": "555",
+      "name": "3107",
+      "capacity": 20,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=555"
+    },
+    {
+      "id": "554",
+      "name": "3110",
+      "capacity": 35,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=554"
+    },
+    {
+      "id": "557",
+      "name": "3202",
+      "capacity": 14,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=557"
+    },
+    {
+      "id": "558",
+      "name": "3204",
+      "capacity": 14,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=558"
+    },
+    {
+      "id": "521",
+      "name": "3205",
+      "capacity": 30,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=521"
+    },
+    {
+      "id": "470",
+      "name": "3210",
+      "capacity": 30,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=470"
+    },
+    {
+      "id": "510",
+      "name": "3211",
+      "capacity": 22,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=510"
+    },
+    {
+      "id": "522",
+      "name": "3215",
+      "capacity": 44,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=522"
+    },
+    {
+      "id": "523",
+      "name": "3216",
+      "capacity": 16,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=523"
+    },
+    {
+      "id": "524",
+      "name": "3217",
+      "capacity": 18,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=524"
+    },
+    {
+      "id": "476",
+      "name": "3218",
+      "capacity": 24,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=476"
+    },
+    {
+      "id": "536",
+      "name": "3303",
+      "capacity": 20,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=536"
+    },
+    {
+      "id": "534",
+      "name": "3308в",
+      "capacity": 26,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=534"
+    },
+    {
+      "id": "533",
+      "name": "3311",
+      "capacity": 30,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=533"
+    },
+    {
+      "id": "532",
+      "name": "3315",
+      "capacity": 40,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=532"
+    },
+    {
+      "id": "529",
+      "name": "3318",
+      "capacity": 120,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=529"
+    },
+    {
+      "id": "535",
+      "name": "3319",
+      "capacity": 28,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=535"
+    },
+    {
+      "id": "531",
+      "name": "3401",
+      "capacity": 28,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=531"
+    },
+    {
+      "id": "474",
+      "name": "3405в",
+      "capacity": 15,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=474"
+    },
+    {
+      "id": "530",
+      "name": "3406",
+      "capacity": 96,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=530"
+    },
+    {
+      "id": "472",
+      "name": "3407",
+      "capacity": 40,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=472"
+    },
+    {
+      "id": "527",
+      "name": "3409",
+      "capacity": 20,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=527"
+    },
+    {
+      "id": "473",
+      "name": "3418к",
+      "capacity": 15,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=473"
+    },
+    {
+      "id": "548",
+      "name": "3502",
+      "capacity": 12,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=548"
+    },
+    {
+      "id": "526",
+      "name": "3505",
+      "capacity": 100,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=526"
+    },
+    {
+      "id": "546",
+      "name": "3506",
+      "capacity": 18,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=546"
+    },
+    {
+      "id": "547",
+      "name": "3508",
+      "capacity": 18,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=547"
+    },
+    {
+      "id": "528",
+      "name": "3509",
+      "capacity": 100,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=528"
+    },
+    {
+      "id": "545",
+      "name": "3510",
+      "capacity": 26,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=545"
+    },
+    {
+      "id": "549",
+      "name": "3511",
+      "capacity": 20,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=549"
+    },
+    {
+      "id": "544",
+      "name": "3512",
+      "capacity": 22,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=544"
+    },
+    {
+      "id": "340",
+      "name": "3514",
+      "capacity": 12,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=340"
+    },
+    {
+      "id": "54",
+      "name": "5",
+      "capacity": 36,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=54"
+    },
+    {
+      "id": "471",
+      "name": "502",
+      "capacity": 50,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=471"
+    },
+    {
+      "id": "469",
+      "name": "503",
+      "capacity": 50,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=469"
+    },
+    {
+      "id": "458",
+      "name": "505",
+      "capacity": 100,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=458"
+    },
+    {
+      "id": "193",
+      "name": "510",
+      "capacity": 34,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=193"
+    },
+    {
+      "id": "212",
+      "name": "513",
+      "capacity": 24,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=212"
+    },
+    {
+      "id": "213",
+      "name": "514",
+      "capacity": 26,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=213"
+    },
+    {
+      "id": "214",
+      "name": "516",
+      "capacity": 16,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=214"
+    },
+    {
+      "id": "215",
+      "name": "517",
+      "capacity": 16,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=215"
+    },
+    {
+      "id": "216",
+      "name": "518",
+      "capacity": 20,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=216"
+    },
+    {
+      "id": "217",
+      "name": "519",
+      "capacity": 16,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=217"
+    },
+    {
+      "id": "539",
+      "name": "519а",
+      "capacity": 50,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=539"
+    },
+    {
+      "id": "519",
+      "name": "525а",
+      "capacity": 12,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=519"
+    },
+    {
+      "id": "218",
+      "name": "530",
+      "capacity": 24,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=218"
+    },
+    {
+      "id": "219",
+      "name": "531",
+      "capacity": 90,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=219"
+    },
+    {
+      "id": "221",
+      "name": "533",
+      "capacity": 100,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=221"
+    },
+    {
+      "id": "223",
+      "name": "536",
+      "capacity": 26,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=223"
+    },
+    {
+      "id": "224",
+      "name": "537",
+      "capacity": 28,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=224"
+    },
+    {
+      "id": "311",
+      "name": "538 ЧЗ",
+      "capacity": 48,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=311"
+    },
+    {
+      "id": "550",
+      "name": "538 б",
+      "capacity": 40,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=550"
+    },
+    {
+      "id": "111",
+      "name": "540",
+      "capacity": 132,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=111"
+    },
+    {
+      "id": "181",
+      "name": "541",
+      "capacity": 60,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=181"
+    },
+    {
+      "id": "176",
+      "name": "542",
+      "capacity": 34,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=176"
+    },
+    {
+      "id": "112",
+      "name": "543",
+      "capacity": 20,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=112"
+    },
+    {
+      "id": "177",
+      "name": "544",
+      "capacity": 31,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=177"
+    },
+    {
+      "id": "236",
+      "name": "547",
+      "capacity": 20,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=236"
+    },
+    {
+      "id": "540",
+      "name": "548",
+      "capacity": 16,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=540"
+    },
+    {
+      "id": "541",
+      "name": "549",
+      "capacity": 16,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=541"
+    },
+    {
+      "id": "542",
+      "name": "549а",
+      "capacity": 16,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=542"
+    },
+    {
+      "id": "543",
+      "name": "549б",
+      "capacity": 16,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=543"
+    },
+    {
+      "id": "132",
+      "name": "6",
+      "capacity": 20,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=132"
+    },
+    {
+      "id": "248",
+      "name": "8",
+      "capacity": 66,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=248"
+    },
+    {
+      "id": "443",
+      "name": "Бот.сад",
+      "capacity": 999,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=443"
+    },
+    {
+      "id": "511",
+      "name": "Бот.сад.2",
+      "capacity": 30,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=511"
+    },
+    {
+      "id": "475",
+      "name": "Гурт2 укриття",
+      "capacity": 30,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=475"
+    },
+    {
+      "id": "452",
+      "name": "Досл.поле ВНАУ",
+      "capacity": 999,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=452"
+    },
+    {
+      "id": "556",
+      "name": "Лаб.ГРС",
+      "capacity": 20,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=556"
+    },
+    {
+      "id": "479",
+      "name": "Лабораторія",
+      "capacity": 999,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=479"
+    },
+    {
+      "id": "450",
+      "name": "НДГ Агрономічне",
+      "capacity": 999,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=450"
+    },
+    {
+      "id": "446",
+      "name": "НКЦ",
+      "capacity": 999,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=446"
+    },
+    {
+      "id": "229",
+      "name": "Спор.К",
+      "capacity": 999,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=229"
+    },
+    {
+      "id": "1",
+      "name": "Спортзал",
+      "capacity": 999,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=1"
+    },
+    {
+      "id": "478",
+      "name": "Стадіон",
+      "capacity": 235,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=478"
+    },
+    {
+      "id": "482",
+      "name": "Філ.каф.",
+      "capacity": 30,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=482"
+    },
+    {
+      "id": "484",
+      "name": "Філ.каф.2",
+      "capacity": 15,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=484"
+    },
+    {
+      "id": "509",
+      "name": "Філ.каф.3",
+      "capacity": 15,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=509"
+    },
+    {
+      "id": "462",
+      "name": "Храм",
+      "capacity": 100,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=462"
+    },
+    {
+      "id": "514",
+      "name": "Храм пз",
+      "capacity": 40,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=514"
+    },
+    {
+      "id": "312",
+      "name": "ЧЗ 2\\2корп.",
+      "capacity": 15,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=312"
+    },
+    {
+      "id": "231",
+      "name": "ЧЗК",
+      "capacity": 50,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=231"
+    },
+    {
+      "id": "449",
+      "name": "біостаціонар",
+      "capacity": 35,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=449"
+    },
+    {
+      "id": "228",
+      "name": "к.№9",
+      "capacity": 22,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=228"
+    },
+    {
+      "id": "551",
+      "name": "центр.доз",
+      "capacity": 500,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=551"
+    },
+    {
+      "id": "182",
+      "name": "№ 559",
+      "capacity": 30,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=182"
+    },
+    {
+      "id": "89",
+      "name": "№1 -1208",
+      "capacity": 12,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=89"
+    },
+    {
+      "id": "90",
+      "name": "№2 -1208",
+      "capacity": 10,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=90"
+    },
+    {
+      "id": "91",
+      "name": "№3 -1208",
+      "capacity": 11,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=91"
+    },
+    {
+      "id": "92",
+      "name": "№4 -1208",
+      "capacity": 11,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=92"
+    },
+    {
+      "id": "191",
+      "name": "№5 -1209",
+      "capacity": 20,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=191"
+    },
+    {
+      "id": "179",
+      "name": "№545",
+      "capacity": 15,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=179"
+    },
+    {
+      "id": "349",
+      "name": "дистанційно",
+      "capacity": 999,
+      "available": true,
+      "note": "",
+      "url": "http://81.30.162.30/time-table/classroom?id=349"
+    }
+  ]
+}
