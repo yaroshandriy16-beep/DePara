@@ -1,10 +1,13 @@
-name: Update VNAU schedules
+name: Update VNAU students
 on:
   workflow_dispatch:
   schedule:
     - cron: '17 2,8,14,20 * * *'
 permissions:
   contents: write
+concurrency:
+  group: update-vnau-students
+  cancel-in-progress: false
 jobs:
   update:
     runs-on: ubuntu-latest
@@ -14,14 +17,51 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: pip install -r requirements.txt
-      - run: python parser.py
-      - name: Commit updated schedules
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Download official VNAU data
+        id: download
+        continue-on-error: true
+        run: python parser.py
+      - name: Write sync status
+        if: always() && steps.download.outcome != 'skipped'
+        env:
+          DOWNLOAD_OUTCOME: ${{ steps.download.outcome }}
+          STATUS_PATH: 'data/sync-students-status.json'
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          python - <<'PYCODE'
+          import json, os
+          from datetime import datetime, timezone
+          from pathlib import Path
+          p = Path(os.environ['STATUS_PATH'])
+          p.parent.mkdir(parents=True, exist_ok=True)
+          outcome = os.environ['DOWNLOAD_OUTCOME']
+          data = {'attemptedAt': datetime.now(timezone.utc).isoformat(),
+                  'status': 'success' if outcome == 'success' else 'failed',
+                  'message': 'Official VNAU source updated' if outcome == 'success' else 'University server unavailable or download incomplete; existing files preserved' }
+          if outcome == 'success':
+              data['lastSuccessfulAt'] = data['attemptedAt']
+          elif p.exists():
+              try:
+                  old = json.loads(p.read_text(encoding='utf-8'))
+                  if old.get('lastSuccessfulAt'):
+                      data['lastSuccessfulAt'] = old['lastSuccessfulAt']
+              except (ValueError, OSError):
+                  pass
+          p.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          PYCODE
+      - name: Commit available results and status
+        if: always() && steps.download.outcome != 'skipped'
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add schedule.json data/
           if ! git diff --cached --quiet; then
-            git commit -m "Update VNAU timetables"
+            git commit -m 'Update VNAU students data and sync status'
             git push
           fi
+      - name: Report failed refresh
+        if: steps.download.outcome == 'failure'
+        run: |
+          echo 'VNAU refresh failed after automatic network retries. Previous data was retained.' >&2
+          exit 1
