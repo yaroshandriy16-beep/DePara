@@ -8,6 +8,7 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 import requests
 from fetch_free_rooms import get_rooms
+from network_retry import resilient_session
 
 ROOT=Path('data/campus')
 
@@ -19,7 +20,7 @@ def main():
     if not 1<=args.days<=7 or not 1<=args.pairs<=8: raise ValueError('Invalid range')
     today=datetime.now(ZoneInfo('Europe/Kyiv')).date()
     entries=[]; errors=[]
-    with requests.Session() as session:
+    with resilient_session() as session:
         for delta in range(args.days):
             day=today+timedelta(days=delta)
             for pair in range(1,args.pairs+1):
@@ -52,5 +53,7 @@ def main():
     temp.write_text(json.dumps({'generatedAt':datetime.now(ZoneInfo('Europe/Kyiv')).isoformat(),'snapshots':entries,'errors':len(errors)},ensure_ascii=False,indent=2),encoding='utf-8')
     temp.replace(ROOT/'index.json')
     print(f'Indexed {len(entries)} snapshots; {len(errors)} failed requests')
+    if errors:
+        print('WARNING: Some classroom snapshots could not be refreshed; previous valid snapshots retained')
 
 if __name__=='__main__':main()

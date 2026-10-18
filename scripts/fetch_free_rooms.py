@@ -11,6 +11,7 @@ from urllib.parse import urljoin
 import requests
 from bs4 import BeautifulSoup
 from parse_classrooms import parse
+from network_retry import resilient_session
 
 BASE = 'http://81.30.162.30/time-table/free-classroom'
 
@@ -28,7 +29,7 @@ def csrf_from_html(html):
 
 def get_rooms(session, date, start, end, structure='0', corpus='', timeout=35):
     headers = {'User-Agent': 'Mozilla/5.0 (compatible; DeParaSchedule/1.0)', 'Accept-Language': 'uk-UA,uk;q=0.9'}
-    initial = session.get(BASE, headers=headers, timeout=timeout)
+    initial = session.get(BASE, headers=headers, timeout=(15, timeout))
     initial.raise_for_status()
     token = csrf_from_html(initial.text)
     soup = BeautifulSoup(initial.text, 'html.parser')
@@ -43,7 +44,7 @@ def get_rooms(session, date, start, end, structure='0', corpus='', timeout=35):
         'TimeTableForm[lessonNumberEnd]': str(end),
         'TimeTableForm[date]': date.strftime('%d.%m.%Y'),
     }
-    response = session.post(action, data=payload, headers={**headers, 'Referer': initial.url}, timeout=timeout)
+    response = session.post(action, data=payload, headers={**headers, 'Referer': initial.url}, timeout=(15, timeout))
     response.raise_for_status()
     if 'text/html' not in response.headers.get('Content-Type', 'text/html').lower():
         raise ValueError('Unexpected response content type')
@@ -76,7 +77,7 @@ def main():
         day = datetime.strptime(args.date, '%Y-%m-%d')
         if not 1 <= args.start_pair <= args.end_pair <= 12:
             raise ValueError('Invalid pair range')
-        with requests.Session() as session:
+        with resilient_session() as session:
             result = get_rooms(session, day, args.start_pair, args.end_pair, args.structure, args.corpus)
         output = Path(args.output)
         output.parent.mkdir(parents=True, exist_ok=True)
