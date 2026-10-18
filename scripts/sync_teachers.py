@@ -6,6 +6,9 @@ import json
 import os
 import re
 import time
+from zoneinfo import ZoneInfo
+
+from network_retry import resilient_session
 from pathlib import Path
 
 import requests
@@ -46,7 +49,7 @@ def post(session, token, chair, teacher='', start=None, end=None):
         data.update({'date-picker': f'{start} - {end}', 'TimeTableForm[dateStart]': start,
                      'TimeTableForm[dateEnd]': end, 'TimeTableForm[indicationDays]': '5',
                      'time-table-type': '1'})
-    r = session.post(URL, data=data, headers=HEADERS, timeout=35)
+    r = session.post(URL, data=data, headers=HEADERS, timeout=(15, 35))
     r.raise_for_status()
     soup = parse(r.text)
     if not soup.select_one('#filter-form'):
@@ -103,10 +106,23 @@ def main():
     ap.add_argument('--batch', type=int, default=20, help='Number of teacher schedules per run')
     ap.add_argument('--delay', type=float, default=0.6)
     args = ap.parse_args()
-    with requests.Session() as session:
+    with resilient_session() as session:
         session.headers.update(HEADERS)
-        resp = session.get(URL, timeout=35)
-        resp.raise_for_status()
+        try:
+            resp = session.get(URL, timeout=(15, 35))
+            resp.raise_for_status()
+        except requests.RequestException as exc:
+            now = dt.datetime.now(dt.timezone.utc).isoformat()
+            status_path = OUT / 'status.json'
+            try:
+                old = json.loads(status_path.read_text(encoding='utf-8'))
+            except (OSError, ValueError):
+                old = {}
+            write(status_path, {'generatedAt': now, 'status': 'failed',
+                  'lastSuccessfulAt': old.get('lastSuccessfulAt'),
+                  'chairs': old.get('chairs', 0), 'teachers': old.get('teachers', 0),
+                  'schedulesUpdated': 0, 'errors': [{'error': str(exc)}]})
+            raise RuntimeError('VNAU teacher server unavailable after retries; previous schedules retained') from exc
         root = parse(resp.text)
         token = csrf(root)
         chairs = options(root, '#timetableform-chairid')
@@ -131,7 +147,7 @@ def main():
         now = dt.datetime.now(dt.timezone.utc).isoformat()
         write(OUT / 'catalog.json', {'generatedAt': now, 'source': URL, 'chairs': chairs,
                                       'teachers': catalog, 'errors': errors})
-        today = dt.datetime.now(dt.timezone.utc).date()
+        today = dt.datetime.now(ZoneInfo('Europe/Kyiv')).date()
         start = today.strftime('%d.%m.%Y')
         end = (today + dt.timedelta(days=35)).strftime('%d.%m.%Y')
         cursor_path = OUT / 'cursor.json'
@@ -139,8 +155,14 @@ def main():
             cursor = int(json.loads(cursor_path.read_text()).get('offset', 0))
         except (OSError, ValueError, TypeError):
             cursor = 0
-        batch = max(0, min(args.batch, 100))
-        targets = [catalog[(cursor + i) % len(catalog)] for i in range(min(batch, len(catalog)))]
+        # A teacher can appear under multiple chairs. Schedule files are keyed by
+        # teacher ID, so fetch each unique ID once per run to avoid overwrites.
+        unique_by_id = {}
+        for teacher in catalog:
+            unique_by_id.setdefault(teacher['id'], teacher)
+        schedule_catalog = list(unique_by_id.values())
+        batch = max(0, min(args.batch, len(schedule_catalog)))
+        targets = [schedule_catalog[(cursor + i) % len(schedule_catalog)] for i in range(batch)]
         ok = 0
         for teacher in targets:
             try:
@@ -157,10 +179,11 @@ def main():
             except Exception as e:
                 errors.append({'teacherId': teacher['id'], 'error': str(e)})
             time.sleep(args.delay)
-        write(cursor_path, {'offset': (cursor + len(targets)) % len(catalog)})
+        write(cursor_path, {'offset': (cursor + len(targets)) % len(schedule_catalog)})
         write(OUT / 'status.json', {'generatedAt': now, 'chairs': len(chairs),
-                                     'teachers': len(catalog), 'schedulesUpdated': ok,
-                                     'errors': errors})
+                                     'teachers': len(catalog), 'uniqueTeachers': len(schedule_catalog),
+                                     'schedulesUpdated': ok, 'status': 'success' if not errors else 'partial',
+                                     'lastSuccessfulAt': now if ok else None, 'errors': errors})
         print(f'Catalog: {len(catalog)}; schedules updated: {ok}; errors: {len(errors)}')
         if not ok and batch:
             raise RuntimeError('All teacher schedule requests failed; inspect status.json')
