@@ -16,3 +16,22 @@
 .lesson.lesson-changed{border:1px solid rgba(250,190,75,.62);background:linear-gradient(105deg,rgba(250,190,75,.10),rgba(255,255,255,.025));}
 .lesson-change-label{display:inline-block;margin-top:5px;color:#f4bd61;font-weight:700;font-size:.72rem;letter-spacing:.01em;}
 @media(prefers-reduced-motion:reduce){.lesson.lesson-changed{transition:none;animation:none;}}
+
+
+/* ДеПара? 2.0 — етап 3: UI polish; no remote assets or extra dependencies */
+:root{--depara-gold:#f0c777;--depara-violet:#a78bfa}
+body{background-image:radial-gradient(ellipse 75% 40% at 50% -8%,rgba(140,99,255,.16),transparent 78%),radial-gradient(ellipse 48% 35% at 100% 55%,rgba(87,61,185,.07),transparent 80%)}
+.depara-version{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border:1px solid rgba(240,199,119,.28);border-radius:999px;background:rgba(240,199,119,.065);color:var(--depara-gold);font-size:.68rem;font-weight:800;letter-spacing:.13em;margin-bottom:12px}
+.depara-version span{color:var(--muted);font-weight:600;letter-spacing:.04em}
+.depara-section-hint{color:var(--muted);font-size:.76rem}
+.quick-grid .depara-quick-teachers{grid-column:1/-1;display:flex;flex-direction:row;justify-content:center;align-items:center;gap:12px;min-height:60px;border-color:rgba(167,139,250,.35);background:linear-gradient(105deg,rgba(129,93,239,.17),rgba(129,93,239,.035))}
+.quick-grid .depara-quick-teachers span{font-size:1.5rem}
+.quick,.service,.subtle-btn,.icon-btn,.group-chip{transition:transform .18s ease,box-shadow .2s ease,border-color .2s ease,background-color .2s ease}
+@media(hover:hover){.quick:hover,.service:hover{transform:translateY(-3px);border-color:rgba(167,139,250,.55);box-shadow:0 12px 25px rgba(45,27,94,.16)}.subtle-btn:hover,.icon-btn:hover{border-color:var(--accent)}}
+.quick:active,.service:active,.subtle-btn:active,.icon-btn:active{transform:scale(.975)}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--depara-gold);outline-offset:3px}
+.glass{backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.depara-live-status{border-left:3px solid rgba(167,139,250,.7)}
+.bottom-nav{padding-bottom:max(8px,env(safe-area-inset-bottom))}
+@media(max-width:360px){.depara-section-hint{display:none}.depara-version{font-size:.61rem}}
+@media(prefers-reduced-motion:reduce){.quick,.service,.subtle-btn,.icon-btn,.group-chip{transition:none!important}.quick:hover,.service:hover,.quick:active,.service:active,.subtle-btn:active,.icon-btn:active{transform:none!important}}
