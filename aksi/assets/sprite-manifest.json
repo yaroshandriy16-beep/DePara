@@ -1,0 +1,66 @@
+{
+  "source": "User-approved chocolate-labrador references and character sheet",
+  "model": [
+    "front",
+    "side"
+  ],
+  "poses": [
+    "stand",
+    "walk",
+    "run",
+    "jump",
+    "wave",
+    "sit",
+    "lie",
+    "sleep",
+    "stretch",
+    "play",
+    "spin"
+  ],
+  "emotions": [
+    "joy",
+    "wink",
+    "surprise",
+    "nap",
+    "curious",
+    "sad",
+    "inspired",
+    "shy",
+    "offended"
+  ],
+  "accessories": [
+    "plain",
+    "headphones",
+    "sunglasses",
+    "backpack",
+    "camera",
+    "cap_blue",
+    "cap_navy",
+    "bow",
+    "scarf",
+    "raincoat",
+    "costume",
+    "sweater_red",
+    "sweater_purple"
+  ],
+  "effects": [
+    "hearts",
+    "confetti",
+    "dream",
+    "idea",
+    "leaves",
+    "snow",
+    "water",
+    "sparkles",
+    "gold_paw",
+    "butterfly",
+    "bone",
+    "gift"
+  ],
+  "seasons": [
+    "winter",
+    "spring",
+    "summer",
+    "autumn"
+  ]
+}
