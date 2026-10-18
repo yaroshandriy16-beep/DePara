@@ -35,3 +35,29 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
 .bottom-nav{padding-bottom:max(8px,env(safe-area-inset-bottom))}
 @media(max-width:360px){.depara-section-hint{display:none}.depara-version{font-size:.61rem}}
 @media(prefers-reduced-motion:reduce){.quick,.service,.subtle-btn,.icon-btn,.group-chip{transition:none!important}.quick:hover,.service:hover,.quick:active,.service:active,.subtle-btn:active,.icon-btn:active{transform:none!important}}
+
+/* DePara Seasons 3.0 — independent visual layer, no impact on app logic */
+#deparaSeasonCanvas{position:fixed;inset:0;z-index:12;pointer-events:none!important;opacity:.82;contain:strict}
+/* App content stays readable above atmospheric gradients; particles are transparent. */
+html[data-depara-style="cyber"]{--depara-season-accent:#8b70ff;--depara-season-glow:rgba(99,83,237,.16)}
+html[data-depara-style="emerald"]{--depara-season-accent:#4bcf9a;--depara-season-glow:rgba(48,178,117,.16)}
+html[data-depara-style="glass"]{--depara-season-accent:#9abfe7;--depara-season-glow:rgba(153,192,229,.14)}
+html[data-depara-season="autumn"]{--depara-season-tint:rgba(234,156,58,.13)}
+html[data-depara-season="winter"]{--depara-season-tint:rgba(116,189,251,.13)}
+html[data-depara-season="spring"]{--depara-season-tint:rgba(239,144,191,.13)}
+html[data-depara-season="summer"]{--depara-season-tint:rgba(241,206,92,.13)}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse at 88% 5%,var(--depara-season-tint,transparent),transparent 48%),radial-gradient(ellipse at 4% 92%,var(--depara-season-glow,transparent),transparent 55%)}
+.app{position:relative;z-index:1}
+.depara-season-settings{padding:18px;margin:14px 0;display:grid;gap:14px;border:1px solid var(--depara-season-accent,#8b70ff)}
+.depara-season-settings label{display:grid;gap:8px;font-size:.91rem}
+.depara-season-settings .switch-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.depara-season-title{display:flex;flex-direction:column;gap:4px;font-weight:750;font-size:1.05rem}
+.depara-season-title small{font-size:.75rem;opacity:.65;font-weight:400}
+.depara-season-settings input[type="range"]{width:100%;accent-color:var(--depara-season-accent,#8b70ff)}
+.depara-season-settings input[type="checkbox"]{accent-color:var(--depara-season-accent,#8b70ff)}
+.depara-season-note{font-size:.76rem;line-height:1.5;margin:0}
+.depara-transitions .view.active{animation:deparaViewEnter .32s cubic-bezier(.2,.8,.2,1) both}
+.depara-transitions .quick,.depara-transitions .glass,.depara-transitions .service{transition:transform .22s ease,box-shadow .28s ease,border-color .28s ease}
+.depara-transitions .quick:active,.depara-transitions .service:active{transform:scale(.97)}
+@keyframes deparaViewEnter{from{opacity:.45;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){#deparaSeasonCanvas{display:none!important}.depara-transitions .view.active{animation:none!important}}
