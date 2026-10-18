@@ -61,3 +61,4 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;bac
 .depara-transitions .quick:active,.depara-transitions .service:active{transform:scale(.97)}
 @keyframes deparaViewEnter{from{opacity:.45;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 @media(prefers-reduced-motion:reduce){#deparaSeasonCanvas{display:none!important}.depara-transitions .view.active{animation:none!important}}
+
