@@ -11,3 +11,8 @@
 
 /* DePara 2.0: reliability + in-app reminders */
 .depara-live-status,.depara-reminders{padding:16px;margin:16px 0}.depara-status-row{display:flex;align-items:center;gap:9px;margin-bottom:6px}.depara-status-dot{display:inline-block;width:9px;height:9px;flex:0 0 9px;border-radius:50%;background:#28b985;box-shadow:0 0 0 4px rgba(40,185,133,.13)}.depara-status-dot.depara-cached{background:#e8a638;box-shadow:0 0 0 4px rgba(232,166,56,.13)}.depara-status-dot.depara-warn{background:#ec6476;box-shadow:0 0 0 4px rgba(236,100,118,.13)}.depara-reminders label{margin-top:12px;display:flex;justify-content:space-between;align-items:center;gap:12px}.depara-reminders select{width:auto;min-width:120px}.depara-reminders p{margin:10px 0}.depara-live-status small{display:block;line-height:1.5}@media(prefers-reduced-motion:reduce){html,body,*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+/* DePara 2.0 · Stage 2: highlighted schedule changes */
+.lesson.lesson-changed{border:1px solid rgba(250,190,75,.62);background:linear-gradient(105deg,rgba(250,190,75,.10),rgba(255,255,255,.025));}
+.lesson-change-label{display:inline-block;margin-top:5px;color:#f4bd61;font-weight:700;font-size:.72rem;letter-spacing:.01em;}
+@media(prefers-reduced-motion:reduce){.lesson.lesson-changed{transition:none;animation:none;}}
