@@ -1,5 +1,6 @@
 {
-  "attemptedAt": "2026-10-18T08:40:25.964153+00:00",
-  "status": "failed",
-  "message": "University server unavailable or download incomplete; existing files preserved"
+  "attemptedAt": "2026-10-18T14:52:17.853587+00:00",
+  "status": "success",
+  "message": "Official VNAU source updated",
+  "lastSuccessfulAt": "2026-10-18T14:52:17.853587+00:00"
 }
