@@ -9,17 +9,20 @@ from html import unescape
 from pathlib import Path
 
 import requests
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parent / "scripts"))
+from network_retry import resilient_session
 from bs4 import BeautifulSoup
 
 URL = 'http://81.30.162.30/time-table/group?type=0'
 OUT = Path('data')
-SESSION = requests.Session()
+SESSION = resilient_session()
 SESSION.headers.update({'User-Agent': 'VNAU-Student-Timetable/1.0 (educational project)'})
 DELAY = float(os.getenv('VNAU_REQUEST_DELAY', '1.5'))
 
 
 def soup_request(payload=None):
-    response = SESSION.get(URL, timeout=40) if payload is None else SESSION.post(URL, data=payload, timeout=40)
+    response = SESSION.get(URL, timeout=(15, 40)) if payload is None else SESSION.post(URL, data=payload, timeout=(15, 40))
     response.raise_for_status()
     if 'text/html' not in response.headers.get('Content-Type', 'text/html'):
         raise ValueError('Expected HTML')
