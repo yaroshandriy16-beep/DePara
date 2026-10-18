@@ -1,13 +1,10 @@
 {
-  "generatedAt": "2026-10-18T02:50:03.892971+00:00",
-  "status": "failed",
-  "lastSuccessfulAt": null,
+  "generatedAt": "2026-10-18T15:41:42.407113+00:00",
   "chairs": 39,
   "teachers": 513,
-  "schedulesUpdated": 0,
-  "errors": [
-    {
-      "error": "HTTPConnectionPool(host='81.30.162.30', port=80): Max retries exceeded with url: /time-table/teacher?type=0 (Caused by ConnectTimeoutError(<HTTPConnection(host='81.30.162.30', port=80) at 0x7f4dddff6120>, 'Connection to 81.30.162.30 timed out. (connect timeout=15)'))"
-    }
-  ]
+  "uniqueTeachers": 332,
+  "schedulesUpdated": 332,
+  "status": "success",
+  "lastSuccessfulAt": "2026-10-18T15:41:42.407113+00:00",
+  "errors": []
 }
