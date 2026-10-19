@@ -41,9 +41,9 @@ group.addEventListener('change',()=>done.disabled=!group.value);
 done.addEventListener('click',()=>{if(!group.value)return;const name=group.selectedOptions[0].textContent,id=group.value;write(roleKey,'student');write(setupKey,'1');document.body.dataset.dpRole='student';window.dispatchEvent(new CustomEvent('depara:student-group',{detail:{id,name}}));$('#dp-success-group').textContent=name+' · ВНАУ';show(success)});
 $('#dp-success-enter').addEventListener('click',finish);
 $('#dp-setup-back').addEventListener('click',()=>show(roles));
-function choose(value){if(value==='student'){studentSetup();return}write(roleKey,'teacher');document.body.dataset.dpRole='teacher';show(teacher)}
+function choose(value){if(value==='student'){studentSetup();return}write(roleKey,'teacher');document.body.dataset.dpRole='teacher';finish();window.dispatchEvent(new CustomEvent('depara:teacher-open'))}
 roles.addEventListener('click',e=>{const b=e.target.closest('[data-dp-role]');if(b)choose(b.dataset.dpRole)});
-$('#dp-teacher-enter').addEventListener('click',()=>{write(roleKey,'teacher');finish();document.querySelector('nav button[data-page="schedule"]')?.click()});
+$('#dp-teacher-enter').addEventListener('click',()=>{write(roleKey,'teacher');finish();window.dispatchEvent(new CustomEvent('depara:teacher-open'))});
 $('#dp-teacher-back').addEventListener('click',()=>show(roles));
 function start(){reveal();show(null);const role=read(roleKey);animationTimer=setTimeout(()=>{if(role==='student'&&read(setupKey)==='1'){document.body.dataset.dpRole='student';finish()}else if(role==='teacher'){document.body.dataset.dpRole='teacher';finish()}else show(roles)},1050)}
 window.DeParaChangeRole=()=>{clearTimeout(animationTimer);reveal();show(roles)};
