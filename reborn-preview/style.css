@@ -120,3 +120,20 @@ body:not(.chat-fullscreen) .messenger-back{display:none}
 .light #task-form input[type=date]{color-scheme:light}
 .light .dashboard-quick button{background:#fff;color:#345744;border-color:#a8c7b1}
 @media(max-width:390px){.dashboard-quick{gap:6px}.dashboard-quick button{font-size:11px}}
+
+/* REBORN major preview update — timetable, goals and task filters */
+.week-board{display:grid;gap:16px;margin:18px 0 26px}
+.week-day{border:1px solid #cbb17b37;background:linear-gradient(150deg,#1c3129bb,#101d1a99);padding:15px;border-radius:22px}
+.week-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;text-transform:capitalize}
+.week-heading b{font-size:16px;color:#f0d39b}
+.week-day .lesson{margin:8px 0}
+.week-day .sub{margin:8px 0}
+.study-filters{display:flex;gap:8px;margin:8px 0 17px;overflow-x:auto}
+.study-filters button{border:1px solid #e7d4a445;border-radius:14px;padding:11px 14px;background:#ffffff0b;color:inherit;font-weight:650;white-space:nowrap}
+.study-filters button.selected{background:linear-gradient(125deg,#f3dca6,#d9b66f);color:#21372c}
+.goal-row{display:flex;align-items:center;gap:13px;margin:12px 0 18px}
+.goal-row input{max-width:95px}
+@media(min-width:760px){.week-board{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.light .week-day{background:#f4f8f4;border-color:#cdded0}
+.light .week-heading b{color:#3c6c52}
+.light .study-filters button{border-color:#adc5b5}
