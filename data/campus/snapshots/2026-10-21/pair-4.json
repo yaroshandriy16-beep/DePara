@@ -5,7 +5,7 @@
   "endPair": 4,
   "structureId": "0",
   "corpusId": "",
-  "fetchedAt": "2026-10-19T04:41:50.688875+00:00",
+  "fetchedAt": "2026-10-19T10:40:23.891836+00:00",
   "status": "official-site-snapshot",
   "rooms": [
     {
@@ -68,7 +68,7 @@
       "id": "56",
       "name": "1108",
       "capacity": 50,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=56"
     },
@@ -100,7 +100,7 @@
       "id": "73",
       "name": "1207",
       "capacity": 28,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=73"
     },
@@ -532,7 +532,7 @@
       "id": "22",
       "name": "2516",
       "capacity": 30,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=22"
     },
@@ -748,7 +748,7 @@
       "id": "532",
       "name": "3315",
       "capacity": 40,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=532"
     },
@@ -756,7 +756,7 @@
       "id": "529",
       "name": "3318",
       "capacity": 120,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=529"
     },
@@ -924,7 +924,7 @@
       "id": "193",
       "name": "510",
       "capacity": 34,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=193"
     },
@@ -1020,7 +1020,7 @@
       "id": "223",
       "name": "536",
       "capacity": 26,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=223"
     },
@@ -1084,7 +1084,7 @@
       "id": "177",
       "name": "544",
       "capacity": 31,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=177"
     },

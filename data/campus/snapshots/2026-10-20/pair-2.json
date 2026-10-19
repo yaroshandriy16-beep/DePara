@@ -5,7 +5,7 @@
   "endPair": 2,
   "structureId": "0",
   "corpusId": "",
-  "fetchedAt": "2026-10-19T04:41:33.692331+00:00",
+  "fetchedAt": "2026-10-19T10:40:08.202810+00:00",
   "status": "official-site-snapshot",
   "rooms": [
     {
@@ -180,7 +180,7 @@
       "id": "552",
       "name": "2002",
       "capacity": 80,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=552"
     },
@@ -188,7 +188,7 @@
       "id": "553",
       "name": "2003",
       "capacity": 40,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=553"
     },
@@ -220,7 +220,7 @@
       "id": "48",
       "name": "2102",
       "capacity": 28,
-      "available": false,
+      "available": true,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=48"
     },
@@ -316,7 +316,7 @@
       "id": "27",
       "name": "2302",
       "capacity": 18,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=27"
     },
@@ -412,7 +412,7 @@
       "id": "331",
       "name": "2404",
       "capacity": 16,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=331"
     },
@@ -932,7 +932,7 @@
       "id": "212",
       "name": "513",
       "capacity": 24,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=212"
     },
@@ -1012,7 +1012,7 @@
       "id": "221",
       "name": "533",
       "capacity": 100,
-      "available": false,
+      "available": true,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=221"
     },
@@ -1044,7 +1044,7 @@
       "id": "550",
       "name": "538 б",
       "capacity": 40,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=550"
     },
