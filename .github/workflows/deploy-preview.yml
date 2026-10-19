@@ -1,0 +1,39 @@
+name: Deploy DePara Preview (isolated database)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    environment: preview
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate preview database secret
+        env:
+          PREVIEW_D1_ID: ${{ secrets.CLOUDFLARE_PREVIEW_D1_DATABASE_ID }}
+        run: |
+          if ! [[ "$PREVIEW_D1_ID" =~ ^[0-9a-fA-F-]{36}$ ]]; then
+            echo "Set CLOUDFLARE_PREVIEW_D1_DATABASE_ID to the separate preview D1 database ID."
+            exit 1
+          fi
+      - name: Configure preview D1
+        env:
+          PREVIEW_D1_ID: ${{ secrets.CLOUDFLARE_PREVIEW_D1_DATABASE_ID }}
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          p = Path('wrangler.preview.toml')
+          p.write_text(p.read_text().replace('REPLACE_WITH_PREVIEW_D1_DATABASE_ID', os.environ['PREVIEW_D1_ID']))
+          PY
+      - name: Deploy preview Worker only
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: '4'
+          command: deploy --config wrangler.preview.toml
