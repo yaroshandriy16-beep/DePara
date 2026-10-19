@@ -451,3 +451,6 @@ body:not(.light) .reborn-orbit{opacity:.3;filter:hue-rotate(0deg)}
 .rb48-notice-sheet .rb40-mark{min-height:36px;min-width:75px}
 .rb45-more{min-height:45px}
 @media(max-width:430px){.rb40-focus .action{font-size:13px;padding:10px 8px}.rb48-notice-sheet .rb40-notice{gap:8px}}
+
+/* ДеПара? Test — mobile layout and accessibility polish */
+.brand .logo{font-size:15px!important;font-weight:850!important;letter-spacing:-1px!important;flex-shrink:0}.brand .logo .gold{color:#e9c478}.brand small{letter-spacing:0!important;text-transform:none!important;line-height:1.3}.brand{min-width:0}.brand>div{min-width:0}.brand b{white-space:nowrap}.header-right{flex-shrink:0}#screen{min-width:0;padding-bottom:calc(92px + env(safe-area-inset-bottom,0px))}#screen>*{max-width:100%;min-width:0}#nav,nav{padding-bottom:max(8px,env(safe-area-inset-bottom,0px))}button{touch-action:manipulation}button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #e9c478;outline-offset:3px}@media(max-width:390px){.brand b{font-size:20px}.brand small{font-size:10px}.header-right{gap:6px}.status{font-size:10px}#screen .rb40-card{min-width:0}}@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
