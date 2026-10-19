@@ -3,7 +3,7 @@
 (() => {
   'use strict';
 
-  const API = 'https://depara-api.yaroshandriy16.workers.dev';
+  const API = 'https://depara-api-preview.yaroshandriy16.workers.dev';
   const $ = s => document.querySelector(s);
   const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({
     '&': '&amp;',
@@ -24,6 +24,8 @@
   let busy = false;
   let loading = false;
   let refreshTimer = null;
+  let fullscreen = false;
+  let previousSignature = '';
 
   const active = () =>
     !!$('nav button[data-page="social"].active');
@@ -31,7 +33,7 @@
   const groupId = () => {
     try {
       return String(
-        JSON.parse(localStorage.getItem('dp4_group')) || '3641'
+        JSON.parse(localStorage.getItem('dp_reborn2_group')) || '3641'
       );
     } catch {
       return '3641';
@@ -40,7 +42,7 @@
 
   const groupName = () => {
     try {
-      return JSON.parse(localStorage.getItem('dp4_groupName')) ||
+      return JSON.parse(localStorage.getItem('dp_reborn2_groupName')) ||
         'Моя група';
     } catch {
       return 'Моя група';
@@ -122,7 +124,19 @@
       error = e.message;
     } finally {
       loading = false;
-      render();
+      const thread = $('#social-messages');
+      if (thread && fullscreen && tab !== 'friends') {
+        const signature = JSON.stringify(messages.map(m => [m.id,m.body,m.created_at]));
+        if (signature !== previousSignature || error) {
+          const nearBottom = thread.scrollHeight-thread.scrollTop-thread.clientHeight < 100;
+          const draft = $('#social-send textarea')?.value || '';
+          render();
+          const input = $('#social-send textarea');
+          if (input) input.value = draft;
+          if (nearBottom) $('#social-messages').scrollTop = $('#social-messages').scrollHeight;
+          previousSignature = signature;
+        }
+      } else render();
     }
   }
 
@@ -220,67 +234,45 @@
     `;
   }
 
+  const myId = () => String(window.Telegram?.WebApp?.initDataUnsafe?.user?.id ?? '');
+  const stamp = v => {
+    if (!v) return '';
+    const raw = String(v);
+    const d = /^\d{10,13}$/.test(raw) ? new Date(Number(raw) * (raw.length === 10 ? 1000 : 1)) : new Date(raw.replace(' ', 'T') + (/Z$|[+-]\d\d:?\d\d$/.test(raw) ? '' : 'Z'));
+    return Number.isNaN(d.getTime()) ? raw.slice(11,16) : d.toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'});
+  };
+  const initials = name => String(name || '?').trim().split(/\s+/).slice(0,2).map(s => s[0] || '').join('').toUpperCase();
   function chatView() {
     const isGroup = tab === 'group';
-
-    const title = isGroup
-      ? 'Чат групи ' + groupName()
-      : label(peer);
-
+    const title = isGroup ? 'Чат групи ' + groupName() : label(peer);
+    const self = myId();
     return `
-      <div class="card">
-        <h2>${esc(title)}</h2>
-        <p class="sub">
-          ${isGroup
-            ? 'Спільний чат вибраної групи'
-            : 'Особисте листування між друзями'}
-        </p>
-      </div>
-
-      <div
-        class="card"
-        id="social-messages"
-        style="max-height:420px;overflow-y:auto"
-      >
-        ${messages.map(m => `
-          <div style="
-            padding:12px 0;
-            border-bottom:1px solid rgba(127,127,127,.2)
-          ">
-            <small class="sub">
-              ${esc(
-                isGroup
-                  ? label(m)
-                  : m.sender_id === peer?.id
-                    ? label(peer)
-                    : 'Я'
-              )}
-              · ${esc(m.created_at)}
-            </small>
-            <p style="
-              white-space:pre-wrap;
-              overflow-wrap:anywhere
-            ">${esc(m.body)}</p>
-          </div>
-        `).join('') ||
-        '<p class="sub">Повідомлень поки немає.</p>'}
-      </div>
-
-      <div class="card">
-        <form id="social-send">
-          <textarea
-            class="field"
-            name="message"
-            required
-            maxlength="2000"
-            rows="3"
-            placeholder="Напиши повідомлення..."
-          ></textarea>
-          <button class="action primary">
-            Надіслати →
-          </button>
+      <section class="messenger" aria-label="${esc(title)}">
+        <div class="messenger-head">
+          <button class="messenger-back" id="social-back" aria-label="Назад">‹</button>
+          <div class="messenger-avatar">${esc(isGroup ? '✦' : initials(title))}</div>
+          <div class="messenger-head-text"><strong>${esc(title)}</strong><span>${isGroup ? 'Групове спілкування' : 'Особисті повідомлення'}</span></div>
+          <span class="messenger-live" title="Хмарний чат">●</span>
+        </div>
+        <div class="messenger-thread" id="social-messages" role="log" aria-live="polite" aria-relevant="additions text">
+          ${messages.map(m => {
+            const own = self && String(m.sender_id ?? m.user_id ?? '') === self;
+            const name = own ? 'Ти' : isGroup ? label(m) : label(peer);
+            return `<div class="message-row ${own ? 'mine' : 'theirs'}">
+              ${own ? '' : `<span class="message-avatar" aria-hidden="true">${esc(initials(name))}</span>`}
+              <div class="message-bubble">
+                ${isGroup && !own ? `<span class="message-name">${esc(name)}</span>` : ''}
+                <div class="message-body">${esc(m.body)}</div>
+                <time class="message-time">${esc(stamp(m.created_at))}</time>
+              </div>
+            </div>`;
+          }).join('') || '<div class="messenger-empty">Тут поки тихо ✦<small>Напиши перше повідомлення</small></div>'}
+        </div>
+        <form id="social-send" class="messenger-compose">
+          <textarea class="messenger-input" name="message" required maxlength="2000" rows="1" placeholder="Повідомлення..." aria-label="Текст повідомлення"></textarea>
+          <button class="messenger-send" type="submit" aria-label="Надіслати повідомлення">➤</button>
         </form>
-      </div>
+      </section>
     `;
   }
 
@@ -290,6 +282,7 @@
     const screen = $('#screen');
     if (!screen) return;
 
+    document.body.classList.toggle('chat-fullscreen', fullscreen && tab !== 'friends');
     screen.innerHTML = `
       <div class="eyebrow">ВНАУ · ДеПара?</div>
       <h1>Спільнота</h1>
@@ -323,11 +316,19 @@
     `;
 
     bind();
+    if (tab !== 'friends') {
+      const thread = $('#social-messages');
+      if (thread) {
+        thread.scrollTop = thread.scrollHeight;
+      }
+    }
   }
 
   function bind() {
+    $('#social-back')?.addEventListener('click', () => { fullscreen=false;tab='friends';peer=null;render(); });
     $('#social-friends')?.addEventListener('click', () => {
       tab = 'friends';
+      fullscreen = false;
       peer = null;
       error = '';
       render();
@@ -335,6 +336,7 @@
 
     $('#social-group')?.addEventListener('click', () => {
       tab = 'group';
+      fullscreen = true;
       peer = null;
       messages = [];
       reload();
@@ -386,12 +388,25 @@
         if (!peer) return;
 
         tab = 'direct';
+        fullscreen = true;
         messages = [];
         reload();
       };
     });
 
-    $('#social-send')?.addEventListener('submit', e => {
+    const compose = $('#social-send');
+    const composeInput = compose?.elements.message;
+    composeInput?.addEventListener('input', () => {
+      composeInput.style.height = 'auto';
+      composeInput.style.height = Math.min(composeInput.scrollHeight, 112) + 'px';
+    });
+    composeInput?.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
+        e.preventDefault();
+        compose?.requestSubmit();
+      }
+    });
+    compose?.addEventListener('submit', e => {
       e.preventDefault();
 
       const input = e.target.elements.message;
@@ -419,6 +434,7 @@
 
   function watch() {
     if (!active()) {
+      document.body.classList.remove('chat-fullscreen');
       if (refreshTimer) {
         clearInterval(refreshTimer);
         refreshTimer = null;
@@ -441,7 +457,7 @@
         if (tab !== 'friends') {
           reload();
         }
-      }, 12000);
+      }, 5000);
     }
   }
 
