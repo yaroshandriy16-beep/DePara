@@ -197,3 +197,18 @@ nav button span{font-size:21px;line-height:1.1}nav button.active{color:#f2d79b;b
 .light .module-hero{color:#fff}.light .module-hero p{color:#e6f0e8}.light .study-top-stats>div{background:#fff;border-color:#d2e2d5}.light .study-top-stats small{color:#63836b}.light .session-item{border-color:#d7e3d9}.light .session-item small{color:#637d6b}
 
 .session-summary{display:grid;gap:9px;margin:12px 0}.session-upcoming{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;align-items:center;padding:12px 13px;border-radius:15px;background:#d8c58e12;border:1px solid #d8c58e33}.session-upcoming b{font-size:10px;color:#e7cf99;letter-spacing:.4px;text-transform:uppercase}.session-upcoming span{font-size:13px;font-weight:700;overflow-wrap:anywhere}.session-upcoming small{grid-column:2;color:#b1c8b9;font-size:11px}.light .session-upcoming{background:#fff8e9;border-color:#e1d4b6}.light .session-upcoming b{color:#94733a}.light .session-upcoming small{color:#5e7868}
+
+/* iOS Telegram/Safari visual hotfix — remove emoji glyph backgrounds */
+.home-feature::after,.hero::after,.module-hero::after{content:none!important;display:none!important}
+.home-feature{isolation:isolate}
+.feature-main{align-items:stretch;min-width:0}
+.feature-copy{flex:1 1 0;min-width:0}
+.feature-copy strong{font-size:clamp(22px,5.3vw,30px);overflow-wrap:break-word;word-break:normal;hyphens:auto}
+.feature-clock{flex:0 0 96px;min-width:0;max-width:96px;display:flex;align-items:center;justify-content:center;padding:13px 7px;overflow:hidden;position:relative;z-index:2;background:linear-gradient(145deg,#ffffff1d,#ffffff09);border:1px solid #f2d9a04d;box-shadow:inset 0 1px 0 #ffffff23}
+.feature-clock b{font-size:clamp(15px,4.4vw,23px);line-height:1.4;white-space:normal;overflow-wrap:normal;word-break:keep-all;text-align:center}
+.feature-clock small{font-size:10px;white-space:nowrap}
+.home-shortcuts{position:relative;z-index:1}
+nav{z-index:30;bottom:calc(12px + env(safe-area-inset-bottom,0px));max-height:82px}
+.app{padding-bottom:calc(185px + env(safe-area-inset-bottom,0px))}
+#screen{min-width:0}
+@media(max-width:410px){.feature-clock{flex-basis:77px;max-width:77px;padding:10px 5px}.feature-clock b{font-size:17px}.feature-copy strong{font-size:clamp(20px,5.5vw,26px)}.home-feature{padding:19px 17px 15px}.feature-main{gap:8px}}
