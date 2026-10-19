@@ -93,3 +93,17 @@ nav button.active{color:#f3d79c}
 .light .message-time{color:#617b6c}
 .light .messenger-input{background:#fff;color:#18332a;border-color:#c7d7cb}
 @media(max-width:430px){.messenger{border-radius:21px}.messenger-thread{padding:13px 9px}.message-bubble{max-width:86%}.messenger-head{padding:13px}}
+
+/* Messenger 2.1 full-screen mode */
+body.chat-fullscreen{overflow:hidden}
+body.chat-fullscreen .app{max-width:none;padding:0}
+body.chat-fullscreen .app>header,body.chat-fullscreen .app>nav{display:none!important}
+body.chat-fullscreen #screen{position:fixed;inset:0;z-index:110;background:#0c1715;overflow:hidden;padding:0}
+body.chat-fullscreen #screen>.eyebrow,body.chat-fullscreen #screen>h1,body.chat-fullscreen #screen>.sub,body.chat-fullscreen #screen>.actions,body.chat-fullscreen #screen>.card{display:none!important}
+body.chat-fullscreen .messenger{position:absolute;inset:0;margin:0;border:0;border-radius:0;display:flex;flex-direction:column;max-height:100%;box-shadow:none}
+body.chat-fullscreen .messenger-head{flex:none;padding:calc(env(safe-area-inset-top,0px) + 13px) 14px 13px;min-height:68px}
+body.chat-fullscreen .messenger-thread{flex:1;min-height:0;height:auto;max-height:none;padding:18px 13px}
+body.chat-fullscreen .messenger-compose{flex:none;padding:10px 12px calc(env(safe-area-inset-bottom,0px) + 12px)}
+.messenger-back{display:grid;place-items:center;flex:none;width:37px;height:40px;border:0;border-radius:13px;background:#ffffff12;color:#e9ce92;font-size:34px;line-height:1}
+body:not(.chat-fullscreen) .messenger-back{display:none}
+@supports(height:100dvh){body.chat-fullscreen #screen{height:100dvh;bottom:auto}}
