@@ -477,3 +477,10 @@ body:not(.light) .reborn-orbit{opacity:.3;filter:hue-rotate(0deg)}
  nav{z-index:50!important}
 }
 @media(max-width:370px){.brand small{font-size:9px!important}.header-right .status{max-width:105px;font-size:9px!important}.brand .logo{width:38px!important;height:38px!important}}
+
+/* Live lesson countdown — compact and legible on mobile */
+#dp-live-lesson-clock{display:flex!important;flex-wrap:wrap;align-items:center;gap:5px 12px;padding:11px 13px!important;min-height:55px;max-width:100%;border-radius:16px}
+#dp-live-lesson-clock .dp-clock-label{font-size:12px;font-weight:700;letter-spacing:.02em}
+#dp-live-lesson-clock .dp-clock-value{font-size:clamp(21px,5.7vw,28px);font-weight:850;font-variant-numeric:tabular-nums;letter-spacing:.025em;line-height:1.1}
+#dp-live-lesson-clock .dp-clock-secondary{flex-basis:100%;font-size:11px;opacity:.83}
+@media(max-width:390px){#dp-live-lesson-clock{gap:4px 9px;padding:9px 11px!important}#dp-live-lesson-clock .dp-clock-value{font-size:21px}}
