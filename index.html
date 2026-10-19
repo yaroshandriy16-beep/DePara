@@ -11,22 +11,23 @@
 
   <meta name="theme-color" content="#071b19">
 
-  <title>ДеПара? — студентський простір</title>
+  <title>ДеПара? — Твій розклад. Твій день.</title>
 
-  <link rel="stylesheet" href="style.css?v=4">
+  <link rel="stylesheet" href="style.css?v=7">
 </head>
 
 <body>
   <div class="ambient"></div>
+  <div class="splash" id="splash" aria-label="Завантаження ДеПара?"><div class="splash-mark">ДП<span>?</span></div><div class="splash-title">ДеПара<span>?</span></div><p>Твій розклад. Твій день.</p><div class="splash-line"></div></div>
 
   <div class="app">
     <header>
       <div class="brand">
-        <span class="logo">✳</span>
+        <span class="logo" aria-hidden="true">ДП<span>?</span></span>
 
         <div>
           <b>ДеПара<span class="gold">?</span></b>
-          <small>твій студентський простір</small>
+          <small>Твій розклад. Твій день.</small>
         </div>
       </div>
 
@@ -72,7 +73,9 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <!-- Основний застосунок -->
-  <script src="app.js?v=6"></script>
+  <script src="app.js?v=7"></script>
+
+  <script>window.addEventListener('load',()=>{setTimeout(()=>document.getElementById('splash')?.classList.add('splash-hide'),400);setTimeout(()=>document.getElementById('splash')?.remove(),900)});setTimeout(()=>document.getElementById('splash')?.remove(),3500);</script>
 
   <!-- Друзі та чати -->
   <script src="social.js?v=1"></script>
