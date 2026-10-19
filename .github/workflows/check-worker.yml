@@ -1,0 +1,24 @@
+name: Check Cloudflare Worker (no deployment)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - depara-reborn-2
+    paths:
+      - worker.js
+      - wrangler.toml
+      - .github/workflows/check-worker.yml
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check JavaScript syntax
+        run: node --check worker.js
+      - name: Check Wrangler build without publishing
+        run: npx --yes wrangler@4 deploy --dry-run --outdir /tmp/depara-worker-build --config wrangler.toml
