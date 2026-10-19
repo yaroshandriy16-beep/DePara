@@ -1,0 +1,1412 @@
+
+
+const encoder = new TextEncoder();
+
+
+
+const cors = {
+
+  'Access-Control-Allow-Origin': '*',
+
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, OPTIONS',
+
+  'Access-Control-Max-Age': '86400'
+
+};
+
+
+
+const json = (data, status = 200) =>
+
+  new Response(JSON.stringify(data), {
+
+    status,
+
+    headers: {
+
+      ...cors,
+
+      'Content-Type': 'application/json; charset=utf-8',
+
+      'Cache-Control': 'no-store',
+
+      'X-Content-Type-Options': 'nosniff'
+
+    }
+
+  });
+
+
+
+async function sign(key, message) {
+
+  const imported = await crypto.subtle.importKey(
+
+    'raw',
+
+    key,
+
+    { name: 'HMAC', hash: 'SHA-256' },
+
+    false,
+
+    ['sign']
+
+  );
+
+  return new Uint8Array(
+
+    await crypto.subtle.sign('HMAC', imported, encoder.encode(message))
+
+  );
+
+}
+
+
+
+function same(a, b) {
+
+  if (a.length !== b.length) return false;
+
+  let diff = 0;
+
+  for (let i = 0; i < a.length; i++) diff |= a[i] ^ b[i];
+
+  return diff === 0;
+
+}
+
+
+
+async function verify(initData, token) {
+
+  if (
+
+    typeof initData !== 'string' ||
+
+    !initData ||
+
+    initData.length > 16384 ||
+
+    !token
+
+  ) throw Error('AUTH_REQUIRED');
+
+
+
+  const entries = [...new URLSearchParams(initData).entries()];
+
+  const params = new URLSearchParams(initData);
+
+
+
+  if (
+
+    new Set(entries.map(([k]) => k)).size !== entries.length ||
+
+    !params.has('user') ||
+
+    !params.has('hash') ||
+
+    !params.has('auth_date')
+
+  ) throw Error('INVALID_TELEGRAM_DATA');
+
+
+
+  const authDate = Number(params.get('auth_date'));
+
+  const now = Math.floor(Date.now() / 1000);
+
+
+
+  if (
+
+    !Number.isSafeInteger(authDate) ||
+
+    authDate > now + 60 ||
+
+    now - authDate > 3600
+
+  ) throw Error('TELEGRAM_SESSION_EXPIRED');
+
+
+
+  const hash = params.get('hash');
+
+
+
+  if (!/^[0-9a-f]{64}$/i.test(hash || ''))
+
+    throw Error('INVALID_TELEGRAM_SIGNATURE');
+
+
+
+  const check = entries
+
+    .filter(([k]) => k !== 'hash')
+
+    .sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0)
+
+    .map(([k, v]) => `${k}=${v}`)
+
+    .join('\n');
+
+
+
+  const secret = await sign(encoder.encode('WebAppData'), token);
+
+  const expected = await sign(secret, check);
+
+  const received = new Uint8Array(
+
+    hash.match(/.{2}/g).map(x => parseInt(x, 16))
+
+  );
+
+
+
+  if (!same(expected, received))
+
+    throw Error('INVALID_TELEGRAM_SIGNATURE');
+
+
+
+  let user;
+
+  try {
+
+    user = JSON.parse(params.get('user'));
+
+  } catch {
+
+    throw Error('INVALID_TELEGRAM_USER');
+
+  }
+
+
+
+  if (!user || !Number.isSafeInteger(user.id) || user.id <= 0)
+
+    throw Error('INVALID_TELEGRAM_USER');
+
+
+
+  return user;
+
+}
+
+
+
+async function userFromRequest(request, env) {
+
+  const auth = request.headers.get('Authorization') || '';
+
+  if (!auth.startsWith('tma ')) throw Error('AUTH_REQUIRED');
+
+  return verify(auth.slice(4), env.TELEGRAM_BOT_TOKEN);
+
+}
+
+
+
+async function profile(env, user) {
+
+  const first =
+
+    typeof user.first_name === 'string'
+
+      ? user.first_name.slice(0, 128) : '';
+
+
+
+  const last =
+
+    typeof user.last_name === 'string'
+
+      ? user.last_name.slice(0, 128) : '';
+
+
+
+  const username =
+
+    typeof user.username === 'string'
+
+      ? user.username.slice(0, 64) : null;
+
+
+
+  const photo =
+
+    typeof user.photo_url === 'string' &&
+
+    user.photo_url.startsWith('https://')
+
+      ? user.photo_url.slice(0, 2048) : null;
+
+
+
+  await env.DB.prepare(
+
+    `INSERT INTO users(id,username,first_name,last_name,photo_url)
+
+     VALUES(?,?,?,?,?)
+
+     ON CONFLICT(id) DO UPDATE SET
+
+       username=excluded.username,
+
+       first_name=excluded.first_name,
+
+       last_name=excluded.last_name,
+
+       photo_url=excluded.photo_url,
+
+       updated_at=CURRENT_TIMESTAMP`
+
+  ).bind(user.id, username, first, last, photo).run();
+
+
+
+  return env.DB.prepare(
+
+    `SELECT id,username,first_name,last_name,photo_url,
+
+            group_id,bio,privacy,xp,level,created_at,updated_at
+
+     FROM users WHERE id=?`
+
+  ).bind(user.id).first();
+
+}
+
+
+
+const authErrors = new Set([
+
+  'AUTH_REQUIRED',
+
+  'INVALID_TELEGRAM_DATA',
+
+  'INVALID_TELEGRAM_SIGNATURE',
+
+  'INVALID_TELEGRAM_USER',
+
+  'TELEGRAM_SESSION_EXPIRED'
+
+]);
+
+
+
+function validState(s) {
+
+  return s &&
+
+    typeof s === 'object' &&
+
+    !Array.isArray(s) &&
+
+    Array.isArray(s.tasks) && s.tasks.length <= 2000 &&
+
+    Array.isArray(s.notes) && s.notes.length <= 2000 &&
+
+    Array.isArray(s.grades) && s.grades.length <= 2000 &&
+
+    s.attendance &&
+
+    typeof s.attendance === 'object' &&
+
+    !Array.isArray(s.attendance) &&
+
+    Number.isSafeInteger(s.xp) &&
+
+    s.xp >= 0 && s.xp <= 100000000 &&
+
+    typeof s.group === 'string' && s.group.length <= 80 &&
+
+    typeof s.groupName === 'string' && s.groupName.length <= 160;
+
+}
+
+
+
+function bad(code, status = 400) {
+
+  return json({ ok: false, error: code }, status);
+
+}
+
+
+
+function numericId(value) {
+
+  const n = Number(value);
+
+  return Number.isSafeInteger(n) && n > 0 ? n : null;
+
+}
+
+
+
+async function bodyJSON(request) {
+
+  const raw = await request.text();
+
+  if (raw.length > 12000) throw Error('PAYLOAD_TOO_LARGE');
+
+  try {
+
+    return JSON.parse(raw);
+
+  } catch {
+
+    throw Error('INVALID_JSON');
+
+  }
+
+}
+
+
+
+function messageBody(value) {
+
+  return typeof value === 'string' &&
+
+    value.trim().length >= 1 &&
+
+    value.trim().length <= 2000
+
+      ? value.trim() : null;
+
+}
+
+
+
+async function isFriend(env, a, b) {
+
+  return Boolean(
+
+    await env.DB.prepare(
+
+      'SELECT 1 FROM social_friends WHERE user_id=? AND friend_id=?'
+
+    ).bind(a, b).first()
+
+  );
+
+}
+
+
+
+async function socialRoute(request, env, path, url) {
+
+  const user = await userFromRequest(request, env);
+
+  await profile(env, user);
+
+  const id = user.id;
+
+
+
+  // Пошук студентів
+
+  if (path === '/api/social/search' && request.method === 'GET') {
+
+    const q = (url.searchParams.get('q') || '')
+
+      .trim().replace(/^@/, '');
+
+
+
+    if (q.length < 2 || q.length > 64)
+
+      return bad('INVALID_QUERY');
+
+
+
+    const rows = await env.DB.prepare(
+
+      `SELECT id,username,first_name,last_name,photo_url
+
+       FROM users
+
+       WHERE id<>?
+
+         AND username IS NOT NULL
+
+         AND LOWER(username) LIKE LOWER(?) ESCAPE '\\\\'
+
+         AND privacy <> 'private'
+
+       ORDER BY
+
+         CASE WHEN LOWER(username)=LOWER(?) THEN 0 ELSE 1 END,
+
+         username
+
+       LIMIT 20`
+
+    ).bind(
+
+      id,
+
+      '%' + q.replace(/[\\\\%_]/g, '\\\\$&') + '%',
+
+      q
+
+    ).all();
+
+
+
+    return json({ ok: true, users: rows.results });
+
+  }
+
+
+
+  // Список друзів
+
+  if (path === '/api/social/friends' && request.method === 'GET') {
+
+    const friends = await env.DB.prepare(
+
+      `SELECT u.id,u.username,u.first_name,u.last_name,u.photo_url
+
+       FROM social_friends f
+
+       JOIN users u ON u.id=f.friend_id
+
+       WHERE f.user_id=?
+
+       ORDER BY u.first_name,u.id
+
+       LIMIT 200`
+
+    ).bind(id).all();
+
+
+
+    return json({ ok: true, friends: friends.results });
+
+  }
+
+
+
+  // Вхідні та вихідні заявки
+
+  if (path === '/api/social/requests' && request.method === 'GET') {
+
+    const incoming = await env.DB.prepare(
+
+      `SELECT r.id,r.sender_id,r.created_at,
+
+              u.username,u.first_name,u.last_name,u.photo_url
+
+       FROM social_friend_requests r
+
+       JOIN users u ON u.id=r.sender_id
+
+       WHERE r.receiver_id=? AND r.status='pending'
+
+       ORDER BY r.id DESC LIMIT 100`
+
+    ).bind(id).all();
+
+
+
+    const outgoing = await env.DB.prepare(
+
+      `SELECT r.id,r.receiver_id,r.created_at,
+
+              u.username,u.first_name,u.last_name,u.photo_url
+
+       FROM social_friend_requests r
+
+       JOIN users u ON u.id=r.receiver_id
+
+       WHERE r.sender_id=? AND r.status='pending'
+
+       ORDER BY r.id DESC LIMIT 100`
+
+    ).bind(id).all();
+
+
+
+    return json({
+
+      ok: true,
+
+      incoming: incoming.results,
+
+      outgoing: outgoing.results
+
+    });
+
+  }
+
+
+
+  // Надіслати заявку в друзі
+
+  if (path === '/api/social/requests' && request.method === 'POST') {
+
+    const body = await bodyJSON(request);
+
+    const target = numericId(body?.userId);
+
+
+
+    if (!target || target === id)
+
+      return bad('INVALID_USER');
+
+
+
+    const other = await env.DB.prepare(
+
+      'SELECT id,privacy FROM users WHERE id=?'
+
+    ).bind(target).first();
+
+
+
+    if (!other || other.privacy === 'private')
+
+      return bad('USER_NOT_FOUND', 404);
+
+
+
+    if (await isFriend(env, id, target))
+
+      return bad('ALREADY_FRIENDS', 409);
+
+
+
+    const reverse = await env.DB.prepare(
+
+      `SELECT id FROM social_friend_requests
+
+       WHERE sender_id=? AND receiver_id=? AND status='pending'
+
+       ORDER BY id DESC LIMIT 1`
+
+    ).bind(target, id).first();
+
+
+
+    if (reverse)
+
+      return bad('ACCEPT_INCOMING_REQUEST_FIRST', 409);
+
+
+
+    const existing = await env.DB.prepare(
+
+      `SELECT id FROM social_friend_requests
+
+       WHERE sender_id=? AND receiver_id=? AND status='pending'`
+
+    ).bind(id, target).first();
+
+
+
+    if (existing)
+
+      return json({
+
+        ok: true,
+
+        requestId: existing.id,
+
+        alreadyPending: true
+
+      });
+
+
+
+    await env.DB.prepare(
+
+      `INSERT INTO social_friend_requests(sender_id,receiver_id,status)
+
+       VALUES(?,?,'pending')`
+
+    ).bind(id, target).run();
+
+
+
+    return json({ ok: true });
+
+  }
+
+
+
+  // Прийняти або відхилити заявку
+
+  if (
+
+    path === '/api/social/requests/respond' &&
+
+    request.method === 'POST'
+
+  ) {
+
+    const body = await bodyJSON(request);
+
+    const requestId = numericId(body?.requestId);
+
+
+
+    if (
+
+      !requestId ||
+
+      !['accept', 'reject'].includes(body?.action)
+
+    ) return bad('INVALID_REQUEST');
+
+
+
+    const row = await env.DB.prepare(
+
+      `SELECT sender_id FROM social_friend_requests
+
+       WHERE id=? AND receiver_id=? AND status='pending'`
+
+    ).bind(requestId, id).first();
+
+
+
+    if (!row) return bad('REQUEST_NOT_FOUND', 404);
+
+
+
+    const result = await env.DB.prepare(
+
+      `UPDATE social_friend_requests
+
+       SET status=?,updated_at=CURRENT_TIMESTAMP
+
+       WHERE id=? AND receiver_id=? AND status='pending'`
+
+    ).bind(
+
+      body.action === 'accept' ? 'accepted' : 'rejected',
+
+      requestId,
+
+      id
+
+    ).run();
+
+
+
+    if (result.meta.changes !== 1)
+
+      return bad('REQUEST_ALREADY_HANDLED', 409);
+
+
+
+    if (body.action === 'accept') {
+
+      await env.DB.batch([
+
+        env.DB.prepare(
+
+          `INSERT OR IGNORE INTO social_friends(user_id,friend_id)
+
+           VALUES(?,?)`
+
+        ).bind(id, row.sender_id),
+
+
+
+        env.DB.prepare(
+
+          `INSERT OR IGNORE INTO social_friends(user_id,friend_id)
+
+           VALUES(?,?)`
+
+        ).bind(row.sender_id, id)
+
+      ]);
+
+    }
+
+
+
+    return json({ ok: true });
+
+  }
+
+
+
+  // Отримати особисті повідомлення
+
+  if (path === '/api/social/dm' && request.method === 'GET') {
+
+    const other = numericId(url.searchParams.get('userId'));
+
+
+
+    if (!other || !await isFriend(env, id, other))
+
+      return bad('FRIEND_REQUIRED', 403);
+
+
+
+    const rows = await env.DB.prepare(
+
+      `SELECT id,sender_id,receiver_id,body,created_at
+
+       FROM social_direct_messages
+
+       WHERE (sender_id=? AND receiver_id=?)
+
+          OR (sender_id=? AND receiver_id=?)
+
+       ORDER BY id DESC LIMIT 100`
+
+    ).bind(id, other, other, id).all();
+
+
+
+    return json({
+
+      ok: true,
+
+      messages: rows.results.reverse()
+
+    });
+
+  }
+
+
+
+  // Надіслати особисте повідомлення
+
+  if (path === '/api/social/dm' && request.method === 'POST') {
+
+    const body = await bodyJSON(request);
+
+    const other = numericId(body?.userId);
+
+    const msg = messageBody(body?.body);
+
+
+
+    if (!other || !msg)
+
+      return bad('INVALID_MESSAGE');
+
+
+
+    if (!await isFriend(env, id, other))
+
+      return bad('FRIEND_REQUIRED', 403);
+
+
+
+    const result = await env.DB.prepare(
+
+      `INSERT INTO social_direct_messages(sender_id,receiver_id,body)
+
+       VALUES(?,?,?)`
+
+    ).bind(id, other, msg).run();
+
+
+
+    return json({
+
+      ok: true,
+
+      messageId: result.meta.last_row_id
+
+    });
+
+  }
+
+
+
+  // Отримати повідомлення групи
+
+  if (path === '/api/social/group' && request.method === 'GET') {
+
+    const group = (url.searchParams.get('groupId') || '').trim();
+
+
+
+    if (!/^[a-zA-Z0-9_-]{1,80}$/.test(group))
+
+      return bad('INVALID_GROUP');
+
+
+
+    const rows = await env.DB.prepare(
+
+      `SELECT m.id,m.group_id,m.sender_id,m.body,m.created_at,
+
+              u.first_name,u.last_name,u.username
+
+       FROM social_group_messages m
+
+       JOIN users u ON u.id=m.sender_id
+
+       WHERE m.group_id=?
+
+       ORDER BY m.id DESC LIMIT 100`
+
+    ).bind(group).all();
+
+
+
+    return json({
+
+      ok: true,
+
+      messages: rows.results.reverse()
+
+    });
+
+  }
+
+
+
+  // Надіслати повідомлення групі
+
+  if (path === '/api/social/group' && request.method === 'POST') {
+
+    const body = await bodyJSON(request);
+
+    const group = String(body?.groupId || '').trim();
+
+    const msg = messageBody(body?.body);
+
+
+
+    if (
+
+      !/^[a-zA-Z0-9_-]{1,80}$/.test(group) ||
+
+      !msg
+
+    ) return bad('INVALID_MESSAGE');
+
+
+
+    const result = await env.DB.prepare(
+
+      `INSERT INTO social_group_messages(group_id,sender_id,body)
+
+       VALUES(?,?,?)`
+
+    ).bind(group, id, msg).run();
+
+
+
+    return json({
+
+      ok: true,
+
+      messageId: result.meta.last_row_id
+
+    });
+
+  }
+
+
+
+  // Messenger 2.0 — список діалогів
+
+  if (path === '/api/social/inbox' && request.method === 'GET') {
+
+    const rows = await env.DB.prepare(`
+
+      SELECT
+
+        u.id, u.username, u.first_name, u.last_name, u.photo_url,
+
+        (
+
+          SELECT m.body
+
+          FROM social_direct_messages m
+
+          WHERE (m.sender_id=? AND m.receiver_id=u.id)
+
+             OR (m.sender_id=u.id AND m.receiver_id=?)
+
+          ORDER BY m.id DESC LIMIT 1
+
+        ) AS last_message,
+
+        (
+
+          SELECT MAX(m.id)
+
+          FROM social_direct_messages m
+
+          WHERE (m.sender_id=? AND m.receiver_id=u.id)
+
+             OR (m.sender_id=u.id AND m.receiver_id=?)
+
+        ) AS last_id,
+
+        (
+
+          SELECT COUNT(*)
+
+          FROM social_direct_messages m
+
+          WHERE m.sender_id=u.id AND m.receiver_id=?
+
+            AND m.id > COALESCE((
+
+              SELECT last_message_id
+
+              FROM social_read_state
+
+              WHERE user_id=?
+
+                AND conversation_key='dm:' || u.id
+
+            ), 0)
+
+        ) AS unread
+
+      FROM social_friends f
+
+      JOIN users u ON u.id=f.friend_id
+
+      WHERE f.user_id=?
+
+      ORDER BY last_id DESC, u.first_name
+
+      LIMIT 200
+
+    `).bind(id,id,id,id,id,id,id).all();
+
+
+
+    return json({ok:true,dialogs:rows.results});
+
+  }
+
+
+
+  // Messenger 2.0 — відмітити повідомлення прочитаними
+
+  if (path === '/api/social/read' && request.method === 'POST') {
+
+    const body = await bodyJSON(request);
+
+    const other = numericId(body?.userId);
+
+
+
+    if (!other || !await isFriend(env,id,other))
+
+      return bad('FRIEND_REQUIRED',403);
+
+
+
+    const last = await env.DB.prepare(`
+
+      SELECT MAX(id) AS last_id
+
+      FROM social_direct_messages
+
+      WHERE sender_id=? AND receiver_id=?
+
+    `).bind(other,id).first();
+
+
+
+    const lastId = last?.last_id || 0;
+
+
+
+    await env.DB.prepare(`
+
+      INSERT INTO social_read_state
+
+        (user_id,conversation_key,last_message_id,updated_at)
+
+      VALUES(?,?,?,CURRENT_TIMESTAMP)
+
+      ON CONFLICT(user_id,conversation_key)
+
+      DO UPDATE SET
+
+        last_message_id=MAX(
+
+          social_read_state.last_message_id,
+
+          excluded.last_message_id
+
+        ),
+
+        updated_at=CURRENT_TIMESTAMP
+
+    `).bind(id,'dm:'+other,lastId).run();
+
+
+
+    return json({ok:true,lastMessageId:lastId});
+
+  }
+
+
+
+  // Messenger 2.0 — статус прочитання вихідних повідомлень
+
+  if (path === '/api/social/read-status' && request.method === 'GET') {
+
+    const other = numericId(url.searchParams.get('userId'));
+
+
+
+    if (!other || !await isFriend(env,id,other))
+
+      return bad('FRIEND_REQUIRED',403);
+
+
+
+    const row = await env.DB.prepare(`
+
+      SELECT last_message_id
+
+      FROM social_read_state
+
+      WHERE user_id=? AND conversation_key=?
+
+    `).bind(other,'dm:'+id).first();
+
+
+
+    return json({
+
+      ok:true,
+
+      readThrough:row?.last_message_id || 0
+
+    });
+
+  }
+
+
+
+
+  return bad('NOT_FOUND', 404);
+
+}
+
+
+
+export default {
+
+  async fetch(request, env) {
+
+    if (request.method === 'OPTIONS')
+
+      return new Response(null, { status: 204, headers: cors });
+
+
+
+    const url = new URL(request.url);
+
+    const path = url.pathname.replace(/\\/+$/, '') || '/';
+
+
+
+    if (path === '/health' && request.method === 'GET')
+
+      return json({
+
+        ok: true,
+
+        service: 'depara-api',
+
+        database: Boolean(env.DB),
+
+        telegramConfigured: Boolean(env.TELEGRAM_BOT_TOKEN)
+
+      });
+
+
+
+    if (!env.DB || !env.TELEGRAM_BOT_TOKEN)
+
+      return json({
+
+        ok: false,
+
+        error: 'SERVER_NOT_CONFIGURED'
+
+      }, 503);
+
+
+
+    try {
+
+      // Telegram авторизація
+
+      if (
+
+        path === '/api/auth/telegram' &&
+
+        request.method === 'POST'
+
+      ) {
+
+        const body = await request.json();
+
+        const user = await verify(
+
+          body.initData,
+
+          env.TELEGRAM_BOT_TOKEN
+
+        );
+
+
+
+        return json({
+
+          ok: true,
+
+          user: await profile(env, user)
+
+        });
+
+      }
+
+
+
+      // Мій профіль
+
+      if (path === '/api/me' && request.method === 'GET') {
+
+        const user = await userFromRequest(request, env);
+
+
+
+        return json({
+
+          ok: true,
+
+          user: await profile(env, user)
+
+        });
+
+      }
+
+
+
+      // Отримання хмарних даних
+
+      if (path === '/api/sync' && request.method === 'GET') {
+
+        const user = await userFromRequest(request, env);
+
+
+
+        const row = await env.DB.prepare(
+
+          `SELECT payload,revision,updated_at
+
+           FROM user_state WHERE user_id=?`
+
+        ).bind(user.id).first();
+
+
+
+        return json({
+
+          ok: true,
+
+          exists: Boolean(row),
+
+          state: row ? JSON.parse(row.payload) : null,
+
+          revision: row?.revision || 0,
+
+          updatedAt: row?.updated_at || null
+
+        });
+
+      }
+
+
+
+      // Збереження хмарних даних
+
+      if (path === '/api/sync' && request.method === 'PUT') {
+
+        const user = await userFromRequest(request, env);
+
+        const raw = await request.text();
+
+
+
+        if (raw.length > 250000)
+
+          return json({
+
+            ok: false,
+
+            error: 'PAYLOAD_TOO_LARGE'
+
+          }, 413);
+
+
+
+        let body;
+
+        try {
+
+          body = JSON.parse(raw);
+
+        } catch {
+
+          return bad('INVALID_JSON');
+
+        }
+
+
+
+        if (
+
+          !validState(body.state) ||
+
+          !Number.isSafeInteger(body.revision) ||
+
+          body.revision < 0
+
+        ) return bad('INVALID_STATE');
+
+
+
+        const payload = JSON.stringify({
+
+          tasks: body.state.tasks,
+
+          notes: body.state.notes,
+
+          grades: body.state.grades,
+
+          attendance: body.state.attendance,
+
+          xp: body.state.xp,
+
+          group: body.state.group,
+
+          groupName: body.state.groupName
+
+        });
+
+
+
+        if (payload.length > 200000)
+
+          return bad('PAYLOAD_TOO_LARGE', 413);
+
+
+
+        const result = await env.DB.prepare(
+
+          `INSERT INTO user_state(user_id,payload,revision,updated_at)
+
+           SELECT ?,?,1,CURRENT_TIMESTAMP WHERE ?=0
+
+           ON CONFLICT(user_id) DO NOTHING`
+
+        ).bind(user.id, payload, body.revision).run();
+
+
+
+        if (result.meta.changes === 1)
+
+          return json({ ok: true, revision: 1 });
+
+
+
+        const update = await env.DB.prepare(
+
+          `UPDATE user_state
+
+           SET payload=?,revision=revision+1,
+
+               updated_at=CURRENT_TIMESTAMP
+
+           WHERE user_id=? AND revision=?`
+
+        ).bind(payload, user.id, body.revision).run();
+
+
+
+        if (update.meta.changes === 1)
+
+          return json({
+
+            ok: true,
+
+            revision: body.revision + 1
+
+          });
+
+
+
+        return bad('REVISION_CONFLICT', 409);
+
+      }
+
+
+
+      // Новий модуль ДеПара? Social
+
+      if (path.startsWith('/api/social/'))
+
+        return await socialRoute(request, env, path, url);
+
+
+
+      return bad('NOT_FOUND', 404);
+
+
+
+    } catch (err) {
+
+      if (authErrors.has(err.message))
+
+        return bad(err.message, 401);
+
+
+
+      if (err.message === 'PAYLOAD_TOO_LARGE')
+
+        return bad('PAYLOAD_TOO_LARGE', 413);
+
+
+
+      if (
+
+        err.message === 'INVALID_JSON' ||
+
+        err instanceof SyntaxError
+
+      ) return bad('INVALID_JSON');
+
+
+
+      console.error('API error', err);
+
+      return bad('INTERNAL_ERROR', 500);
+
+    }
+
+  }
+
+};
