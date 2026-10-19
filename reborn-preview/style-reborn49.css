@@ -484,3 +484,11 @@ body:not(.light) .reborn-orbit{opacity:.3;filter:hue-rotate(0deg)}
 #dp-live-lesson-clock .dp-clock-value{font-size:clamp(21px,5.7vw,28px);font-weight:850;font-variant-numeric:tabular-nums;letter-spacing:.025em;line-height:1.1}
 #dp-live-lesson-clock .dp-clock-secondary{flex-basis:100%;font-size:11px;opacity:.83}
 @media(max-width:390px){#dp-live-lesson-clock{gap:4px 9px;padding:9px 11px!important}#dp-live-lesson-clock .dp-clock-value{font-size:21px}}
+
+/* 4.9.1 preview: ensure inactive sections do not reserve blank space. */
+#screen [data-rb45-study][hidden],#screen [data-rb45-schedule][hidden],#screen .rb45-home-extra[hidden],#screen [data-rb43-section][hidden]{display:none!important}
+/* Keep the last control reachable above the Telegram/iPhone bottom bar. */
+#screen{padding-bottom:calc(112px + env(safe-area-inset-bottom,0px))}
+#screen .rb45-tabs{max-width:100%;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+#screen .rb45-tabs::-webkit-scrollbar{display:none}
+#screen .rb45-tabs button{flex-shrink:0}
