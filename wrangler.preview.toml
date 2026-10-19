@@ -1,0 +1,10 @@
+# Preview is isolated from the production Worker and production D1.
+# Fill in the D1 database ID after creating a separate preview database.
+name = "depara-api-preview"
+main = "worker.js"
+compatibility_date = "2026-10-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "depara-preview-db"
+database_id = "REPLACE_WITH_PREVIEW_D1_DATABASE_ID"
