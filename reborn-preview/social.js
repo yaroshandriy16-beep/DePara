@@ -24,6 +24,8 @@
   let busy = false;
   let loading = false;
   let refreshTimer = null;
+  let fullscreen = false;
+  let previousSignature = '';
 
   const active = () =>
     !!$('nav button[data-page="social"].active');
@@ -122,7 +124,19 @@
       error = e.message;
     } finally {
       loading = false;
-      render();
+      const thread = $('#social-messages');
+      if (thread && fullscreen && tab !== 'friends') {
+        const signature = JSON.stringify(messages.map(m => [m.id,m.body,m.created_at]));
+        if (signature !== previousSignature || error) {
+          const nearBottom = thread.scrollHeight-thread.scrollTop-thread.clientHeight < 100;
+          const draft = $('#social-send textarea')?.value || '';
+          render();
+          const input = $('#social-send textarea');
+          if (input) input.value = draft;
+          if (nearBottom) $('#social-messages').scrollTop = $('#social-messages').scrollHeight;
+          previousSignature = signature;
+        }
+      } else render();
     }
   }
 
@@ -224,10 +238,10 @@
   const stamp = v => {
     if (!v) return '';
     const raw = String(v);
-    const d = /^\\d{10,13}$/.test(raw) ? new Date(Number(raw) * (raw.length === 10 ? 1000 : 1)) : new Date(raw.replace(' ', 'T') + (/Z$|[+-]\\d\\d:?\\d\\d$/.test(raw) ? '' : 'Z'));
+    const d = /^\d{10,13}$/.test(raw) ? new Date(Number(raw) * (raw.length === 10 ? 1000 : 1)) : new Date(raw.replace(' ', 'T') + (/Z$|[+-]\d\d:?\d\d$/.test(raw) ? '' : 'Z'));
     return Number.isNaN(d.getTime()) ? raw.slice(11,16) : d.toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'});
   };
-  const initials = name => String(name || '?').trim().split(/\\s+/).slice(0,2).map(s => s[0] || '').join('').toUpperCase();
+  const initials = name => String(name || '?').trim().split(/\s+/).slice(0,2).map(s => s[0] || '').join('').toUpperCase();
   function chatView() {
     const isGroup = tab === 'group';
     const title = isGroup ? 'Чат групи ' + groupName() : label(peer);
@@ -235,6 +249,7 @@
     return `
       <section class="messenger" aria-label="${esc(title)}">
         <div class="messenger-head">
+          <button class="messenger-back" id="social-back" aria-label="Назад">‹</button>
           <div class="messenger-avatar">${esc(isGroup ? '✦' : initials(title))}</div>
           <div class="messenger-head-text"><strong>${esc(title)}</strong><span>${isGroup ? 'Групове спілкування' : 'Особисті повідомлення'}</span></div>
           <span class="messenger-live" title="Хмарний чат">●</span>
@@ -267,6 +282,7 @@
     const screen = $('#screen');
     if (!screen) return;
 
+    document.body.classList.toggle('chat-fullscreen', fullscreen && tab !== 'friends');
     screen.innerHTML = `
       <div class="eyebrow">ВНАУ · ДеПара?</div>
       <h1>Спільнота</h1>
@@ -309,8 +325,10 @@
   }
 
   function bind() {
+    $('#social-back')?.addEventListener('click', () => { fullscreen=false;tab='friends';peer=null;render(); });
     $('#social-friends')?.addEventListener('click', () => {
       tab = 'friends';
+      fullscreen = false;
       peer = null;
       error = '';
       render();
@@ -318,6 +336,7 @@
 
     $('#social-group')?.addEventListener('click', () => {
       tab = 'group';
+      fullscreen = true;
       peer = null;
       messages = [];
       reload();
@@ -369,6 +388,7 @@
         if (!peer) return;
 
         tab = 'direct';
+        fullscreen = true;
         messages = [];
         reload();
       };
@@ -414,6 +434,7 @@
 
   function watch() {
     if (!active()) {
+      document.body.classList.remove('chat-fullscreen');
       if (refreshTimer) {
         clearInterval(refreshTimer);
         refreshTimer = null;
@@ -436,7 +457,7 @@
         if (tab !== 'friends') {
           reload();
         }
-      }, 12000);
+      }, 5000);
     }
   }
 
