@@ -5,7 +5,7 @@
   "endPair": 3,
   "structureId": "0",
   "corpusId": "",
-  "fetchedAt": "2026-10-19T10:40:21.939043+00:00",
+  "fetchedAt": "2026-10-19T16:42:47.910515+00:00",
   "status": "official-site-snapshot",
   "rooms": [
     {
@@ -156,7 +156,7 @@
       "id": "134",
       "name": "16",
       "capacity": 24,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=134"
     },
@@ -252,7 +252,7 @@
       "id": "308",
       "name": "2120",
       "capacity": 16,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=308"
     },
@@ -292,7 +292,7 @@
       "id": "559",
       "name": "2226-А",
       "capacity": 8,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=559"
     },
@@ -308,7 +308,7 @@
       "id": "26",
       "name": "2301",
       "capacity": 14,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=26"
     },
@@ -316,7 +316,7 @@
       "id": "27",
       "name": "2302",
       "capacity": 18,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=27"
     },
@@ -348,7 +348,7 @@
       "id": "35",
       "name": "2316",
       "capacity": 16,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=35"
     },
@@ -612,7 +612,7 @@
       "id": "515",
       "name": "3001",
       "capacity": 0,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=515"
     },
@@ -620,7 +620,7 @@
       "id": "483",
       "name": "3005",
       "capacity": 20,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=483"
     },

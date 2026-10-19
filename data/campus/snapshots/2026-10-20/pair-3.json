@@ -5,7 +5,7 @@
   "endPair": 3,
   "structureId": "0",
   "corpusId": "",
-  "fetchedAt": "2026-10-19T10:40:10.144004+00:00",
+  "fetchedAt": "2026-10-19T16:42:35.646794+00:00",
   "status": "official-site-snapshot",
   "rooms": [
     {
@@ -188,7 +188,7 @@
       "id": "553",
       "name": "2003",
       "capacity": 40,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=553"
     },
@@ -196,7 +196,7 @@
       "id": "517",
       "name": "2004",
       "capacity": 28,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=517"
     },
@@ -252,7 +252,7 @@
       "id": "308",
       "name": "2120",
       "capacity": 16,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=308"
     },
@@ -268,7 +268,7 @@
       "id": "513",
       "name": "2128",
       "capacity": 12,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=513"
     },
@@ -324,7 +324,7 @@
       "id": "209",
       "name": "2313",
       "capacity": 18,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=209"
     },
@@ -356,7 +356,7 @@
       "id": "538",
       "name": "2317",
       "capacity": 18,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=538"
     },
@@ -1052,7 +1052,7 @@
       "id": "111",
       "name": "540",
       "capacity": 132,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=111"
     },
@@ -1356,7 +1356,7 @@
       "id": "191",
       "name": "№5 -1209",
       "capacity": 20,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=191"
     },

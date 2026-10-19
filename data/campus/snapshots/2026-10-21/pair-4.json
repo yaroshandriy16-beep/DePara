@@ -5,7 +5,7 @@
   "endPair": 4,
   "structureId": "0",
   "corpusId": "",
-  "fetchedAt": "2026-10-19T10:40:23.891836+00:00",
+  "fetchedAt": "2026-10-19T16:42:49.995538+00:00",
   "status": "official-site-snapshot",
   "rooms": [
     {
@@ -188,7 +188,7 @@
       "id": "553",
       "name": "2003",
       "capacity": 40,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=553"
     },
@@ -196,7 +196,7 @@
       "id": "517",
       "name": "2004",
       "capacity": 28,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=517"
     },
@@ -220,7 +220,7 @@
       "id": "48",
       "name": "2102",
       "capacity": 28,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=48"
     },
@@ -228,7 +228,7 @@
       "id": "49",
       "name": "2111",
       "capacity": 24,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=49"
     },
@@ -244,7 +244,7 @@
       "id": "288",
       "name": "2118",
       "capacity": 22,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=288"
     },
@@ -260,7 +260,7 @@
       "id": "81",
       "name": "2124",
       "capacity": 20,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=81"
     },
@@ -332,7 +332,7 @@
       "id": "29",
       "name": "2314",
       "capacity": 18,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=29"
     },
@@ -348,7 +348,7 @@
       "id": "35",
       "name": "2316",
       "capacity": 16,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=35"
     },
@@ -404,7 +404,7 @@
       "id": "6",
       "name": "2402",
       "capacity": 28,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=6"
     },
@@ -484,7 +484,7 @@
       "id": "17",
       "name": "2429",
       "capacity": 32,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=17"
     },
@@ -500,7 +500,7 @@
       "id": "24",
       "name": "2502",
       "capacity": 20,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=24"
     },
@@ -540,7 +540,7 @@
       "id": "525",
       "name": "2519",
       "capacity": 20,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=525"
     },
@@ -612,7 +612,7 @@
       "id": "515",
       "name": "3001",
       "capacity": 0,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=515"
     },
@@ -620,7 +620,7 @@
       "id": "483",
       "name": "3005",
       "capacity": 20,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=483"
     },
@@ -660,7 +660,7 @@
       "id": "558",
       "name": "3204",
       "capacity": 14,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=558"
     },
@@ -676,7 +676,7 @@
       "id": "470",
       "name": "3210",
       "capacity": 30,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=470"
     },
@@ -700,7 +700,7 @@
       "id": "523",
       "name": "3216",
       "capacity": 16,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=523"
     },
@@ -804,7 +804,7 @@
       "id": "527",
       "name": "3409",
       "capacity": 20,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=527"
     },
@@ -812,7 +812,7 @@
       "id": "473",
       "name": "3418к",
       "capacity": 15,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=473"
     },
@@ -836,7 +836,7 @@
       "id": "546",
       "name": "3506",
       "capacity": 18,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=546"
     },
@@ -964,7 +964,7 @@
       "id": "216",
       "name": "518",
       "capacity": 20,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=216"
     },
@@ -996,7 +996,7 @@
       "id": "218",
       "name": "530",
       "capacity": 24,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=218"
     },
@@ -1028,7 +1028,7 @@
       "id": "224",
       "name": "537",
       "capacity": 28,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=224"
     },
@@ -1348,7 +1348,7 @@
       "id": "92",
       "name": "№4 -1208",
       "capacity": 11,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=92"
     },

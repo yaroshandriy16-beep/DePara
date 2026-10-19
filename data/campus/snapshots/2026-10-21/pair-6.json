@@ -5,7 +5,7 @@
   "endPair": 6,
   "structureId": "0",
   "corpusId": "",
-  "fetchedAt": "2026-10-19T10:40:27.809655+00:00",
+  "fetchedAt": "2026-10-19T16:42:54.075267+00:00",
   "status": "official-site-snapshot",
   "rooms": [
     {
@@ -556,7 +556,7 @@
       "id": "14",
       "name": "2522",
       "capacity": 24,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=14"
     },
