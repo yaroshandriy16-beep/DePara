@@ -3,7 +3,7 @@
 (() => {
   'use strict';
 
-  const API = 'https://depara-api.yaroshandriy16.workers.dev';
+  const API = 'https://depara-api-preview.yaroshandriy16.workers.dev';
   const $ = s => document.querySelector(s);
   const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({
     '&': '&amp;',
