@@ -140,3 +140,35 @@ body:not(.chat-fullscreen) .messenger-back{display:none}
 
 /* REBORN calendar and important events */
 .calendar-card{margin:16px 0}.calendar-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;text-transform:capitalize}.calendar-header b{font-size:17px}.month-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}.weekday{text-align:center;color:#b7bfb8;font-size:11px;padding:5px 0}.calendar-day{min-width:0;min-height:53px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:1px solid #ffffff18;background:#ffffff08;color:inherit;border-radius:11px;font:inherit;cursor:pointer}.calendar-day small{color:#d9bb79;font-size:10px;min-height:12px}.calendar-day.chosen{background:linear-gradient(145deg,#ead4a0,#cba660);color:#14271e;font-weight:800}.calendar-day.chosen small{color:#2d6246}.calendar-day.is-today:not(.chosen){border-color:#d9bb79}.alert-line{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid #ffffff16}.alert-line:last-of-type{margin-bottom:14px}.alert-mark{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;background:#e8c77d20;color:#e8c77d;font-weight:800;flex:none}.alert-line div{display:grid;gap:4px;min-width:0}.alert-line b{overflow-wrap:anywhere}.alert-line small{color:#aabcb2}.light .calendar-day{background:#edf3ee;border-color:#d6e1d9}.light .calendar-day.chosen{background:#d5b66c}.light .alert-line{border-color:#dce5de}.light .alert-line small{color:#607568}
+
+/* REBORN UI OVERHAUL — preview only, mobile-first titanium emerald */
+:root{--bg:#071311;--panel:#10251f;--panel2:#19362c;--text:#f6f5ec;--muted:#a1b6a9;--gold:#ebcd91;--border:#ffffff20;--green:#9ce6b6}
+html{-webkit-tap-highlight-color:transparent;scroll-behavior:smooth}
+body{background:radial-gradient(ellipse 95% 45% at 52% -12%,#285d48 0%,transparent 78%),#071311;letter-spacing:-.012em}
+.ambient{background:radial-gradient(ellipse at 75% 5%,#235d483d,transparent 50%),radial-gradient(ellipse at 0% 85%,#5a4b2520,transparent 55%)}
+.app{max-width:860px;padding:calc(18px + env(safe-area-inset-top,0px)) 18px calc(124px + env(safe-area-inset-bottom,0px))}
+header{margin-bottom:26px;padding:7px 0 21px;border-bottom:1px solid #d4e6d21a;gap:12px}
+.brand{min-width:0}.brand b{font-size:clamp(22px,5.2vw,29px);font-weight:800;letter-spacing:-1.3px}.brand small{font-size:10px;letter-spacing:1.2px;line-height:1.55;margin-top:3px}.logo{width:49px;height:49px;flex:none;border-radius:17px;background:linear-gradient(150deg,#2d6950,#10241e 75%);border:1px solid #e8d5a16b;box-shadow:inset 0 1px 0 #ffffff33,0 10px 25px #0005}
+.header-right{gap:8px;flex:none}.status{display:inline-flex;align-items:center;max-width:122px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:10px 11px;border:1px solid #8ae0a437;border-radius:999px;background:#7bc8990b;font-size:10px}.icon-btn{border-color:#ffffff29;background:#ffffff0c;min-width:39px;min-height:39px}
+h1{font-size:clamp(32px,8vw,51px);line-height:1.07;letter-spacing:-2px;margin:10px 0 12px;font-weight:800}
+h2{font-size:19px;letter-spacing:-.5px}.eyebrow{font-size:10px;letter-spacing:2.2px}.sub{line-height:1.55}
+.hero{margin:22px 0;padding:27px 23px 25px;border-radius:29px;background:radial-gradient(circle at 90% 12%,#5e9d684a,transparent 44%),linear-gradient(138deg,#1b4c3b,#0d211d 85%);border:1px solid #d5c18b55;box-shadow:inset 0 1px 0 #ffffff24,0 20px 40px #0003}
+.hero:after{font-size:180px;right:-30px;top:-48px;color:#e8cd8910}.hero strong{font-size:clamp(23px,6vw,32px);line-height:1.17;letter-spacing:-.8px;max-width:90%}
+.card{border-radius:23px;background:linear-gradient(160deg,#ffffff0d,#ffffff04);border:1px solid #ffffff1c;box-shadow:inset 0 1px 0 #ffffff0b,0 8px 24px #00000013;padding:19px}
+.metric{font-size:clamp(26px,6vw,34px);letter-spacing:-1.2px;color:var(--gold)}
+.lesson{position:relative;border-radius:20px;padding:17px 14px 17px 18px;background:linear-gradient(115deg,#19372d,#10231e);border:1px solid #d9e5d01c;box-shadow:inset 3px 0 0 #d9be7a8c;gap:11px}
+.lesson .time{min-width:51px;font-size:13px}.lesson b{font-size:14px}.lesson .details{line-height:1.45}.tag{background:#90d9ac12;border-color:#8dcda43b;color:#a8e6bc}
+.action,.pill{border-radius:15px;padding:12px 15px;background:#ffffff0b;border:1px solid #ffffff25;transition:transform .16s ease,background .16s ease}
+.action:active,.pill:active,nav button:active,.daystrip button:active{transform:scale(.96)}
+.action.primary{background:linear-gradient(135deg,#f4dfa9,#d2ae69);box-shadow:0 6px 20px #d7b57024;color:#16271e}
+.field{background:#091b17b8;border-color:#ffffff25;border-radius:16px;min-height:45px}.field:focus{outline:2px solid #d4b87965;outline-offset:1px}
+.daystrip{gap:8px;scrollbar-width:none}.daystrip::-webkit-scrollbar{display:none}.daystrip button{border-radius:16px;min-width:57px;background:#ffffff09;border-color:#ffffff1e}.daystrip button.active{background:linear-gradient(145deg,#f1d9a4,#d6b875);font-weight:800}
+nav{bottom:calc(10px + env(safe-area-inset-bottom,0px));width:min(calc(100% - 24px),790px);padding:8px 7px;border:1px solid #e6d9b82e;border-radius:25px;background:#0c211df2;box-shadow:0 16px 45px #0008,inset 0 1px 0 #ffffff14;backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px)}
+nav button{min-width:0;flex:1;padding:8px 2px 7px;gap:5px;border-radius:17px;font-size:10px;transition:background .2s,color .2s,transform .16s}
+nav button span{font-size:21px;line-height:1.1}nav button.active{color:#f2d79b;background:#e4c78d15}nav button.active span{filter:drop-shadow(0 0 8px #e7c67b5e)}
+.section{gap:10px}.section h2{font-size:19px}.dashboard-quick{gap:8px}
+#toast{max-width:calc(100vw - 36px);text-align:center;bottom:calc(108px + env(safe-area-inset-bottom,0px));box-shadow:0 12px 35px #0007}
+@media(max-width:410px){.app{padding-left:14px;padding-right:14px}.brand small{font-size:9px}.status{max-width:104px;padding:9px 8px}.hero{padding:23px 19px}.lesson .tag{max-width:72px;overflow:hidden;text-overflow:ellipsis}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+.light{--bg:#eef4ef;--panel:#e5eee7;--panel2:#dae9de;--text:#18372b;--muted:#5d7869;--border:#b9d1c0;--green:#2e7751;background:#edf3ee}
+.light .card{background:linear-gradient(155deg,#fff,#f0f7f1);border-color:#bcd3c3}.light .hero{background:linear-gradient(145deg,#d6eadb,#f1f6e8);color:#173b2b}.light .lesson{background:#f6faf6;border-color:#cbded0}.light nav{background:#f8fbf4f4;border-color:#c8d9c5}.light nav button.active{background:#d8e8d5;color:#2e694a}.light .status{color:#337c51;background:#e4f2e6}.light .field{background:#fff;border-color:#b9d0c0}.light .tag{color:#397b55;background:#d8eddd}.light .metric{color:#937031}
