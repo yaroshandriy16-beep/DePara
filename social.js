@@ -1,0 +1,474 @@
+
+/* ДеПара? Social — друзі та чати */
+(() => {
+  'use strict';
+
+  const API = 'https://depara-api.yaroshandriy16.workers.dev';
+  const $ = s => document.querySelector(s);
+  const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[c]));
+
+  let tab = 'friends';
+  let friends = [];
+  let incoming = [];
+  let outgoing = [];
+  let results = [];
+  let messages = [];
+  let peer = null;
+  let error = '';
+  let busy = false;
+  let loading = false;
+  let refreshTimer = null;
+
+  const active = () =>
+    !!$('nav button[data-page="social"].active');
+
+  const groupId = () => {
+    try {
+      return String(
+        JSON.parse(localStorage.getItem('dp4_group')) || '3641'
+      );
+    } catch {
+      return '3641';
+    }
+  };
+
+  const groupName = () => {
+    try {
+      return JSON.parse(localStorage.getItem('dp4_groupName')) ||
+        'Моя група';
+    } catch {
+      return 'Моя група';
+    }
+  };
+
+  const label = u =>
+    [u?.first_name, u?.last_name].filter(Boolean).join(' ') ||
+    u?.username ||
+    'Студент';
+
+  async function api(path, method = 'GET', data) {
+    const initData = window.Telegram?.WebApp?.initData;
+
+    if (!initData) {
+      throw Error('Відкрий ДеПара? через Telegram-бота');
+    }
+
+    const response = await fetch(API + '/api/social/' + path, {
+      method,
+      headers: {
+        Authorization: 'tma ' + initData,
+        ...(data !== undefined
+          ? { 'Content-Type': 'application/json' }
+          : {})
+      },
+      ...(data !== undefined
+        ? { body: JSON.stringify(data) }
+        : {})
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.ok) {
+      throw Error(result.error || 'HTTP ' + response.status);
+    }
+
+    return result;
+  }
+
+  async function loadFriends() {
+    const [f, r] = await Promise.all([
+      api('friends'),
+      api('requests')
+    ]);
+
+    friends = f.friends || [];
+    incoming = r.incoming || [];
+    outgoing = r.outgoing || [];
+  }
+
+  async function loadMessages() {
+    if (tab === 'group') {
+      const result = await api(
+        'group?groupId=' + encodeURIComponent(groupId())
+      );
+      messages = result.messages || [];
+    } else if (tab === 'direct' && peer) {
+      const result = await api(
+        'dm?userId=' + encodeURIComponent(peer.id)
+      );
+      messages = result.messages || [];
+    }
+  }
+
+  async function reload() {
+    if (!active() || loading) return;
+
+    loading = true;
+    error = '';
+
+    try {
+      await loadFriends();
+
+      if (tab !== 'friends') {
+        await loadMessages();
+      }
+    } catch (e) {
+      error = e.message;
+    } finally {
+      loading = false;
+      render();
+    }
+  }
+
+  async function action(fn) {
+    if (busy) return;
+
+    busy = true;
+    error = '';
+
+    try {
+      await fn();
+    } catch (e) {
+      error = e.message;
+    } finally {
+      busy = false;
+      render();
+    }
+  }
+
+  function userCard(u, buttons = '') {
+    return `
+      <div class="card" style="margin:10px 0">
+        <b>${esc(label(u))}</b>
+        <p class="sub">
+          ${u.username ? '@' + esc(u.username) : 'Без username'}
+        </p>
+        ${buttons}
+      </div>
+    `;
+  }
+
+  function friendsView() {
+    return `
+      <div class="card">
+        <h2>Знайти студента</h2>
+        <form id="social-search">
+          <input
+            class="field"
+            name="q"
+            required
+            minlength="2"
+            maxlength="64"
+            placeholder="Telegram username"
+          >
+          <button class="action primary">
+            Знайти
+          </button>
+        </form>
+      </div>
+
+      ${results.map(u => userCard(
+        u,
+        `<button class="action" data-add="${u.id}">
+          Додати в друзі
+        </button>`
+      )).join('')}
+
+      <div class="section">
+        <h2>Заявки в друзі (${incoming.length})</h2>
+      </div>
+
+      ${incoming.map(u => userCard(
+        u,
+        `<button
+          class="action primary"
+          data-respond="accept"
+          data-request="${u.id}">
+          Прийняти
+        </button>
+        <button
+          class="action"
+          data-respond="reject"
+          data-request="${u.id}">
+          Відхилити
+        </button>`
+      )).join('') || '<p class="sub">Нових заявок немає.</p>'}
+
+      <div class="section">
+        <h2>Мої друзі (${friends.length})</h2>
+      </div>
+
+      ${friends.map(u => userCard(
+        u,
+        `<button class="action" data-chat="${u.id}">
+          Написати повідомлення →
+        </button>`
+      )).join('') || '<p class="sub">Поки що друзів немає.</p>'}
+
+      ${outgoing.length ? `
+        <div class="section">
+          <h2>Очікують відповіді</h2>
+        </div>
+        ${outgoing.map(u => userCard(u)).join('')}
+      ` : ''}
+    `;
+  }
+
+  function chatView() {
+    const isGroup = tab === 'group';
+
+    const title = isGroup
+      ? 'Чат групи ' + groupName()
+      : label(peer);
+
+    return `
+      <div class="card">
+        <h2>${esc(title)}</h2>
+        <p class="sub">
+          ${isGroup
+            ? 'Спільний чат вибраної групи'
+            : 'Особисте листування між друзями'}
+        </p>
+      </div>
+
+      <div
+        class="card"
+        id="social-messages"
+        style="max-height:420px;overflow-y:auto"
+      >
+        ${messages.map(m => `
+          <div style="
+            padding:12px 0;
+            border-bottom:1px solid rgba(127,127,127,.2)
+          ">
+            <small class="sub">
+              ${esc(
+                isGroup
+                  ? label(m)
+                  : m.sender_id === peer?.id
+                    ? label(peer)
+                    : 'Я'
+              )}
+              · ${esc(m.created_at)}
+            </small>
+            <p style="
+              white-space:pre-wrap;
+              overflow-wrap:anywhere
+            ">${esc(m.body)}</p>
+          </div>
+        `).join('') ||
+        '<p class="sub">Повідомлень поки немає.</p>'}
+      </div>
+
+      <div class="card">
+        <form id="social-send">
+          <textarea
+            class="field"
+            name="message"
+            required
+            maxlength="2000"
+            rows="3"
+            placeholder="Напиши повідомлення..."
+          ></textarea>
+          <button class="action primary">
+            Надіслати →
+          </button>
+        </form>
+      </div>
+    `;
+  }
+
+  function render() {
+    if (!active()) return;
+
+    const screen = $('#screen');
+    if (!screen) return;
+
+    screen.innerHTML = `
+      <div class="eyebrow">ВНАУ · ДеПара?</div>
+      <h1>Спільнота</h1>
+      <p class="sub">Друзі та чати на Cloudflare D1</p>
+
+      <div class="actions">
+        <button
+          class="action ${tab === 'friends' ? 'primary' : ''}"
+          id="social-friends">
+          Друзі
+        </button>
+
+        <button
+          class="action ${tab === 'group' ? 'primary' : ''}"
+          id="social-group">
+          Чат групи
+        </button>
+
+        <button class="action" id="social-refresh">
+          ↻ Оновити
+        </button>
+      </div>
+
+      ${error ? `
+        <div class="card">
+          <p class="sub">${esc(error)}</p>
+        </div>
+      ` : ''}
+
+      ${tab === 'friends' ? friendsView() : chatView()}
+    `;
+
+    bind();
+  }
+
+  function bind() {
+    $('#social-friends')?.addEventListener('click', () => {
+      tab = 'friends';
+      peer = null;
+      error = '';
+      render();
+    });
+
+    $('#social-group')?.addEventListener('click', () => {
+      tab = 'group';
+      peer = null;
+      messages = [];
+      reload();
+    });
+
+    $('#social-refresh')?.addEventListener('click', reload);
+
+    $('#social-search')?.addEventListener('submit', e => {
+      e.preventDefault();
+
+      const q = e.target.elements.q.value.trim();
+
+      action(async () => {
+        const result = await api(
+          'search?q=' + encodeURIComponent(q)
+        );
+        results = result.users || [];
+      });
+    });
+
+    document.querySelectorAll('[data-add]').forEach(b => {
+      b.onclick = () => action(async () => {
+        await api('requests', 'POST', {
+          userId: Number(b.dataset.add)
+        });
+
+        results = [];
+        await loadFriends();
+      });
+    });
+
+    document.querySelectorAll('[data-respond]').forEach(b => {
+      b.onclick = () => action(async () => {
+        await api('requests/respond', 'POST', {
+          requestId: Number(b.dataset.request),
+          action: b.dataset.respond
+        });
+
+        await loadFriends();
+      });
+    });
+
+    document.querySelectorAll('[data-chat]').forEach(b => {
+      b.onclick = () => {
+        peer = friends.find(
+          u => u.id === Number(b.dataset.chat)
+        );
+
+        if (!peer) return;
+
+        tab = 'direct';
+        messages = [];
+        reload();
+      };
+    });
+
+    $('#social-send')?.addEventListener('submit', e => {
+      e.preventDefault();
+
+      const input = e.target.elements.message;
+      const msg = input.value.trim();
+
+      if (!msg) return;
+
+      action(async () => {
+        if (tab === 'group') {
+          await api('group', 'POST', {
+            groupId: groupId(),
+            body: msg
+          });
+        } else if (tab === 'direct' && peer) {
+          await api('dm', 'POST', {
+            userId: peer.id,
+            body: msg
+          });
+        }
+
+        await loadMessages();
+      });
+    });
+  }
+
+  function watch() {
+    if (!active()) {
+      if (refreshTimer) {
+        clearInterval(refreshTimer);
+        refreshTimer = null;
+      }
+      return;
+    }
+
+    if (!$('#social-friends')) {
+      render();
+      reload();
+    }
+
+    if (!refreshTimer) {
+      refreshTimer = setInterval(() => {
+        if (!active()) {
+          watch();
+          return;
+        }
+
+        if (tab !== 'friends') {
+          reload();
+        }
+      }, 12000);
+    }
+  }
+
+  function init() {
+    const screen = $('#screen');
+    if (!screen) return;
+
+    const observer = new MutationObserver(() => {
+      if (active() && !$('#social-friends')) {
+        watch();
+      }
+    });
+
+    observer.observe(screen, { childList: true });
+
+    document.querySelectorAll('nav button').forEach(b => {
+      b.addEventListener('click', () => {
+        setTimeout(watch, 0);
+      });
+    });
+
+    watch();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
