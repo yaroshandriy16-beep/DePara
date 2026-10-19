@@ -451,3 +451,29 @@ body:not(.light) .reborn-orbit{opacity:.3;filter:hue-rotate(0deg)}
 .rb48-notice-sheet .rb40-mark{min-height:36px;min-width:75px}
 .rb45-more{min-height:45px}
 @media(max-width:430px){.rb40-focus .action{font-size:13px;padding:10px 8px}.rb48-notice-sheet .rb40-notice{gap:8px}}
+
+/* Test 4.9 — focused iPhone layout corrections, no feature changes */
+@media(max-width:600px){
+ .app{padding-bottom:calc(175px + env(safe-area-inset-bottom,0px))!important}
+ #screen{padding-bottom:24px;min-width:0}
+ header{gap:8px!important;margin-bottom:16px!important;padding:4px 0 14px!important}
+ .brand{gap:9px!important;min-width:0}
+ .brand .logo{width:42px!important;height:42px!important;flex-shrink:0}
+ .brand b{font-size:clamp(20px,5.5vw,25px)!important}
+ .brand small{font-size:10px!important;letter-spacing:.3px!important;line-height:1.4}
+ .header-right{gap:6px!important;flex-shrink:0}
+ .header-right .status{font-size:10px!important;padding:8px!important;max-width:130px}
+ .header-right .icon-btn{padding:9px!important;min-width:40px;min-height:40px}
+ .reborn-home .home-heading{margin-bottom:8px!important}
+ .reborn-home .home-heading h1{font-size:clamp(29px,8vw,37px)!important;line-height:1.1!important}
+ .reborn-home .home-feature{margin-top:10px!important;margin-bottom:10px!important}
+ .reborn-home .home-feature .hero{padding:17px!important;margin:8px 0!important}
+ .reborn-home .home-feature .hero strong{font-size:clamp(22px,6vw,28px)!important;line-height:1.2!important}
+ .reborn-home .home-feature .action{min-height:48px!important}
+ .rb45-more{min-height:42px!important;margin:8px 0!important;padding:10px 12px!important;border-radius:12px!important}
+ #screen:has(#rb43-profile-tabs) .profile-hero{padding:13px!important}
+ #screen:has(#rb43-profile-tabs) .card{padding:13px!important;margin:9px 0!important}
+ #screen:has(#rb43-profile-tabs) .rb43-profile-tabs{margin:8px 0!important}
+ nav{z-index:50!important}
+}
+@media(max-width:370px){.brand small{font-size:9px!important}.header-right .status{max-width:105px;font-size:9px!important}.brand .logo{width:38px!important;height:38px!important}}
