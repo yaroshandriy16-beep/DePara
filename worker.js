@@ -436,7 +436,7 @@ async function socialRoute(request, env, path, url) {
 
          AND username IS NOT NULL
 
-         AND LOWER(username) LIKE LOWER(?) ESCAPE '\\\\'
+         AND LOWER(username) LIKE LOWER(?) ESCAPE '\\'
 
          AND privacy <> 'private'
 
@@ -452,7 +452,7 @@ async function socialRoute(request, env, path, url) {
 
       id,
 
-      '%' + q.replace(/[\\\\%_]/g, '\\\\$&') + '%',
+      '%' + q.replace(/[\\%_]/g, '\\$&') + '%',
 
       q
 
@@ -1117,7 +1117,7 @@ export default {
 
     const url = new URL(request.url);
 
-    const path = url.pathname.replace(/\\/+$/, '') || '/';
+    const path = url.pathname.replace(/\/+$/, '') || '/';
 
 
 
