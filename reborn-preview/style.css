@@ -107,3 +107,16 @@ body.chat-fullscreen .messenger-compose{flex:none;padding:10px 12px calc(env(saf
 .messenger-back{display:grid;place-items:center;flex:none;width:37px;height:40px;border:0;border-radius:13px;background:#ffffff12;color:#e9ce92;font-size:34px;line-height:1}
 body:not(.chat-fullscreen) .messenger-back{display:none}
 @supports(height:100dvh){body.chat-fullscreen #screen{height:100dvh;bottom:auto}}
+
+/* REBORN app-wide dashboard, schedule and learning space */
+.dashboard-quick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:15px 0 21px}
+.dashboard-quick button{border:1px solid #e6c78a38;background:linear-gradient(140deg,#20392f,#14221e);color:#f1d49b;border-radius:15px;padding:13px 6px;font-weight:750;font-size:12px}
+.dashboard-quick button:active{transform:scale(.97)}
+.next-countdown{display:inline-flex;margin:13px 0 4px;border-radius:30px;border:1px solid #ebd6a25e;background:#ffffff12;color:#f3dca9;font-size:12px;padding:8px 12px;font-weight:800}
+.schedule-tools{display:flex;gap:9px;margin:14px 0}
+.task-deadline{display:block;margin-top:5px;font-size:11px;color:#e9c984}
+#task-form{display:grid;gap:10px}
+#task-form input[type=date]{color-scheme:dark}
+.light #task-form input[type=date]{color-scheme:light}
+.light .dashboard-quick button{background:#fff;color:#345744;border-color:#a8c7b1}
+@media(max-width:390px){.dashboard-quick{gap:6px}.dashboard-quick button{font-size:11px}}
