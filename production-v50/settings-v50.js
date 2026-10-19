@@ -1,6 +1,6 @@
 (()=>{'use strict';
 const $=s=>document.querySelector(s),P='dp4_';
-const items=[['role','🎓','Змінити роль','Студент або викладач'],['group','▦','Змінити факультет і групу','Без видалення завдань і нотаток'],['welcome','✦','Повторити привітання','Переглянути заставку ще раз'],['export','↓','Зберегти резервну копію','Завантажити JSON з локальними даними'],['import','↑','Відновити з копії','Імпортувати раніше збережені дані'],['reset','↺','Повне скидання','Очистити локальні дані та почати заново']];
+const items=[['role','🎓','Змінити роль','Студент або викладач'],['group','▦','Змінити факультет і групу','Без видалення завдань і нотаток'],['home','⌂','На головний екран','Швидкий запуск ДеПара? через Telegram'],['welcome','✦','Повторити привітання','Переглянути заставку ще раз'],['export','↓','Зберегти резервну копію','Завантажити JSON з локальними даними'],['import','↑','Відновити з копії','Імпортувати раніше збережені дані'],['reset','↺','Повне скидання','Очистити локальні дані та почати заново']];
 let running=false;
 function profile(){if(document.querySelector('nav button.active')?.dataset.page!=='profile')return;const root=$('#screen'),tabs=$('#rb43-profile-tabs');if(!root||!tabs||$('#dp-v50-settings'))return;
 const section=document.createElement('section');section.id='dp-v50-settings';section.className='card dp-v50-settings';section.dataset.rb43Section='settings';
@@ -11,6 +11,7 @@ function data(){const out={};for(let i=0;i<localStorage.length;i++){const key=lo
 function exportBackup(){try{const content={format:'depara-preview-backup',version:1,createdAt:new Date().toISOString(),data:data()};const blob=new Blob([JSON.stringify(content,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='DePara-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000)}catch{alert('Не вдалося створити резервну копію')}}
 function reset(){if(!confirm('Повне скидання ДеПара? Будуть видалені локальні завдання, нотатки, оцінки, налаштування і група. Спочатку збережи резервну копію. Продовжити?'))return;if(!confirm('Підтвердити остаточне видалення локальних даних тестової версії?'))return;try{Object.keys(data()).forEach(k=>localStorage.removeItem(k));location.reload()}catch{alert('Не вдалося очистити локальні дані')}}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-dp-setting]');if(!b)return;const action=b.dataset.dpSetting;
+if(action==='home'){const tg=window.Telegram?.WebApp;if(tg&&typeof tg.addToHomeScreen==='function'){try{tg.addToHomeScreen()}catch{alert('Відкрий ДеПара? у Telegram та спробуй ще раз')}}else{alert('Щоб додати ярлик: відкрий ДеПара? в актуальній версії Telegram. Якщо кнопка не підтримується, відкрий посилання бота в Safari, натисни «Поділитися» → «На Початковий екран».')}return;}
 if(action==='role')window.DeParaChangeRole?.();
 if(action==='group')window.DeParaChangeGroup?.();
 if(action==='welcome')window.DeParaReplayWelcome?.();
