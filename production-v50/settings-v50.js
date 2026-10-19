@@ -1,0 +1,23 @@
+(()=>{'use strict';
+const $=s=>document.querySelector(s),P='dp4_';
+const items=[['role','🎓','Змінити роль','Студент або викладач'],['group','▦','Змінити факультет і групу','Без видалення завдань і нотаток'],['welcome','✦','Повторити привітання','Переглянути заставку ще раз'],['export','↓','Зберегти резервну копію','Завантажити JSON з локальними даними'],['import','↑','Відновити з копії','Імпортувати раніше збережені дані'],['reset','↺','Повне скидання','Очистити локальні дані та почати заново']];
+let running=false;
+function profile(){if(document.querySelector('nav button.active')?.dataset.page!=='profile')return;const root=$('#screen'),tabs=$('#rb43-profile-tabs');if(!root||!tabs||$('#dp-v50-settings'))return;
+const section=document.createElement('section');section.id='dp-v50-settings';section.className='card dp-v50-settings';section.dataset.rb43Section='settings';
+section.innerHTML='<h2>Центр налаштувань 5.0</h2><p class="sub">Керуй профілем, роллю та локальними даними.</p>'+items.map(([id,icon,title,subtitle])=>'<button type="button" class="dp-v50-setting-row '+(id==='reset'?'dp-danger':'')+'" data-dp-setting="'+id+'"><span class="dp-setting-icon">'+icon+'</span><span><strong>'+title+'</strong><small>'+subtitle+'</small></span><span class="dp-setting-arrow">›</span></button>').join('')+'<p class="sub">Дані зберігаються на цьому пристрої. Резервна копія не включає серверні повідомлення або дані Telegram.</p><input id="dp-v50-import" type="file" accept="application/json,.json" hidden>';
+root.append(section);section.hidden=tabs.querySelector('[data-rb43-tab="settings"]')?.classList.contains('active')!==true;
+}
+function data(){const out={};for(let i=0;i<localStorage.length;i++){const key=localStorage.key(i);if(key?.startsWith(P))out[key]=localStorage.getItem(key)}return out}
+function exportBackup(){try{const content={format:'depara-preview-backup',version:1,createdAt:new Date().toISOString(),data:data()};const blob=new Blob([JSON.stringify(content,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='DePara-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000)}catch{alert('Не вдалося створити резервну копію')}}
+function reset(){if(!confirm('Повне скидання ДеПара? Будуть видалені локальні завдання, нотатки, оцінки, налаштування і група. Спочатку збережи резервну копію. Продовжити?'))return;if(!confirm('Підтвердити остаточне видалення локальних даних тестової версії?'))return;try{Object.keys(data()).forEach(k=>localStorage.removeItem(k));location.reload()}catch{alert('Не вдалося очистити локальні дані')}}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-dp-setting]');if(!b)return;const action=b.dataset.dpSetting;
+if(action==='role')window.DeParaChangeRole?.();
+if(action==='group')window.DeParaChangeGroup?.();
+if(action==='welcome')window.DeParaReplayWelcome?.();
+if(action==='export')exportBackup();
+if(action==='import')$('#dp-v50-import')?.click();
+if(action==='reset')reset();
+});
+document.addEventListener('change',async e=>{if(e.target.id!=='dp-v50-import')return;const file=e.target.files?.[0];e.target.value='';if(!file)return;if(file.size>3*1024*1024){alert('Файл завеликий для локальної резервної копії');return}try{const parsed=JSON.parse(await file.text());if(parsed?.format!=='depara-preview-backup'||parsed.version!==1||!parsed.data||typeof parsed.data!=='object'||Array.isArray(parsed.data))throw Error('format');const entries=Object.entries(parsed.data);if(!entries.length||entries.some(([k,v])=>!k.startsWith(P)||typeof v!=='string'))throw Error('keys');if(!confirm('Відновити '+entries.length+' записів із резервної копії? Наявні значення цих записів буде замінено.'))return;for(const [k,v] of entries)localStorage.setItem(k,v);location.reload()}catch{alert('Не вдалося імпортувати файл. Перевір, чи це резервна копія ДеПара?')}})
+const screen=$('#screen');if(screen)new MutationObserver(()=>{if(running)return;running=true;queueMicrotask(()=>{running=false;profile()})}).observe(screen,{childList:true});profile();
+})();
