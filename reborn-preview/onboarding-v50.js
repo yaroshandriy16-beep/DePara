@@ -51,8 +51,8 @@ function choose(value){if(value==='student'){studentSetup();return}teacherSetup(
 roles.addEventListener('click',e=>{const b=e.target.closest('[data-dp-role]');if(b)choose(b.dataset.dpRole)});
 $('#dp-teacher-enter').addEventListener('click',()=>{if(!chosenTeacher)return;write(K+'teacher_v1',JSON.stringify({name:teacherName(chosenTeacher),teacherId:String(chosenTeacher.id)}));write(roleKey,'teacher');document.body.dataset.dpRole='teacher';finish();if(typeof window.DeParaOpenTeacher==='function')window.DeParaOpenTeacher(String(chosenTeacher.id));else window.dispatchEvent(new CustomEvent('depara:teacher-open',{detail:{id:String(chosenTeacher.id)}}))});
 $('#dp-teacher-back').addEventListener('click',()=>show(roles));
-function start(){reveal();show(null);const role=read(roleKey);animationTimer=setTimeout(()=>{if(role==='student'&&read(setupKey)==='1'){document.body.dataset.dpRole='student';finish()}else if(role==='teacher'){document.body.dataset.dpRole='teacher';finish()}else show(roles)},1050)}
-window.DeParaChangeRole=()=>{clearTimeout(animationTimer);reveal();show(roles)};
+function start(){reveal();show(null);const role=read(roleKey);animationTimer=setTimeout(()=>{if(role==='student'&&read(setupKey)==='1'){document.body.dataset.dpRole='student';finish()}else if(role==='teacher'&&read(K+'teacher_v1')){document.body.dataset.dpRole='teacher';finish()}else show(roles)},1050)}
+window.DeParaChangeRole=()=>{clearTimeout(animationTimer);localStorage.removeItem(roleKey);document.body.dataset.dpRole='';document.body.classList.remove('dp-teacher-active');const dashboard=document.querySelector('#dp-teacher-app');if(dashboard){dashboard.hidden=true;dashboard.style.display='none'}reveal();show(roles)};
 window.DeParaChangeGroup=()=>{clearTimeout(animationTimer);mode='change';studentSetup()};
 window.DeParaReplayWelcome=()=>{clearTimeout(animationTimer);reveal();show(null);setTimeout(()=>show(roles),1100)};
 start();
