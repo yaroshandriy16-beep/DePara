@@ -1,0 +1,4 @@
+DePara production release: promote tested REBORN weekly schedule image sharing and production bot deep link.
+Source branch: cloudflare-worker-setup
+Worker: depara-api
+Database: depara-db
