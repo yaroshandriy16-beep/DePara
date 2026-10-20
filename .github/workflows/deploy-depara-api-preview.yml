@@ -7,6 +7,7 @@ on:
       - '.github/workflows/deploy-depara-api-preview.yml'
 permissions:
   contents: read
+  issues: write
 concurrency:
   group: depara-api-preview-deploy
   cancel-in-progress: false
@@ -51,3 +52,12 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           wranglerVersion: '4'
           command: deploy --config cloudflare/preview/wrangler.toml
+
+      - name: Report failed preview deployment automatically
+        if: ${{ failure() }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const {owner, repo} = context.repo;
+            const body = 'Preview deployment failed. Run: ' + context.serverUrl + '/' + owner + '/' + repo + '/actions/runs/' + context.runId + '\nCommit: ' + context.sha;
+            await github.rest.issues.create({owner, repo, title: 'Preview deploy failed (run ' + context.runId + ')', body});
