@@ -96,3 +96,38 @@ test('Student: saved group persists and profile settings are accessible', async 
   await page.locator('[data-dp-setting="group"]').click();
   await expect(page.locator('#dp-group-search')).toBeVisible();
 });
+
+test('Teacher: failed refresh preserves cached schedule and shows warning', async ({ page }) => {
+  await page.locator('[data-dp-role="teacher"]').click();
+  await page.locator('#dp-teacher-search').fill('Шту');
+  await page.locator('#dp-teacher-search-results button').first().click();
+  await page.locator('#dp-teacher-enter').click();
+  const teacher=page.locator('#dp-teacher-app');
+  await teacher.locator('.dp-t-nav [data-t-page="schedule"]').click();
+  await expect(teacher.locator('#dp-t-refresh')).toBeVisible();
+  await page.waitForResponse(r => r.url().includes('/data/teachers/schedules/') && r.status() === 200);
+  const before=await teacher.locator('.dp-t-lesson').count();
+  await page.route('**/data/teachers/schedules/**', route=>route.abort());
+  await teacher.locator('#dp-t-refresh').click();
+  await expect(teacher.getByText('Не вдалося оновити розклад.', {exact:false})).toBeVisible();
+  await expect(teacher.locator('.dp-t-lesson')).toHaveCount(before);
+});
+
+test('Student: social requires Telegram and settings reject invalid backup', async ({ page }) => {
+  await page.locator('[data-dp-role="student"]').click();
+  await page.locator('#dp-group-search').fill('ЕІ-23-1');
+  await page.locator('#dp-search-results button').first().click();
+  await page.locator('#dp-setup-done').click();
+  await page.locator('#dp-success-enter').click();
+  await page.locator('#nav button[data-page="social"]').click();
+  await expect(page.locator('#screen')).toContainText('Telegram');
+  await page.locator('#nav button[data-page="profile"]').click();
+  await page.locator('#rb43-profile-tabs [data-rb43-tab="settings"]').click();
+  const dialog=page.waitForEvent('dialog');
+  await page.locator('#dp-v50-import').setInputFiles({
+    name:'invalid.json',mimeType:'application/json',buffer:Buffer.from('{"format":"unknown","data":{}}')
+  });
+  const alert=await dialog;
+  expect(alert.message()).toContain('Не вдалося імпортувати');
+  await alert.accept();
+});
