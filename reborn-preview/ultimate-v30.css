@@ -1,0 +1,24 @@
+/* DePara REBORN 3.0 — preview-only UI foundation */
+:root{--dp3-touch:44px;--dp3-radius:18px}
+html{scroll-behavior:smooth}
+body{overscroll-behavior-y:contain}
+#screen{contain:layout style;max-width:100%;padding-bottom:calc(110px + env(safe-area-inset-bottom,0px))}
+#screen .reborn-home,#screen .ui23-day-panel,#screen .home-feature,#screen .card{min-width:0;max-width:100%}
+#screen .ui23-day-panel-head{flex-wrap:wrap}
+#screen .ui23-day-panel-head button{min-height:var(--dp3-touch);border-radius:12px}
+#screen .ui23-day-panel .lesson{overflow-wrap:anywhere}
+#screen .ui23-secondary summary{min-height:var(--dp3-touch);display:flex;align-items:center;justify-content:space-between}
+#screen .ui23-secondary summary:after{float:none;margin-left:12px}
+#screen .ui23-schedule-header{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:7px}
+#screen .ui23-schedule-header button{min-height:var(--dp3-touch);padding:9px 7px}
+#screen .ui23-schedule-header button:last-child{justify-self:end}
+#screen .ui23-schedule-header .ui23-date{text-align:center;font-size:clamp(11px,3.2vw,14px);min-width:0}
+#screen #rb43-profile-tabs button{min-height:var(--dp3-touch)}
+#screen .dp-v50-setting-row{min-height:var(--dp3-touch)}
+#nav button{min-height:var(--dp3-touch)}
+#dp-teacher-app button{touch-action:manipulation}
+#dp3-status{font-size:12px;line-height:1.3;margin:0 0 12px;display:flex;align-items:center;gap:7px;opacity:.8}
+#dp3-status .dp3-dot{width:7px;height:7px;flex:none;border-radius:50%;background:#5dc59d}
+#dp3-status[data-offline="true"] .dp3-dot{background:#e9c478}
+@media(max-width:359px){#screen .ui23-day-panel{padding:9px}#screen .ui23-schedule-header button{font-size:11px}#nav button{font-size:10px}#screen .home-heading h1{font-size:24px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important}}
