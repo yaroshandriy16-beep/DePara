@@ -957,7 +957,7 @@ async function prepareScheduleShare(request, env) {
   }
   const buttons = { inline_keyboard: [[{
     text: "Відкрити ДеПара?",
-    url: "https://yaroshandriy16-beep.github.io/DePara/"
+    url: "https://t.me/DePara_bot/app?startapp=shared_schedule"
   }]] };
   const result = photoFileId ? {
     type: "photo",
