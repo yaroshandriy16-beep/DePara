@@ -20,9 +20,11 @@ function mount(){
 }
 function draw(box){
  const sorted=[...tasks].sort((a,b)=>Number(a.done)-Number(b.done)||(a.date||'9999').localeCompare(b.date||'9999'));
+ const today=new Date();const todayKey=[today.getFullYear(),String(today.getMonth()+1).padStart(2,'0'),String(today.getDate()).padStart(2,'0')].join('-');
  box.querySelector('#dp31-progress').textContent=tasks.filter(t=>t.done).length+'/'+tasks.length+' виконано';
- box.querySelector('#dp31-list').innerHTML=sorted.length?sorted.map(t=>'<div class="dp31-task '+(t.done?'is-done':'')+'"><button type="button" data-action="done" data-id="'+esc(t.id)+'" aria-label="'+(t.done?'Повернути завдання':'Позначити виконаним')+'">'+(t.done?'✓':'○')+'</button><div><strong>'+esc(t.title)+'</strong>'+(t.date?'<small>До '+esc(t.date)+'</small>':'')+'</div><button type="button" data-action="remove" data-id="'+esc(t.id)+'" aria-label="Видалити завдання">×</button></div>').join(''):'<p class="dp31-empty">Поки завдань немає. Додай перше вище.</p>';
+ box.querySelector('#dp31-list').innerHTML=sorted.length?sorted.map(t=>'<div class="dp31-task '+(t.done?'is-done':'')+'"><button type="button" data-action="done" data-id="'+esc(t.id)+'" aria-label="'+(t.done?'Повернути завдання':'Позначити виконаним')+'">'+(t.done?'✓':'○')+'</button><div><strong>'+esc(t.title)+'</strong>'+(t.date?'<small>'+(t.date<todayKey&&!t.done?'Прострочено · ':t.date===todayKey?'Сьогодні · ':'До ')+esc(t.date)+'</small>':'')+'</div><button type="button" data-action="remove" data-id="'+esc(t.id)+'" aria-label="Видалити завдання">×</button></div>').join(''):'<p class="dp31-empty">Поки завдань немає. Додай перше вище.</p>';
 }
+window.addEventListener('storage',e=>{if(e.key===key){tasks=read();const box=screen.querySelector('#dp31-planner');if(box)draw(box)}});
 function queue(){if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;mount()})}
 new MutationObserver(queue).observe(screen,{childList:true,subtree:false});
 document.addEventListener('click',e=>{if(e.target.closest('#nav button'))setTimeout(queue,0)});
