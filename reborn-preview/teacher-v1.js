@@ -41,7 +41,7 @@ root.querySelector('#dp-t-today')?.addEventListener('click',()=>{state.date=iso(
 root.querySelectorAll('[data-t-view]').forEach(b=>b.onclick=()=>{state.view=b.dataset.tView;render()});
 root.querySelector('#dp-t-refresh')?.addEventListener('click',refresh);
 root.querySelector('#dp-t-change-role')?.addEventListener('click',()=>{localStorage.removeItem(roleKey);visible();window.DeParaChangeRole?.()});
-root.querySelector('#dp-t-change-teacher')?.addEventListener('click',()=>{localStorage.removeItem(roleKey);visible();window.DeParaChangeRole?.()});
+root.querySelector('#dp-t-change-teacher')?.addEventListener('click',()=>window.DeParaChangeTeacher?.());
 root.querySelector('#dp-t-notes')?.addEventListener('input',e=>localStorage.setItem('dp_reborn2_teacher_notes_'+state.teacherId,e.target.value));
 }
 function drawTeachers(q){const box=root.querySelector('#dp-t-results');if(!box)return;const query=String(q||'').toLocaleLowerCase('uk').trim().replace(/^\\*/,'');if(state.teacherId&&!query){box.innerHTML='<p>Обрано: <b>'+esc(state.name)+'</b></p>';return}if(query.length<2){box.innerHTML='';return}const matches=allTeachers().filter(t=>t.name.toLocaleLowerCase('uk').replace(/^\\*/,'').includes(query)).slice(0,35);box.innerHTML=matches.map(t=>'<button type="button" class="dp-t-btn dp-t-outline" data-teacher-id="'+esc(t.id)+'"><span>'+esc(t.name.replace(/^\\*/,''))+'<small style="display:block">'+esc(t.chair||'')+'</small></span><span>Обрати →</span></button>').join('')||'<p>Викладача не знайдено.</p>';box.querySelectorAll('[data-teacher-id]').forEach(b=>b.onclick=()=>{const t=allTeachers().find(t=>String(t.id)===b.dataset.teacherId);if(!t)return;state.teacherId=String(t.id);state.name=t.name.replace(/^\\*/,'');save();render();refresh()})}
