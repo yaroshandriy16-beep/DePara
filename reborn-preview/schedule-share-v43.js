@@ -29,32 +29,11 @@ dialog.querySelector('#dp40-bot').onclick=async()=>{
   const lines=Array.from({length:7},(_,i)=>{const d=add(monday,i),ls=all.filter(l=>l.date===iso(d)).sort((a,b)=>(a.start||'').localeCompare(b.start||''));return fmt(d,{weekday:'long',day:'numeric',month:'short'})+'\n'+(ls.length?ls.map(l=>(l.start||'—')+' '+(l.subject||'Заняття')).join('\n'):'Пар немає')}).join('\n\n');
   const title='Розклад '+String(data.meta?.group||data.group_name||data.group||group())+' · '+iso(monday);
   if(lines.length>3200)throw Error('Розклад завеликий для текстового повідомлення. Скористайся кнопкою «Картинкою».');
-  let imageBase64=null,thumbnailBase64=null;
-  if(currentBlob){
-    try{
-      const bitmap=await createImageBitmap(currentBlob);
-      const canvas=document.createElement('canvas');
-      canvas.width=bitmap.width;canvas.height=bitmap.height;
-      canvas.getContext('2d').drawImage(bitmap,0,0);
-      const thumbCanvas=document.createElement('canvas');
-      const ratio=Math.min(1,320/Math.max(bitmap.width,bitmap.height));
-      thumbCanvas.width=Math.max(1,Math.round(bitmap.width*ratio));
-      thumbCanvas.height=Math.max(1,Math.round(bitmap.height*ratio));
-      thumbCanvas.getContext('2d').drawImage(bitmap,0,0,thumbCanvas.width,thumbCanvas.height);
-      const thumbnail=await new Promise(resolve=>thumbCanvas.toBlob(resolve,'image/jpeg',0.65));
-      if(thumbnail&&thumbnail.size<=200000){
-        const thumbEncoded=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(Error('thumbnail read failed'));reader.readAsDataURL(thumbnail)});
-        thumbnailBase64=String(thumbEncoded).split(',')[1]||null;
-      }
-      bitmap.close?.();
-      const jpeg=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',0.86));
-      if(jpeg&&jpeg.size<=2800000){
-        const encoded=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(Error('image read failed'));reader.readAsDataURL(jpeg)});
-        imageBase64=String(encoded).split(',')[1]||null;
-      }
-    }catch(e){console.warn('JPEG share encoding failed',e)}
+  let imageBase64=null;
+  if(currentBlob&&currentBlob.size<=2800000){
+    try{const encoded=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(Error('image read failed'));reader.readAsDataURL(currentBlob)});imageBase64=String(encoded).split(',')[1]||null}catch(e){console.warn('Image share fallback',e)}
   }
-  const prepared=await fetch(SHARE_API+'/api/share/prepare',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'tma '+tg.initData},body:JSON.stringify({title,schedule:lines,imageBase64,thumbnailBase64})});
+  const prepared=await fetch(SHARE_API+'/api/share/prepare',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'tma '+tg.initData},body:JSON.stringify({title,schedule:lines,imageBase64})});
   const result=await prepared.json();if(!prepared.ok||!result.ok||!result.id)throw Error('Не вдалося підготувати повідомлення Telegram');
   if(result.mode!=='photo')alert('Telegram надіслав текст замість картинки: '+(result.photoError||'зображення недоступне')+'. Перевіримо причину.');
   tg.shareMessage(result.id,()=>{});
