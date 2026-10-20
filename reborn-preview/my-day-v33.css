@@ -1,0 +1,10 @@
+/* My Day 3.3 — no hidden lessons or collapsed cards */
+#screen .reborn-home>[data-dp33-visible="0"]{display:none!important}
+#screen .reborn-home>[data-dp33-visible="1"]{display:block}
+#screen .reborn-home>.home-kicker[data-dp33-visible="1"]{display:flex}
+#screen .reborn-home>.home-heading[data-dp33-visible="1"]{display:flex}
+#screen .reborn-home>#ui23-day-panel,#screen .reborn-home>.ui23-day-panel{display:block!important}
+#screen .reborn-home>#ui23-day-panel .lesson{display:flex!important}
+#screen .reborn-home>.change-banner{margin-top:16px}
+#screen .reborn-home>.home-feature{margin-bottom:14px}
+#screen .reborn-home .rb45-more,#screen .reborn-home #dp32-quickbar{display:none!important}
