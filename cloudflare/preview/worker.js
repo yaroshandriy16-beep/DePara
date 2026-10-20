@@ -1048,8 +1048,8 @@ async function prepareScheduleShare(request, env) {
       const binary = atob(body.imageBase64);
       if (binary.length <= 2800000 && env.SHARE_IMAGES) {
         const bytes = Uint8Array.from(binary, ch => ch.charCodeAt(0));
-        const key = "shared/" + crypto.randomUUID() + ".png";
-        await env.SHARE_IMAGES.put(key, bytes, { httpMetadata: { contentType: "image/png" }, customMetadata: { expiresAt: String(Date.now() + 86400000) } });
+        const key = "shared/" + crypto.randomUUID() + ".jpg";
+        await env.SHARE_IMAGES.put(key, bytes, { httpMetadata: { contentType: "image/jpeg" }, customMetadata: { expiresAt: String(Date.now() + 86400000) } });
         photoUrl = new URL(request.url).origin + "/api/share/image/" + key.slice(7);
         photoError = null;
       } else photoError = env.SHARE_IMAGES ? "IMAGE_TOO_LARGE" : "R2_NOT_CONFIGURED";
@@ -1121,14 +1121,14 @@ var worker_default = {
     // Public image endpoint used by Telegram to fetch a prepared inline photo.
     if (path.startsWith("/api/share/image/") && request.method === "GET") {
       const id = path.slice("/api/share/image/".length);
-      if (!/^[0-9a-f-]{36}\\.png$/i.test(id) || !env.SHARE_IMAGES) return bad("NOT_FOUND", 404);
+      if (!/^[0-9a-f-]{36}\\.jpg$/i.test(id) || !env.SHARE_IMAGES) return bad("NOT_FOUND", 404);
       const object = await env.SHARE_IMAGES.get("shared/" + id);
       if (!object) return bad("NOT_FOUND", 404);
       if (Number(object.customMetadata?.expiresAt || 0) < Date.now()) {
         await env.SHARE_IMAGES.delete("shared/" + id);
         return bad("EXPIRED", 404);
       }
-      return new Response(object.body, { headers: { "Content-Type": "image/png", "Cache-Control": "public, max-age=300", "X-Content-Type-Options": "nosniff" } });
+      return new Response(object.body, { headers: { "Content-Type": "image/jpeg", "Cache-Control": "public, max-age=300", "X-Content-Type-Options": "nosniff" } });
     }
     if (!env.DB || !env.TELEGRAM_BOT_TOKEN)
 
