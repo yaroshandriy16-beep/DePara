@@ -31,6 +31,23 @@ jobs:
           grep -q 'database_name = "depara-preview-db"' cloudflare/preview/wrangler.toml
           grep -q 'database_id = "c1602af7-3219-4d14-87af-8515c40193be"' cloudflare/preview/wrangler.toml
 
+      - name: Ensure preview-only R2 bucket exists
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: '4'
+          command: r2 bucket create depara-preview-share-images
+        continue-on-error: true
+
+      - name: Verify preview R2 bucket exists
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: '4'
+          command: r2 bucket info depara-preview-share-images
+
       - name: Deploy test Worker only
         uses: cloudflare/wrangler-action@v3
         with:
