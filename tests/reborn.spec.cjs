@@ -288,3 +288,20 @@ test('REBORN 3.1: student tasks can be added, completed and removed', async ({ p
  await page.locator('#dp31-list [data-action="remove"]').first().click();
  await expect(page.locator('#dp31-list')).not.toContainText('Лабораторна 3.1');
 });
+
+test('REBORN 3.1: student task survives reload with deadline', async ({ page }) => {
+ await page.locator('[data-dp-role="student"]').click();
+ await page.locator('#dp-group-search').fill('ЕІ-23-1');
+ await page.locator('#dp-search-results button').first().click();
+ await page.locator('#dp-setup-done').click();
+ await page.locator('#dp-success-enter').click();
+ await page.locator('#nav button[data-page="study"]').click();
+ await page.locator('#dp31-title').fill('Перевірка збереження');
+ await page.locator('#dp31-date').fill('2026-11-10');
+ await page.locator('#dp31-form button').click();
+ await expect(page.locator('#dp31-list')).toContainText('2026-11-10');
+ await page.reload();
+ await page.locator('#nav button[data-page="study"]').click();
+ await expect(page.locator('#dp31-list')).toContainText('Перевірка збереження');
+ await expect(page.locator('#dp31-list')).toContainText('2026-11-10');
+});
