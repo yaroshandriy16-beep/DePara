@@ -1064,7 +1064,10 @@ async function prepareScheduleShare(request, env) {
           }
         }
         photoError = thumbnailUrl ? null : "THUMBNAIL_NOT_RECEIVED";
-        if (!thumbnailUrl) photoUrl = null;
+        if (!thumbnailUrl) {
+          await env.SHARE_IMAGES.delete(key).catch(() => null);
+          photoUrl = null;
+        }
       } else photoError = env.SHARE_IMAGES ? "IMAGE_TOO_LARGE" : "R2_NOT_CONFIGURED";
     } catch (err) { photoError = "R2_UPLOAD_FAILED"; console.warn("Share R2 upload failed", String(err)); }
   }
