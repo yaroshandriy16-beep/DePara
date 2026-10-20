@@ -939,7 +939,7 @@ async function prepareScheduleShare(request, env) {
   }
   const buttons = { inline_keyboard: [[{
     text: "Відкрити ДеПара?",
-    url: "https://yaroshandriy16-beep.github.io/DePara/reborn-preview/"
+    url: "https://yaroshandriy16-beep.github.io/DePara/"
   }]] };
   const result = photoFileId ? {
     type: "photo",
