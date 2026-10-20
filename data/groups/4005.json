@@ -6,27 +6,9 @@
     "group": "ЛГ -25 -маг",
     "groupId": "4005",
     "source": "http://81.30.162.30/time-table/group?type=0",
-    "updatedAt": "2026-10-19T20:46:48.607874+00:00"
+    "updatedAt": "2026-10-20T02:46:08.604212+00:00"
   },
   "lessons": [
-    {
-      "date": "2026-10-19",
-      "start": "08:00",
-      "end": "09:20",
-      "subject": "Лісова політика",
-      "type": "Пз",
-      "room": "ауд. 2531",
-      "teacher": "ЛГ -25 -маг"
-    },
-    {
-      "date": "2026-10-19",
-      "start": "09:30",
-      "end": "10:50",
-      "subject": "Selection and reproduction of main forest species",
-      "type": "Лк",
-      "room": "ауд. 2401",
-      "teacher": "ЛГ -25 -маг"
-    },
     {
       "date": "2026-10-20",
       "start": "13:10",
