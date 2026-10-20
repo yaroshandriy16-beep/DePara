@@ -1,0 +1,15 @@
+/* Schedule 2.4 polish, preview only */
+#dp35-schedule .dp35-modes button,#dp35-schedule .dp35-days button,#dp35-schedule .dp35-class{transition:background-color .18s ease,color .18s ease,border-color .18s ease,transform .18s ease}
+#dp35-schedule .dp35-modes button:active,#dp35-schedule .dp35-days button:active{transform:scale(.96)}
+#dp35-schedule .dp35-lesson{margin-bottom:0}
+#dp35-schedule .dp35-class{padding:13px 12px}
+#dp35-schedule .dp35-class strong{font-size:14px;line-height:1.4}
+#dp35-schedule .dp35-class p{margin:6px 0 9px}
+#dp35-schedule .dp35-lesson.dp38-current .dp35-class{border-color:#e9c67c;border-left-color:#e9c67c;box-shadow:0 0 0 1px rgba(233,198,124,.28)}
+#dp35-schedule .dp35-lesson.dp38-current .dp35-class:before{content:"ЗАРАЗ ІДЕ";display:inline-block;margin:0 0 9px;color:#f1cf84;font-size:10px;letter-spacing:1.3px;font-weight:800}
+#dp35-schedule .dp35-lesson.dp38-past .dp35-class{opacity:.65}
+#dp35-schedule .dp35-lesson.dp38-past .dp35-time{opacity:.7}
+#dp35-schedule .dp35-weekday{scroll-margin-top:16px}
+#dp35-schedule .dp35-results{animation:dp38-appear .18s ease-out}
+@keyframes dp38-appear{from{opacity:.75;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){#dp35-schedule .dp35-results{animation:none}#dp35-schedule *{transition:none!important}}
