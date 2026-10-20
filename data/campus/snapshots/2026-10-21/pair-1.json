@@ -5,7 +5,7 @@
   "endPair": 1,
   "structureId": "0",
   "corpusId": "",
-  "fetchedAt": "2026-10-20T04:38:18.937392+00:00",
+  "fetchedAt": "2026-10-20T10:39:07.448343+00:00",
   "status": "official-site-snapshot",
   "rooms": [
     {
@@ -52,7 +52,7 @@
       "id": "490",
       "name": "1004",
       "capacity": 18,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=490"
     },
@@ -340,7 +340,7 @@
       "id": "30",
       "name": "2315",
       "capacity": 16,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=30"
     },
@@ -348,7 +348,7 @@
       "id": "35",
       "name": "2316",
       "capacity": 16,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=35"
     },
@@ -412,7 +412,7 @@
       "id": "331",
       "name": "2404",
       "capacity": 16,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=331"
     },
@@ -628,7 +628,7 @@
       "id": "125",
       "name": "31",
       "capacity": 24,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=125"
     },
@@ -1276,7 +1276,7 @@
       "id": "312",
       "name": "ЧЗ 2\\2корп.",
       "capacity": 15,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=312"
     },
@@ -1340,7 +1340,7 @@
       "id": "91",
       "name": "№3 -1208",
       "capacity": 11,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=91"
     },

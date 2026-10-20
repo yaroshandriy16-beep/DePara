@@ -5,14 +5,14 @@
   "endPair": 3,
   "structureId": "0",
   "corpusId": "",
-  "fetchedAt": "2026-10-20T04:38:35.632565+00:00",
+  "fetchedAt": "2026-10-20T10:39:23.106921+00:00",
   "status": "official-site-snapshot",
   "rooms": [
     {
       "id": "433",
       "name": "040",
       "capacity": 30,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=433"
     },
@@ -20,7 +20,7 @@
       "id": "436",
       "name": "041",
       "capacity": 24,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=436"
     },
@@ -28,7 +28,7 @@
       "id": "434",
       "name": "042",
       "capacity": 18,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=434"
     },
@@ -36,7 +36,7 @@
       "id": "435",
       "name": "043",
       "capacity": 26,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=435"
     },
@@ -348,7 +348,7 @@
       "id": "35",
       "name": "2316",
       "capacity": 16,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=35"
     },
@@ -580,7 +580,7 @@
       "id": "123",
       "name": "26",
       "capacity": 24,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=123"
     },
@@ -628,7 +628,7 @@
       "id": "125",
       "name": "31",
       "capacity": 24,
-      "available": false,
+      "available": true,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=125"
     },
