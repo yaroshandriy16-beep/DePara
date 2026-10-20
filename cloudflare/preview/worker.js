@@ -1046,7 +1046,7 @@ async function prepareScheduleShare(request, env) {
   if (typeof body?.imageBase64 === "string" && body.imageBase64.length <= 3800000 && /^[A-Za-z0-9+/]+={0,2}$/.test(body.imageBase64)) {
     try {
       const binary = atob(body.imageBase64);
-      if (binary.length <= 2800000 && env.SHARE_IMAGES) {
+      if (binary.length <= 2800000 && binary.charCodeAt(0) === 255 && binary.charCodeAt(1) === 216 && env.SHARE_IMAGES) {
         const bytes = Uint8Array.from(binary, ch => ch.charCodeAt(0));
         const key = "shared/" + crypto.randomUUID() + ".jpg";
         await env.SHARE_IMAGES.put(key, bytes, { httpMetadata: { contentType: "image/jpeg" }, customMetadata: { expiresAt: String(Date.now() + 86400000) } });
