@@ -1072,7 +1072,7 @@ async function prepareScheduleShare(request, env) {
     type: "photo",
     id: "depara-photo-" + crypto.randomUUID(),
     photo_file_id: photoFileId,
-    caption: "📅 " + (title || "Розклад пар") + "\\nДеПара?",
+    caption: "",
     reply_markup: buttons
   } : {
     type: "article",
