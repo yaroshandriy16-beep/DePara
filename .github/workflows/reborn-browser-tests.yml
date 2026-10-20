@@ -26,7 +26,7 @@ jobs:
           python3 -m http.server 8765 --bind 127.0.0.1 > /tmp/depara-server.log 2>&1 &
           sleep 2
       - name: Run iPhone-sized browser tests
-        run: npx playwright test tests/reborn.spec.cjs --reporter=line --workers=1
+        run: npx playwright test tests/reborn.spec.cjs --config=playwright.config.cjs --reporter=line --workers=1
         env:
           PLAYWRIGHT_BASE_URL: http://127.0.0.1:8765
       - name: Save test report
