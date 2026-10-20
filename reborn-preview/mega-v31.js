@@ -11,6 +11,8 @@ function mount(){
  if(document.body.classList.contains('dp-teacher-active'))return;
  const page=$('#nav button.active')?.dataset.page;
  if(page==='today'){mountHome();return}
+ if(page==='profile'){cleanProfile();return}
+ if(page==='study')cleanStudy();
  if(page!=='study'||screen.querySelector('#dp31-planner'))return;
  const box=document.createElement('section');box.id='dp31-planner';box.className='dp31-planner card';
  box.innerHTML='<div class="dp31-head"><div><small>НАВЧАННЯ 3.1</small><h2>Мої завдання</h2><p>Дедлайни й справи зберігаються на цьому пристрої.</p></div><span id="dp31-progress"></span></div><form id="dp31-form"><label for="dp31-title">Нове завдання</label><input id="dp31-title" maxlength="120" placeholder="Наприклад, підготувати лабораторну" required><label for="dp31-date">Дедлайн (необов’язково)</label><input id="dp31-date" type="date"><button type="submit">+ Додати завдання</button></form><label for="dp31-filter">Показати</label><select id="dp31-filter"><option value="all">Усі завдання</option><option value="open">Невиконані</option><option value="done">Виконані</option></select><div id="dp31-list" aria-live="polite"></div><p id="dp31-message" role="status"></p>';
@@ -27,6 +29,18 @@ function draw(box){
  box.querySelector('#dp31-progress').textContent=tasks.filter(t=>t.done).length+'/'+tasks.length+' виконано';
  box.querySelector('#dp31-list').innerHTML=sorted.length?sorted.map(t=>'<div class="dp31-task '+(t.done?'is-done':'')+'"><button type="button" data-action="done" data-id="'+esc(t.id)+'" aria-label="'+(t.done?'Повернути завдання':'Позначити виконаним')+'">'+(t.done?'✓':'○')+'</button><div><strong>'+esc(t.title)+'</strong>'+(t.date?'<small>'+(t.date<todayKey&&!t.done?'Прострочено · ':t.date===todayKey?'Сьогодні · ':'До ')+esc(t.date)+'</small>':'')+'</div><button type="button" data-action="remove" data-id="'+esc(t.id)+'" aria-label="Видалити завдання">×</button></div>').join(''):'<p class="dp31-empty">Поки завдань немає. Додай перше вище.</p>';
 }
+function cleanProfile(){
+ const cards=[...screen.querySelectorAll('.card')];
+ const hasStyle=!!screen.querySelector('#rb40-slot .rb40-themes');
+ if(hasStyle)cards.filter(c=>c.querySelector('h2')?.textContent.trim()==='Оформлення').forEach(c=>c.remove());
+}
+function cleanStudy(){
+ // Profile-only widgets must never appear among academic tools.
+ for(const card of [...screen.children]){
+  const heading=card.querySelector?.('h2')?.textContent.trim();
+  if(heading==='Мій стиль'||heading==='Мій профіль'||heading==='Твій профіль')card.remove();
+ }
+}
 function mountHome(){
  const home=screen.querySelector('.reborn-home');if(!home||home.querySelector('#dp31-home'))return;
  const open=tasks.filter(t=>!t.done);const today=new Date();const day=[today.getFullYear(),String(today.getMonth()+1).padStart(2,'0'),String(today.getDate()).padStart(2,'0')].join('-');
@@ -38,6 +52,6 @@ function mountHome(){
 window.addEventListener('storage',e=>{if(e.key===key){tasks=read();const box=screen.querySelector('#dp31-planner');if(box)draw(box);const home=screen.querySelector('#dp31-home');if(home){home.remove();mountHome()}}});
 function queue(){if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;mount()})}
 new MutationObserver(queue).observe(screen,{childList:true,subtree:false});
-document.addEventListener('click',e=>{if(e.target.closest('#nav button'))setTimeout(queue,0)});
+document.addEventListener('click',e=>{if(e.target.closest('#nav button,#rb43-profile-tabs button'))setTimeout(queue,0)});
 queue();
 })();
