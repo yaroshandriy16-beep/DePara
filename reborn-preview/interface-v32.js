@@ -39,6 +39,15 @@ function reconcile(){
 function queue(){if(pending)return;pending=true;requestAnimationFrame(()=>{pending=false;reconcile()})}
 screen.addEventListener('click',e=>{const b=e.target.closest('[data-dp32-page]');if(b)nav.querySelector('button[data-page="'+b.dataset.dp32Page+'"]')?.click();if(e.target.closest('#rb43-profile-tabs button,#rb45-study button,#rb45-schedule button'))queue()});
 nav.addEventListener('click',queue);
+screen.addEventListener('click',e=>{
+ const btn=e.target.closest('#rb43-profile-tabs [data-rb43-tab]');
+ if(!btn)return;
+ const selected=btn.dataset.rb43Tab;
+ const tabs=screen.querySelector('#rb43-profile-tabs');
+ tabs?.querySelectorAll('[data-rb43-tab]').forEach(b=>{b.classList.toggle('active',b===btn);b.setAttribute('aria-selected',String(b===btn))});
+ screen.querySelectorAll('[data-rb43-section]').forEach(el=>{el.hidden=el.dataset.rb43Section!==selected});
+ const style=screen.querySelector('#rb40-slot');if(style){style.dataset.rb43Section='settings';style.hidden=selected!=='settings'}
+},true);
 new MutationObserver(queue).observe(screen,{childList:true,subtree:false});
 queue();
 })();
