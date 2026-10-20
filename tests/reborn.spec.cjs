@@ -143,7 +143,7 @@ test('UI 2.2: mobile home, schedule shortcut, profile and accessible tabs', asyn
   await page.locator('#dp-success-enter').click();
   await page.locator('#nav button[data-page="today"]').click();
   await expect(page.locator('.reborn-home .home-feature')).toBeVisible();
-  await expect(page.locator('.reborn-home .home-section-head h2').first()).toContainText('Пари на день');
+  await expect(page.locator('#ui23-day-panel .ui23-day-panel-head')).toContainText('Пари на сьогодні');
   await page.locator('#nav button[data-page="schedule"]').click();
   await expect(page.locator('#ui22-today-shortcut')).toBeVisible();
   await page.locator('#ui22-today-shortcut').click();
@@ -170,4 +170,38 @@ test('UI 2.2: teacher tabs stay usable on narrow iPhone', async ({ page }) => {
   }
   const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth+2);
   expect(overflow,'No horizontal viewport overflow on narrow iPhone').toBe(false);
+});
+
+test('UI 2.3: next lesson and today lessons share compact dashboard',async({page})=>{
+ await page.locator('[data-dp-role="student"]').click();
+ await page.locator('#dp-group-search').fill('ЕІ-23-1');
+ await page.locator('#dp-search-results button').first().click();
+ await page.locator('#dp-setup-done').click();
+ await page.locator('#dp-success-enter').click();
+ await page.locator('#nav button[data-page="today"]').click();
+ await expect(page.locator('.home-feature')).toBeVisible();
+ await expect(page.locator('#ui23-day-panel')).toBeVisible();
+ await expect(page.locator('#ui23-overview summary')).toBeVisible();
+ await expect(page.locator('#ui23-overview')).not.toHaveAttribute('open','');
+ await page.locator('#ui23-overview summary').click();
+ await expect(page.locator('#ui23-overview')).toHaveAttribute('open','');
+ await page.locator('#ui23-day-panel .ui23-day-panel-head button').click();
+ await expect(page.locator('#nav button[data-page="schedule"]')).toHaveClass(/active/);
+});
+
+test('UI 2.3: schedule day controls and profile settings on 375px iPhone',async({page})=>{
+ await page.setViewportSize({width:375,height:812});
+ await page.locator('[data-dp-role="student"]').click();
+ await page.locator('#dp-group-search').fill('ЕІ-23-1');
+ await page.locator('#dp-search-results button').first().click();
+ await page.locator('#dp-setup-done').click();
+ await page.locator('#dp-success-enter').click();
+ await page.locator('#nav button[data-page="schedule"]').click();
+ await expect(page.locator('#ui23-schedule-date')).toBeVisible();
+ await expect(page.locator('#ui23-schedule-date button')).toHaveCount(2);
+ await page.locator('#nav button[data-page="profile"]').click();
+ await expect(page.locator('#ui23-profile-label')).toBeVisible();
+ await page.locator('#rb43-profile-tabs [data-rb43-tab="settings"]').click();
+ await expect(page.locator('#dp-v50-settings')).toBeVisible();
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+2)).toBe(false);
 });
