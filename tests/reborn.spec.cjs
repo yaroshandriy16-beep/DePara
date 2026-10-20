@@ -134,3 +134,39 @@ test('Student: social requires Telegram and settings reject invalid backup', asy
   expect(alert.message()).toContain('Не вдалося імпортувати');
   await alert.accept();
 });
+
+test('UI 2.2: mobile home, schedule shortcut, profile and accessible tabs', async ({ page }) => {
+  await page.locator('[data-dp-role="student"]').click();
+  await page.locator('#dp-group-search').fill('ЕІ-23-1');
+  await page.locator('#dp-search-results button').first().click();
+  await page.locator('#dp-setup-done').click();
+  await page.locator('#dp-success-enter').click();
+  await expect(page.locator('.reborn-home .home-feature')).toBeVisible();
+  await expect(page.locator('.reborn-home .home-section-head h2').first()).toContainText('Пари на день');
+  await page.locator('#nav button[data-page="schedule"]').click();
+  await expect(page.locator('#ui22-today-shortcut')).toBeVisible();
+  await page.locator('#ui22-today-shortcut').click();
+  await expect(page.locator('#nav button[data-page="schedule"]')).toHaveAttribute('aria-current','page');
+  await page.locator('#nav button[data-page="profile"]').click();
+  await expect(page.locator('#rb43-profile-tabs')).toHaveAttribute('role','tablist');
+  await page.locator('#rb43-profile-tabs [data-rb43-tab="settings"]').click();
+  await expect(page.locator('#dp-v50-settings h2')).toHaveText('Налаштування');
+  const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth+2);
+  expect(overflow,'No horizontal viewport overflow on iPhone').toBe(false);
+});
+
+test('UI 2.2: teacher tabs stay usable on narrow iPhone', async ({ page }) => {
+  await page.setViewportSize({width:320,height:700});
+  await page.locator('[data-dp-role="teacher"]').click();
+  await page.locator('#dp-teacher-search').fill('Шту');
+  await page.locator('#dp-teacher-search-results button').first().click();
+  await page.locator('#dp-teacher-enter').click();
+  const teacher=page.locator('#dp-teacher-app');
+  await expect(teacher).toBeVisible();
+  for(const tab of ['today','schedule','study','community','profile']){
+    await teacher.locator('.dp-t-nav [data-t-page="'+tab+'"]').click();
+    await expect(teacher.locator('.dp-t-nav [data-t-page="'+tab+'"]')).toHaveClass(/active/);
+  }
+  const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth+2);
+  expect(overflow,'No horizontal viewport overflow on narrow iPhone').toBe(false);
+});
