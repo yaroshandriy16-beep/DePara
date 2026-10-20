@@ -1,6 +1,6 @@
 (()=>{'use strict';
 const KEY='dp_reborn2_teacher_v1',roleKey='dp_reborn2_role',root=document.createElement('section');
-root.id='dp-teacher-app';root.hidden=true;root.setAttribute('aria-label','Кабінет викладача');document.body.append(root);
+root.id='dp-teacher-app';root.hidden=true;root.setAttribute('aria-label','Кабінет викладача');document.body.append(root);root.style.display='none';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const iso=d=>{const x=new Date(d);return [x.getFullYear(),String(x.getMonth()+1).padStart(2,'0'),String(x.getDate()).padStart(2,'0')].join('-')};
 const read=()=>{try{return JSON.parse(localStorage.getItem(KEY))||{}}catch{return {}}};
@@ -8,7 +8,7 @@ const state={name:read().name||'',teacherId:read().teacherId||'',date:iso(new Da
 const save=()=>localStorage.setItem(KEY,JSON.stringify({name:state.name,teacherId:state.teacherId}));
 let timer=0,run=0;
 const allTeachers=()=>Array.from(new Map(state.catalog.map(t=>[String(t.id),t])).values()).sort((a,b)=>a.name.localeCompare(b.name,'uk'));
-function visible(force=false){const on=force||localStorage.getItem(roleKey)==='teacher';document.body.classList.toggle('dp-teacher-active',on);root.hidden=!on;if(on)render()}
+function visible(force=false){const on=force||localStorage.getItem(roleKey)==='teacher';document.body.classList.toggle('dp-teacher-active',on);root.hidden=!on;if(on){root.style.display='block';render()}else root.style.display='none'}
 function lessonCard(l){return '<article class="dp-t-lesson"><span class="dp-t-time">'+esc(l.start||'—')+'<small>'+esc(l.end||'')+'</small></span><div><strong>'+esc(l.subject||'Заняття')+'</strong><small>'+esc(l.groupName)+' · '+esc(l.type||'Пара')+'</small><small>'+esc(l.room||'Аудиторія не вказана')+'</small></div></article>'}
 function render(){if(root.hidden)return;const today=state.date,day=new Date(today+'T12:00:00'),items=state.lessons.filter(l=>state.view==='week'?(()=>{const d=new Date(today+'T12:00:00');d.setDate(d.getDate()-(d.getDay()+6)%7);const e=new Date(d);e.setDate(e.getDate()+7);return l.date>=iso(d)&&l.date<iso(e)})():l.date===today);const byDay=Object.groupBy?Object.groupBy(items,l=>l.date):items.reduce((a,l)=>((a[l.date]??=[]).push(l),a),{});
 root.innerHTML='<div class="dp-t-head"><span class="dp-t-kicker">ДеПара? · ВИКЛАДАЧ</span><h1>Мій викладацький простір<span style="color:#d9bc72">.</span></h1><p>Офіційний персональний розклад викладача ВНАУ</p></div>'+
