@@ -6,6 +6,7 @@ const iso=d=>{const x=new Date(d);return [x.getFullYear(),String(x.getMonth()+1)
 const read=()=>{try{return JSON.parse(localStorage.getItem(KEY))||{}}catch{return {}}};
 const state={name:read().name||'',teacherId:read().teacherId||'',date:iso(new Date()),view:'day',page:'today',catalog:[],lessons:[],loading:false,error:'',picker:false};
 const save=()=>localStorage.setItem(KEY,JSON.stringify({name:state.name,teacherId:state.teacherId}));
+root.addEventListener('input',e=>{if(e.target.id!=='dp-t-notes'||!state.teacherId)return;try{localStorage.setItem('dp_reborn2_teacher_notes_'+state.teacherId,e.target.value)}catch{const msg=root.querySelector('#dp-t-notes-status');if(msg)msg.textContent='Не вдалося зберегти нотатку'}} ,true);
 let timer=0,run=0;
 const allTeachers=()=>Array.from(new Map(state.catalog.map(t=>[String(t.id),t])).values()).sort((a,b)=>a.name.localeCompare(b.name,'uk'));
 function visible(force=false){const on=force||localStorage.getItem(roleKey)==='teacher';if(!on){run++;state.loading=false;}document.body.classList.toggle('dp-teacher-active',on);root.hidden=!on;if(on){root.style.display='block';render()}else root.style.display='none'}
