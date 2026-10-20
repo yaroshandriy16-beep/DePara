@@ -408,7 +408,9 @@ async function socialRoute(request, env, path, url) {
 
   const id = user.id;
 
-//  Пошук студентів
+
+
+  // Пошук студентів*
 
   if (path === '/api/social/search' && request.method === 'GET') {
 
@@ -462,7 +464,9 @@ async function socialRoute(request, env, path, url) {
 
   }
 
-//  Список друзів
+
+
+  // Список друзів*
 
   if (path === '/api/social/friends' && request.method === 'GET') {
 
@@ -488,7 +492,9 @@ async function socialRoute(request, env, path, url) {
 
   }
 
-//  Вхідні та вихідні заявки
+
+
+  // Вхідні та вихідні заявки*
 
   if (path === '/api/social/requests' && request.method === 'GET') {
 
@@ -540,7 +546,9 @@ async function socialRoute(request, env, path, url) {
 
   }
 
-//  Надіслати заявку в друзі
+
+
+  // Надіслати заявку в друзі*
 
   if (path === '/api/social/requests' && request.method === 'POST') {
 
@@ -632,7 +640,9 @@ async function socialRoute(request, env, path, url) {
 
   }
 
-//  Прийняти або відхилити заявку
+
+
+  // Прийняти або відхилити заявку*
 
   if (
 
@@ -730,7 +740,9 @@ async function socialRoute(request, env, path, url) {
 
   }
 
-//  Отримати особисті повідомлення
+
+
+  // Отримати особисті повідомлення*
 
   if (path === '/api/social/dm' && request.method === 'GET') {
 
@@ -770,7 +782,9 @@ async function socialRoute(request, env, path, url) {
 
   }
 
-//  Надіслати особисте повідомлення
+
+
+  // Надіслати особисте повідомлення*
 
   if (path === '/api/social/dm' && request.method === 'POST') {
 
@@ -814,7 +828,9 @@ async function socialRoute(request, env, path, url) {
 
   }
 
-//  Отримати повідомлення групи
+
+
+  // Отримати повідомлення групи*
 
   if (path === '/api/social/group' && request.method === 'GET') {
 
@@ -856,7 +872,9 @@ async function socialRoute(request, env, path, url) {
 
   }
 
-//  Надіслати повідомлення групі
+
+
+  // Надіслати повідомлення групі*
 
   if (path === '/api/social/group' && request.method === 'POST') {
 
@@ -974,8 +992,7 @@ async function prepareScheduleShare(request, env) {
   return json({ ok: true, id: data.result.id, mode: photoFileId ? 'photo' : 'text', photoError: photoFileId ? null : photoError, expiration_date: data.result.expiration_date });
 }
 
-
-const worker_default = {
+export default {
 
   async fetch(request, env) {
 
@@ -1020,10 +1037,9 @@ const worker_default = {
 
 
     try {
-      if (path === "/api/share/prepare" && request.method === "POST") return await prepareScheduleShare(request, env);
+      if (path === '/api/share/prepare' && request.method === 'POST') return await prepareScheduleShare(request, env);
 
-
-//  Telegram авторизація
+      // Telegram авторизація*
 
       if (
 
@@ -1055,7 +1071,9 @@ const worker_default = {
 
       }
 
-//  Мій профіль
+
+
+      // Мій профіль*
 
       if (path === '/api/me' && request.method === 'GET') {
 
@@ -1073,7 +1091,9 @@ const worker_default = {
 
       }
 
-//  Отримання хмарних даних
+
+
+      // Отримання хмарних даних*
 
       if (path === '/api/sync' && request.method === 'GET') {
 
@@ -1107,7 +1127,9 @@ const worker_default = {
 
       }
 
-//  Збереження хмарних даних
+
+
+      // Збереження хмарних даних*
 
       if (path === '/api/sync' && request.method === 'PUT') {
 
@@ -1229,7 +1251,9 @@ const worker_default = {
 
       }
 
-//  Новий модуль ДеПара? Social
+
+
+      // Новий модуль ДеПара? Social*
 
       if (path.startsWith('/api/social/'))
 
@@ -1239,7 +1263,9 @@ const worker_default = {
 
       return bad('NOT_FOUND', 404);
 
-//  Messenger 2.0 — список діалогів
+
+
+  // Messenger 2.0 — список діалогів*
 
   if (path === '/api/social/inbox' && request.method === 'GET') {
 
@@ -1315,7 +1341,9 @@ const worker_default = {
 
   }
 
-//  Messenger 2.0 — відмітити повідомлення прочитаними
+
+
+  // Messenger 2.0 — відмітити повідомлення прочитаними*
 
   if (path === '/api/social/read' && request.method === 'POST') {
 
@@ -1377,7 +1405,9 @@ const worker_default = {
 
   }
 
-//  Messenger 2.0 — статус прочитання вихідних повідомлень
+
+
+  // Messenger 2.0 — статус прочитання вихідних повідомлень*
 
   if (path === '/api/social/read-status' && request.method === 'GET') {
 
@@ -1448,4 +1478,3 @@ const worker_default = {
   }
 
 };
-export { worker_default as default };
