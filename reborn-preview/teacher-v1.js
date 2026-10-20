@@ -11,6 +11,7 @@ const allTeachers=()=>Array.from(new Map(state.catalog.map(t=>[String(t.id),t]))
 function visible(force=false){const on=force||localStorage.getItem(roleKey)==='teacher';if(!on){run++;state.loading=false;}document.body.classList.toggle('dp-teacher-active',on);root.hidden=!on;if(on){root.style.display='block';render()}else root.style.display='none'}
 function lessonCard(l){return '<article class="dp-t-lesson"><span class="dp-t-time">'+esc(l.start||'—')+'<small>'+esc(l.end||'')+'</small></span><div><strong>'+esc(l.subject||'Заняття')+'</strong><small>'+esc(l.groupName)+' · '+esc(l.type||'Пара')+'</small><small>'+esc(l.room||'Аудиторія не вказана')+'</small></div></article>'}
 function render(){if(root.hidden)return;
+const draft=root.querySelector('#dp-t-notes');if(draft&&state.teacherId){try{localStorage.setItem('dp_reborn2_teacher_notes_'+state.teacherId,draft.value)}catch{}}
 const today=iso(new Date()),selected=state.date,day=new Date(selected+'T12:00:00'),lessons=state.lessons;
 const dayItems=lessons.filter(l=>l.date===selected),todayItems=lessons.filter(l=>l.date===today),next=lessons.filter(l=>l.date>=today&&(!l.end||l.date>today||l.end>new Date().toTimeString().slice(0,5)))[0];
 const weekStart=new Date(selected+'T12:00:00');weekStart.setDate(weekStart.getDate()-(weekStart.getDay()+6)%7);
