@@ -256,7 +256,7 @@ async function bodyJSON(request) {
 
   const raw = await request.text();
 
-  if (raw\.length > 12e3) throw Error("PAYLOAD_TOO_LARGE");
+  if (raw.length > 12e3) throw Error("PAYLOAD_TOO_LARGE");
 
   try {
 
@@ -600,7 +600,7 @@ async function socialRoute(request, env, path, url) {
 
            VALUES(?,?)`
 
-        ).bind(id, row\.sender_id),
+        ).bind(id, row.sender_id),
 
         env.DB.prepare(
 
@@ -610,7 +610,7 @@ async function socialRoute(request, env, path, url) {
 
            VALUES(?,?)`
 
-        ).bind(row\.sender_id, id)
+        ).bind(row.sender_id, id)
 
       ]);
 
@@ -1080,7 +1080,7 @@ var worker_default = {
 
     const url = new URL(request.url);
 
-    const path = url.pathname.replace(/\\/+$/, "") || "/";
+    const path = url.pathname.replace(/\/+$/, "") || "/";
 
     if (path === "/health" && request.method === "GET")
 
@@ -1167,7 +1167,7 @@ var worker_default = {
 
           exists: Boolean(row),
 
-          state: row ? JSON.parse(row\.payload) : null,
+          state: row ? JSON.parse(row.payload) : null,
 
           revision: row?.revision || 0,
 
@@ -1183,7 +1183,7 @@ var worker_default = {
 
         const raw = await request.text();
 
-        if (raw\.length > 25e4)
+        if (raw.length > 25e4)
 
           return json({
 
