@@ -155,7 +155,9 @@
       error = e.message;
     } finally {
       busy = false;
+      const draft = error ? ($('#social-send textarea')?.value || '') : '';
       render();
+      if (draft) { const input = $('#social-send textarea'); if (input) input.value = draft; }
     }
   }
 
