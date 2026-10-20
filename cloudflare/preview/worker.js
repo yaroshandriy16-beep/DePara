@@ -1041,6 +1041,7 @@ async function prepareScheduleShare(request, env) {
   const title = typeof body?.title === "string" ? body.title.trim().slice(0, 100) : "Розклад пар";
   const message = "📅 " + (title || "Розклад пар") + "\n\n" + schedule + "\n\nДеПара? REBORN";
   let photoFileId = null;
+  let photoError = typeof body?.imageBase64 === 'string' ? 'UPLOAD_NOT_COMPLETED' : 'IMAGE_NOT_RECEIVED';
   if (typeof body?.imageBase64 === "string" && body.imageBase64.length <= 3800000 && /^[A-Za-z0-9+/]+={0,2}$/.test(body.imageBase64)) {
     try {
       const binary = atob(body.imageBase64);
@@ -1059,9 +1060,9 @@ async function prepareScheduleShare(request, env) {
             method: "POST", headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ chat_id: user.id, message_id: messageId })
           }).catch(() => null);
-        } else console.warn("Share photo upload unavailable", photoData?.error_code);
+        } else { photoError = "TELEGRAM_" + (photoData?.error_code || "ERROR") + "_" + String(photoData?.description || "upload rejected").slice(0, 130); console.warn("Share photo upload unavailable", photoData?.error_code); }
       }
-    } catch (err) { console.warn("Share photo upload failed", String(err)); }
+    } catch (err) { photoError = "UPLOAD_EXCEPTION"; console.warn("Share photo upload failed", String(err)); }
   }
   const buttons = { inline_keyboard: [[{
     text: "Відкрити ДеПара?",
@@ -1097,7 +1098,7 @@ async function prepareScheduleShare(request, env) {
     console.error("Telegram share preparation failed", response.status, data?.error_code);
     return bad("TELEGRAM_SHARE_FAILED", 502);
   }
-  return json({ ok: true, id: data.result.id, expiration_date: data.result.expiration_date });
+  return json({ ok: true, id: data.result.id, mode: photoFileId ? 'photo' : 'text', photoError: photoFileId ? null : photoError, expiration_date: data.result.expiration_date });
 }
 
 var worker_default = {
