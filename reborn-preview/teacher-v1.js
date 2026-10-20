@@ -12,7 +12,7 @@ function visible(force=false){const on=force||localStorage.getItem(roleKey)==='t
 function lessonCard(l){return '<article class="dp-t-lesson"><span class="dp-t-time">'+esc(l.start||'—')+'<small>'+esc(l.end||'')+'</small></span><div><strong>'+esc(l.subject||'Заняття')+'</strong><small>'+esc(l.groupName)+' · '+esc(l.type||'Пара')+'</small><small>'+esc(l.room||'Аудиторія не вказана')+'</small></div></article>'}
 function render(){if(root.hidden)return;
 const today=iso(new Date()),selected=state.date,day=new Date(selected+'T12:00:00'),lessons=state.lessons;
-const dayItems=lessons.filter(l=>l.date===today),next=lessons.filter(l=>l.date>=today&&(!l.end||l.date>today||l.end>new Date().toTimeString().slice(0,5)))[0];
+const dayItems=lessons.filter(l=>l.date===selected),todayItems=lessons.filter(l=>l.date===today),next=lessons.filter(l=>l.date>=today&&(!l.end||l.date>today||l.end>new Date().toTimeString().slice(0,5)))[0];
 const weekStart=new Date(selected+'T12:00:00');weekStart.setDate(weekStart.getDate()-(weekStart.getDay()+6)%7);
 const weekEnd=new Date(weekStart);weekEnd.setDate(weekEnd.getDate()+7);
 const weekItems=lessons.filter(l=>l.date>=iso(weekStart)&&l.date<iso(weekEnd));
@@ -42,7 +42,7 @@ root.querySelectorAll('[data-t-view]').forEach(b=>b.onclick=()=>{state.view=b.da
 root.querySelector('#dp-t-refresh')?.addEventListener('click',refresh);
 root.querySelector('#dp-t-change-role')?.addEventListener('click',()=>{localStorage.removeItem(roleKey);visible();window.DeParaChangeRole?.()});
 root.querySelector('#dp-t-change-teacher')?.addEventListener('click',()=>window.DeParaChangeTeacher?.());
-root.querySelector('#dp-t-notes')?.addEventListener('input',e=>localStorage.setItem('dp_reborn2_teacher_notes_'+state.teacherId,e.target.value));
+root.querySelector('#dp-t-notes')?.addEventListener('input',e=>{try{localStorage.setItem('dp_reborn2_teacher_notes_'+state.teacherId,e.target.value)}catch{const msg=root.querySelector('#dp-t-notes-status');if(msg)msg.textContent='Не вдалося зберегти нотатку: перевір пам’ять пристрою'}});
 }
 function drawTeachers(q){const box=root.querySelector('#dp-t-results');if(!box)return;const query=String(q||'').toLocaleLowerCase('uk').trim().replace(/^\\*/,'');if(state.teacherId&&!query){box.innerHTML='<p>Обрано: <b>'+esc(state.name)+'</b></p>';return}if(query.length<2){box.innerHTML='';return}const matches=allTeachers().filter(t=>t.name.toLocaleLowerCase('uk').replace(/^\\*/,'').includes(query)).slice(0,35);box.innerHTML=matches.map(t=>'<button type="button" class="dp-t-btn dp-t-outline" data-teacher-id="'+esc(t.id)+'"><span>'+esc(t.name.replace(/^\\*/,''))+'<small style="display:block">'+esc(t.chair||'')+'</small></span><span>Обрати →</span></button>').join('')||'<p>Викладача не знайдено.</p>';box.querySelectorAll('[data-teacher-id]').forEach(b=>b.onclick=()=>{const t=allTeachers().find(t=>String(t.id)===b.dataset.teacherId);if(!t)return;state.teacherId=String(t.id);state.name=t.name.replace(/^\\*/,'');save();render();refresh()})}
 function shift(n){const d=new Date(state.date+'T12:00:00');d.setDate(d.getDate()+n);state.date=iso(d);render()}
