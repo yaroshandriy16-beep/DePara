@@ -1,0 +1,26 @@
+# ДеПара? — карта репозиторію (2026-10-21)
+
+## Активні частини
+- `index.html`: головна сторінка GitHub Pages; використовує файли з `reborn-preview/` та `production-v49/`, `production-v50/`.
+- `reborn-preview/index.html`: тестова сторінка. Обидві сторінки посилаються на спільні файли, тому не можна масово видаляти старі назви лише за номером версії.
+- `cloudflare/production/`: код основного Telegram Worker; реліз тільки через `.github/depara-production-release.txt`.
+- `data/groups/`, `data/teachers/`, `data/campus/`: актуальні та історичні дані університету.
+- `parser.py`, `scripts/`, `.github/workflows/update-*.yml`, `sync-teachers.yml`: регулярне оновлення даних.
+
+## Архівні / експериментальні частини
+- `preview-r2-silent-share-20261021`: відхилений експеримент із R2; PR #5 закритий без злиття.
+- `reborn-preview/`: містить численні історичні файли `app-reborn*.js`, `schedule-v*.js`, `style-reborn*.css`. Видаляти лише після перевірки посилань у двох HTML-сторінках, тестах і JavaScript.
+- Резервні гілки `backup-*`: залишені для відновлення; не впливають на опублікований сайт.
+
+## Зроблене прибирання
+1. Повернено стабільний Telegram image-sharing JavaScript у тестову сторінку.
+2. Оновлено cache-busting URL для тестової сторінки.
+3. Із ручного preview deployment прибрано R2 bucket creation/verification та автоматичний запуск; checkout повернено до `cloudflare-worker-setup`.
+4. PR #5 закрито без злиття.
+5. Робочі дані та production Worker не видалялися.
+
+## Правила наступних змін
+- Не видаляти `data/` автоматично: багато файлів використовуються для розкладу, викладачів та вільних аудиторій.
+- Не зливати тестовий код у production Worker без тестування.
+- Перш ніж видалити застарілий JS/CSS, перевірити всі імпорти/посилання, у тому числі в `index.html` і `reborn-preview/index.html`.
+- Не вмикати R2 знову без окремого рішення про оплату.
