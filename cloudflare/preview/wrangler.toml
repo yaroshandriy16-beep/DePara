@@ -1,0 +1,9 @@
+name = "depara-api-preview"
+main = "worker.js"
+compatibility_date = "2026-10-20"
+workers_dev = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "depara-preview-db"
+database_id = "c1602af7-3219-4d14-87af-8515c40193be"
