@@ -1,0 +1,40 @@
+name: Deploy DePara API Preview (manual)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: depara-api-preview-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy-preview:
+    runs-on: ubuntu-latest
+    environment: depara-preview
+    steps:
+      - name: Checkout selected branch
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Validate preview Worker and web app syntax
+        run: |
+          node --input-type=module --check < cloudflare/preview/worker.js
+          node --check reborn-preview/app.js
+
+      - name: Ensure only preview Worker is targeted
+        run: |
+          grep -q 'name = "depara-api-preview"' cloudflare/preview/wrangler.toml
+          grep -q 'database_name = "depara-preview-db"' cloudflare/preview/wrangler.toml
+          grep -q 'database_id = "c1602af7-3219-4d14-87af-8515c40193be"' cloudflare/preview/wrangler.toml
+
+      - name: Deploy test Worker only
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: '4'
+          command: deploy --config cloudflare/preview/wrangler.toml
