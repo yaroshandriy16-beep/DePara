@@ -15,7 +15,7 @@ let y=288;for(const day of days){rounded(ctx,38,y,W-76,64,14,'#244734');ctx.fill
 ctx.fillStyle='#8caf9a';ctx.font='21px system-ui';ctx.fillText('ДеПара? • ВНАУ',48,height-42);
 return new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(Error('Не вдалося створити зображення')),'image/png'))}
 let url=null;async function show(){try{const btn=screen.querySelector('#dp40-share');if(btn)btn.disabled=true;currentBlob=await make();if(url)URL.revokeObjectURL(url);url=URL.createObjectURL(currentBlob);dialog.querySelector('img').src=url;dialog.querySelector('#dp40-save').href=url;dialog.showModal()}catch(e){alert(e.message||'Помилка створення розкладу')}finally{const btn=screen.querySelector('#dp40-share');if(btn)btn.disabled=false}}
-const SHARE_API='https://depara-api-preview.yaroshandriy16.workers.dev';
+const SHARE_API=location.pathname.includes('/reborn-preview/')?'https://depara-api-preview.yaroshandriy16.workers.dev':'https://depara-api.yaroshandriy16.workers.dev';
 dialog.querySelector('#dp40-bot').onclick=async()=>{
  const button=dialog.querySelector('#dp40-bot'),tg=window.Telegram?.WebApp;
  if(!tg?.initData||typeof tg.shareMessage!=='function'){alert('Відкрий ДеПара? у тестовому Telegram-боті, щоб надіслати розклад від імені бота. Картинкою можна поділитися тут.');return}
