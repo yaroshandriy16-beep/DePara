@@ -20,7 +20,7 @@ var cors = {
 
 };
 
-var json = /* @__PURE__ */* __name((data, status = 200) => new Response(JSON.stringify(data), {
+var json = /* @__PURE__ */ __name((data, status = 200) => new Response(JSON.stringify(data), {
 
   status,
 
