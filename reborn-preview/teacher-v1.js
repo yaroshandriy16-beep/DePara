@@ -1,6 +1,6 @@
 (()=>{'use strict';
 const KEY='dp_reborn2_teacher_v1',roleKey='dp_reborn2_role',root=document.createElement('section');
-root.id='dp-teacher-app';root.hidden=true;root.setAttribute('aria-label','Кабінет викладача');document.querySelector('.app')?.append(root);
+root.id='dp-teacher-app';root.hidden=true;root.setAttribute('aria-label','Кабінет викладача');document.body.append(root);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const iso=d=>{const x=new Date(d);return [x.getFullYear(),String(x.getMonth()+1).padStart(2,'0'),String(x.getDate()).padStart(2,'0')].join('-')};
 const read=()=>{try{return JSON.parse(localStorage.getItem(KEY))||{}}catch{return {}}};
@@ -8,7 +8,7 @@ const state={name:read().name||'',teacherId:read().teacherId||'',date:iso(new Da
 const save=()=>localStorage.setItem(KEY,JSON.stringify({name:state.name,teacherId:state.teacherId}));
 let timer=0,run=0;
 const allTeachers=()=>Array.from(new Map(state.catalog.map(t=>[String(t.id),t])).values()).sort((a,b)=>a.name.localeCompare(b.name,'uk'));
-function visible(){const on=localStorage.getItem(roleKey)==='teacher';document.body.classList.toggle('dp-teacher-active',on);root.hidden=!on;if(on)render()}
+function visible(force=false){const on=force||localStorage.getItem(roleKey)==='teacher';document.body.classList.toggle('dp-teacher-active',on);root.hidden=!on;if(on)render()}
 function lessonCard(l){return '<article class="dp-t-lesson"><span class="dp-t-time">'+esc(l.start||'—')+'<small>'+esc(l.end||'')+'</small></span><div><strong>'+esc(l.subject||'Заняття')+'</strong><small>'+esc(l.groupName)+' · '+esc(l.type||'Пара')+'</small><small>'+esc(l.room||'Аудиторія не вказана')+'</small></div></article>'}
 function render(){if(root.hidden)return;const today=state.date,day=new Date(today+'T12:00:00'),items=state.lessons.filter(l=>state.view==='week'?(()=>{const d=new Date(today+'T12:00:00');d.setDate(d.getDate()-(d.getDay()+6)%7);const e=new Date(d);e.setDate(e.getDate()+7);return l.date>=iso(d)&&l.date<iso(e)})():l.date===today);const byDay=Object.groupBy?Object.groupBy(items,l=>l.date):items.reduce((a,l)=>((a[l.date]??=[]).push(l),a),{});
 root.innerHTML='<div class="dp-t-head"><span class="dp-t-kicker">ДеПара? · ВИКЛАДАЧ</span><h1>Мій викладацький простір<span style="color:#d9bc72">.</span></h1><p>Офіційний персональний розклад викладача ВНАУ</p></div>'+
@@ -31,7 +31,7 @@ function drawTeachers(q){const box=root.querySelector('#dp-t-results');if(!box)r
 function shift(n){const d=new Date(state.date+'T12:00:00');d.setDate(d.getDate()+n);state.date=iso(d);render()}
 async function catalog(){try{const r=await fetch('../data/teachers/catalog.json');if(!r.ok)throw Error();state.catalog=(await r.json()).teachers||[]}catch{state.error='Не вдалося завантажити каталог викладачів.'}render()}
 async function refresh(){const id=++run;if(!state.teacherId){state.lessons=[];render();return}state.loading=true;state.error='';render();try{const r=await fetch('../data/teachers/schedules/'+encodeURIComponent(state.teacherId)+'.json?t='+Date.now());if(!r.ok)throw Error('HTTP '+r.status);const data=await r.json();if(id!==run)return;state.lessons=(data.lessons||[]).map(l=>({...l,groupName:(l.details||[]).filter(x=>!/^ауд\\./i.test(x)&&!/^Додано:/i.test(x)).join(' · ')||'Група не вказана',room:(l.details||[]).find(x=>/^ауд\\./i.test(x))||'',type:l.subject?.match(/\\[([^\\]]+)\\]/)?.[1]||'Пара'})).sort((a,b)=>(a.date+' '+a.start).localeCompare(b.date+' '+b.start));state.error=''}catch{if(id!==run)return;state.error='Розклад цього викладача поки недоступний у базі.';state.lessons=[]}state.loading=false;render()}
-window.addEventListener('depara:teacher-open',()=>{const chosen=read();state.teacherId=chosen.teacherId||'';state.name=chosen.name||'';visible();catalog();refresh()});
+window.addEventListener('depara:teacher-open',e=>{const chosen=read();state.teacherId=String(e.detail?.id||chosen.teacherId||'');state.name=chosen.name||'';localStorage.setItem(roleKey,'teacher');visible(true);catalog();refresh()});
 document.addEventListener('click',e=>{if(e.target.closest('[data-dp-role="teacher"]'))setTimeout(()=>{visible();refresh()},100);if(e.target.id==='dp-teacher-enter')setTimeout(()=>{visible();refresh()},100);if(e.target.closest('[data-dp-role="student"]'))setTimeout(visible,100);if(e.target.id==='dp-success-enter')setTimeout(visible,100)});
 const ob=document.querySelector('#dp-onboarding');if(ob)new MutationObserver(()=>{const on=localStorage.getItem(roleKey)==='teacher';if(root.hidden===on)visible()}).observe(ob,{attributes:true,attributeFilter:['style','class','hidden']});
 setTimeout(()=>{visible();catalog();if(localStorage.getItem(roleKey)==='teacher')refresh()},1250);
