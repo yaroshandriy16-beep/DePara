@@ -305,3 +305,31 @@ test('REBORN 3.1: student task survives reload with deadline', async ({ page }) 
  await expect(page.locator('#dp31-list')).toContainText('Перевірка збереження');
  await expect(page.locator('#dp31-list')).toContainText('2026-11-10');
 });
+
+test('REBORN 3.1: teacher note persists after reload', async ({ page }) => {
+ await page.locator('[data-dp-role="teacher"]').click();
+ await page.locator('#dp-teacher-search').fill('Шту');
+ await page.locator('#dp-teacher-search-results button').first().click();
+ await page.locator('#dp-teacher-enter').click();
+ await page.locator('#dp-teacher-app [data-t-page="study"]').click();
+ await page.locator('#dp-t-notes').fill('План викладача 3.1');
+ await page.reload();
+ await expect(page.locator('#dp-teacher-app')).toBeVisible({timeout:15000});
+ await page.locator('#dp-teacher-app [data-t-page="study"]').click();
+ await expect(page.locator('#dp-t-notes')).toHaveValue('План викладача 3.1');
+});
+test('REBORN 3.1: profile settings remain usable after navigating across tabs', async ({ page }) => {
+ await page.locator('[data-dp-role="student"]').click();
+ await page.locator('#dp-group-search').fill('ЕІ-23-1');
+ await page.locator('#dp-search-results button').first().click();
+ await page.locator('#dp-setup-done').click();
+ await page.locator('#dp-success-enter').click();
+ await page.locator('#nav button[data-page="profile"]').click();
+ await page.locator('#rb43-profile-tabs [data-rb43-tab="settings"]').click();
+ await expect(page.locator('#dp-v50-settings')).toBeVisible();
+ await page.locator('#nav button[data-page="schedule"]').click();
+ await expect(page.locator('#ui23-schedule-date')).toBeVisible();
+ await page.locator('#nav button[data-page="profile"]').click();
+ await page.locator('#rb43-profile-tabs [data-rb43-tab="settings"]').click();
+ await expect(page.locator('#dp-v50-settings')).toBeVisible();
+});
