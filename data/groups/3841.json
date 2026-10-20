@@ -6,7 +6,7 @@
     "group": "Маш-24-1",
     "groupId": "3841",
     "source": "http://81.30.162.30/time-table/group?type=0",
-    "updatedAt": "2026-10-20T02:49:42.280956+00:00"
+    "updatedAt": "2026-10-20T08:52:48.592871+00:00"
   },
   "lessons": [
     {
@@ -51,7 +51,7 @@
       "end": "09:20",
       "subject": "Foundations of CAD",
       "type": "Лк",
-      "room": "ауд. 3211",
+      "room": "ауд. 2317",
       "teacher": "Шаргородський Сергій Анатолійович"
     },
     {
