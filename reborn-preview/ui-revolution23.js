@@ -51,7 +51,7 @@ function schedule(){
  const prev=document.createElement('button'),next=document.createElement('button'),label=document.createElement('span');
  prev.type=next.type='button';prev.textContent='← День';next.textContent='День →';label.className='ui23-date';
  const d=new Date(date+'T12:00:00');label.textContent=d.toLocaleDateString('uk-UA',{weekday:'short',day:'numeric',month:'long'});
- const move=offset=>{const d=new Date(date+'T12:00:00');d.setDate(d.getDate()+offset);const target=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');strip.querySelector('[data-day="'+target+'"]')?.click()};
+ const move=offset=>{const selectedDate=strip.querySelector('button.active')?.dataset.day||date;const d=new Date(selectedDate+'T12:00:00');d.setDate(d.getDate()+offset);const target=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');strip.querySelector('[data-day="'+target+'"]')?.click()};
  const first=buttons[0]?.dataset.day,last=buttons[buttons.length-1]?.dataset.day;
  prev.disabled=date===first;next.disabled=date===last;
  prev.addEventListener('click',()=>move(-1));next.addEventListener('click',()=>move(1));
