@@ -271,3 +271,20 @@ test('REBORN 3.0: schedule date controls update and retain mobile accessibility'
   }
   await expect(page.locator('#ui23-schedule-date')).toBeVisible();
 });
+
+test('REBORN 3.1: student tasks can be added, completed and removed', async ({ page }) => {
+ await page.locator('[data-dp-role="student"]').click();
+ await page.locator('#dp-group-search').fill('ЕІ-23-1');
+ await page.locator('#dp-search-results button').first().click();
+ await page.locator('#dp-setup-done').click();
+ await page.locator('#dp-success-enter').click();
+ await page.locator('#nav button[data-page="study"]').click();
+ await expect(page.locator('#dp31-planner')).toBeVisible();
+ await page.locator('#dp31-title').fill('Лабораторна 3.1');
+ await page.locator('#dp31-form button').click();
+ await expect(page.locator('#dp31-list')).toContainText('Лабораторна 3.1');
+ await page.locator('#dp31-list [data-action="done"]').first().click();
+ await expect(page.locator('#dp31-list .is-done')).toHaveCount(1);
+ await page.locator('#dp31-list [data-action="remove"]').first().click();
+ await expect(page.locator('#dp31-list')).not.toContainText('Лабораторна 3.1');
+});
