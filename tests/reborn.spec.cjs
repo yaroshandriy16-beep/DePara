@@ -241,3 +241,33 @@ test('UI 2.3: schedule date arrows and profile settings remain usable on 320px s
   const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth+2);
   expect(overflow,'No horizontal overflow on 320px iPhone').toBe(false);
 });
+
+test('REBORN 3.0: home displays compact connection status and accessible daily panel', async ({ page }) => {
+  await page.locator('[data-dp-role="student"]').click();
+  await page.locator('#dp-group-search').fill('ЕІ-23-1');
+  await page.locator('#dp-search-results button').first().click();
+  await page.locator('#dp-setup-done').click();
+  await page.locator('#dp-success-enter').click();
+  await page.locator('#nav button[data-page="today"]').click();
+  await expect(page.locator('#dp3-status')).toBeVisible();
+  await expect(page.locator('#ui23-day-panel')).toBeVisible();
+  await expect(page.locator('#dp3-status .dp3-status-text')).toContainText('Розклад');
+});
+test('REBORN 3.0: schedule date controls update and retain mobile accessibility', async ({ page }) => {
+  await page.locator('[data-dp-role="student"]').click();
+  await page.locator('#dp-group-search').fill('ЕІ-23-1');
+  await page.locator('#dp-search-results button').first().click();
+  await page.locator('#dp-setup-done').click();
+  await page.locator('#dp-success-enter').click();
+  await page.locator('#nav button[data-page="schedule"]').click();
+  await expect(page.locator('#ui23-schedule-date')).toBeVisible();
+  const active=page.locator('.daystrip button.active');
+  await expect(active).toHaveAttribute('aria-pressed','true');
+  const next=page.locator('#ui23-schedule-date button').last();
+  if(await next.isEnabled()){
+    const before=await page.locator('#ui23-schedule-date .ui23-date').textContent();
+    await next.click();
+    await expect(page.locator('#ui23-schedule-date .ui23-date')).not.toHaveText(before);
+  }
+  await expect(page.locator('#ui23-schedule-date')).toBeVisible();
+});
