@@ -1042,6 +1042,7 @@ async function prepareScheduleShare(request, env) {
   const message = "📅 " + (title || "Розклад пар") + "\n\n" + schedule + "\n\nДеПара? REBORN";
   // Upload the image directly to R2: no temporary Telegram DM or notification.
   let photoUrl = null;
+  let thumbnailUrl = null;
   let photoError = typeof body?.imageBase64 === "string" ? "IMAGE_UPLOAD_FAILED" : "IMAGE_NOT_RECEIVED";
   if (typeof body?.imageBase64 === "string" && body.imageBase64.length <= 3800000 && /^[A-Za-z0-9+/]+={0,2}$/.test(body.imageBase64)) {
     try {
@@ -1051,7 +1052,19 @@ async function prepareScheduleShare(request, env) {
         const key = "shared/" + crypto.randomUUID() + ".jpg";
         await env.SHARE_IMAGES.put(key, bytes, { httpMetadata: { contentType: "image/jpeg" }, customMetadata: { expiresAt: String(Date.now() + 86400000) } });
         photoUrl = new URL(request.url).origin + "/api/share/image/" + key.slice(7);
-        photoError = null;
+        if (typeof body?.thumbnailBase64 === "string" && body.thumbnailBase64.length <= 280000 && /^[A-Za-z0-9+/]+={0,2}$/.test(body.thumbnailBase64)) {
+          const thumbBinary = atob(body.thumbnailBase64);
+          if (thumbBinary.length <= 200000 && thumbBinary.charCodeAt(0) === 255 && thumbBinary.charCodeAt(1) === 216) {
+            const thumbKey = "shared/" + crypto.randomUUID() + ".jpg";
+            await env.SHARE_IMAGES.put(thumbKey, Uint8Array.from(thumbBinary, ch => ch.charCodeAt(0)), {
+              httpMetadata: { contentType: "image/jpeg" },
+              customMetadata: { expiresAt: String(Date.now() + 86400000) }
+            });
+            thumbnailUrl = new URL(request.url).origin + "/api/share/image/" + thumbKey.slice(7);
+          }
+        }
+        photoError = thumbnailUrl ? null : "THUMBNAIL_NOT_RECEIVED";
+        if (!thumbnailUrl) photoUrl = null;
       } else photoError = env.SHARE_IMAGES ? "IMAGE_TOO_LARGE" : "R2_NOT_CONFIGURED";
     } catch (err) { photoError = "R2_UPLOAD_FAILED"; console.warn("Share R2 upload failed", String(err)); }
   }
@@ -1063,6 +1076,7 @@ async function prepareScheduleShare(request, env) {
     type: "photo",
     id: "depara-photo-" + crypto.randomUUID(),
     photo_url: photoUrl,
+    thumbnail_url: thumbnailUrl,
     caption: "",
     reply_markup: buttons
   } : {
