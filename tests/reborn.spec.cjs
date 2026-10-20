@@ -70,8 +70,10 @@ test('Teacher: notes persist after reload and today count matches visible lesson
   await expect(teacher.locator('.dp-t-stats strong').first()).toHaveText(
     String(await teacher.locator('.dp-t-list .dp-t-lesson').count())
   );
+  await expect(teacher.locator('.dp-t-card').filter({hasText:'Завантажуємо розклад'})).toHaveCount(0);
   await teacher.locator('.dp-t-nav [data-t-page="study"]').click();
   await teacher.locator('#dp-t-notes').fill('Audit 2.0: збереження нотатки');
+  await expect.poll(async()=>page.evaluate(()=>{const id=JSON.parse(localStorage.getItem('dp_reborn2_teacher_v1')||'{}').teacherId;return localStorage.getItem('dp_reborn2_teacher_notes_'+id)})).toBe('Audit 2.0: збереження нотатки');
   await page.reload();
   await expect(teacher).toBeVisible({timeout:15000});
   await teacher.locator('.dp-t-nav [data-t-page="study"]').click();
