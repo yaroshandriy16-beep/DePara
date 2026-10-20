@@ -212,7 +212,7 @@ async function profile(env, user) {
 
 __name(profile, "profile");
 
-var authErrors = /* @__PURE__ */* new Set([
+var authErrors = /* @__PURE__ */ new Set([
 
   "AUTH_REQUIRED",
 
