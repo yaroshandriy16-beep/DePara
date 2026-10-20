@@ -1040,15 +1040,45 @@ async function prepareScheduleShare(request, env) {
   if (!schedule || schedule.length > 3200) return bad("INVALID_SCHEDULE");
   const title = typeof body?.title === "string" ? body.title.trim().slice(0, 100) : "Розклад пар";
   const message = "📅 " + (title || "Розклад пар") + "\n\n" + schedule + "\n\nДеПара? REBORN";
-  const result = {
+  let photoFileId = null;
+  if (typeof body?.imageBase64 === "string" && body.imageBase64.length <= 3800000 && /^[A-Za-z0-9+/]+={0,2}$/.test(body.imageBase64)) {
+    try {
+      const binary = atob(body.imageBase64);
+      if (binary.length <= 2800000) {
+        const bytes = Uint8Array.from(binary, ch => ch.charCodeAt(0));
+        const form = new FormData();
+        form.append("chat_id", String(user.id));
+        form.append("photo", new Blob([bytes], { type: "image/png" }), "depara-week.png");
+        form.append("disable_notification", "true");
+        const uploaded = await fetch("https://api.telegram.org/bot" + env.TELEGRAM_BOT_TOKEN + "/sendPhoto", { method: "POST", body: form });
+        const photoData = await uploaded.json().catch(() => null);
+        if (photoData?.ok && photoData.result?.photo?.length) {
+          photoFileId = photoData.result.photo[photoData.result.photo.length - 1].file_id;
+          const messageId = photoData.result.message_id;
+          if (messageId) await fetch("https://api.telegram.org/bot" + env.TELEGRAM_BOT_TOKEN + "/deleteMessage", {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ chat_id: user.id, message_id: messageId })
+          }).catch(() => null);
+        } else console.warn("Share photo upload unavailable", photoData?.error_code);
+      }
+    } catch (err) { console.warn("Share photo upload failed", String(err)); }
+  }
+  const buttons = { inline_keyboard: [[{
+    text: "Відкрити ДеПара?",
+    url: "https://yaroshandriy16-beep.github.io/DePara/reborn-preview/"
+  }]] };
+  const result = photoFileId ? {
+    type: "photo",
+    id: "depara-photo-" + crypto.randomUUID(),
+    photo_file_id: photoFileId,
+    caption: "📅 " + (title || "Розклад пар") + "\\nДеПара?",
+    reply_markup: buttons
+  } : {
     type: "article",
     id: "depara-share-" + crypto.randomUUID(),
     title: "Поділитися розкладом",
     input_message_content: { message_text: message },
-    reply_markup: { inline_keyboard: [[{
-      text: "Відкрити ДеПара?",
-      url: "https://yaroshandriy16-beep.github.io/DePara/reborn-preview/"
-    }]] }
+    reply_markup: buttons
   };
   const response = await fetch("https://api.telegram.org/bot" + env.TELEGRAM_BOT_TOKEN + "/savePreparedInlineMessage", {
     method: "POST",
