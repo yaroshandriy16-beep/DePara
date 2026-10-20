@@ -5,23 +5,10 @@
     "chairId": "6",
     "chair": "Лісового та садово-паркового господарства"
   },
-  "fetchedAt": "2026-10-19T15:54:50.424750+00:00",
-  "rangeStart": "2026-10-19",
-  "rangeEnd": "2026-11-23",
+  "fetchedAt": "2026-10-20T15:51:19.588670+00:00",
+  "rangeStart": "2026-10-20",
+  "rangeEnd": "2026-11-24",
   "lessons": [
-    {
-      "date": "2026-10-19",
-      "pair": 2,
-      "start": "09:30",
-      "end": "10:50",
-      "subject": "Selection and reproduction of main forest species[Лк]",
-      "details": [
-        "ауд. 2401",
-        "ЛГ -25 -маг",
-        "Додано:  05.08.2026"
-      ],
-      "short": "SandRMFS [Лк] ауд. 2401 ЛГ -25 -маг"
-    },
     {
       "date": "2026-10-26",
       "pair": 2,
@@ -36,17 +23,17 @@
       "short": "FM [Пз] ауд. 2531 ЛГ-24-1"
     },
     {
-      "date": "2026-10-19",
-      "pair": 3,
-      "start": "11:30",
-      "end": "12:50",
-      "subject": "Forest Mensuration[Лк]",
+      "date": "2026-11-02",
+      "pair": 2,
+      "start": "09:30",
+      "end": "10:50",
+      "subject": "Forest Mensuration[Екз]",
       "details": [
-        "ауд. 2531",
+        "ауд. 2524",
         "ЛГ-24-1",
-        "Додано:  28.07.2026"
+        "Додано:  20.10.2026"
       ],
-      "short": "FM [Лк] ауд. 2531 ЛГ-24-1"
+      "short": "FM [Екз] ауд. 2524 ЛГ-24-1"
     },
     {
       "date": "2026-10-20",
@@ -73,32 +60,6 @@
         "Додано:  05.08.2026"
       ],
       "short": "SandRMFS [Лк] ауд. 2404 ЛГ -25 -маг"
-    },
-    {
-      "date": "2026-11-10",
-      "pair": 3,
-      "start": "11:30",
-      "end": "12:50",
-      "subject": "Selection and reproduction of main forest species[Пз]",
-      "details": [
-        "ауд. 2402",
-        "ЛГ -25 -маг",
-        "Додано:  05.08.2026"
-      ],
-      "short": "SandRMFS [Пз] ауд. 2402 ЛГ -25 -маг"
-    },
-    {
-      "date": "2026-11-03",
-      "pair": 4,
-      "start": "13:10",
-      "end": "14:30",
-      "subject": "Selection and reproduction of main forest species[Лк]",
-      "details": [
-        "ауд. 2519",
-        "ЛГ -25 -маг",
-        "Додано:  05.08.2026"
-      ],
-      "short": "SandRMFS [Лк] ауд. 2519 ЛГ -25 -маг"
     },
     {
       "date": "2026-10-21",
@@ -140,6 +101,32 @@
       "short": "SandRMFS [Пз] ауд. 2515 ЛГ -25 -маг"
     },
     {
+      "date": "2026-10-21",
+      "pair": 4,
+      "start": "13:10",
+      "end": "14:30",
+      "subject": "Forest Mensuration[Пз]",
+      "details": [
+        "ауд. 2002",
+        "ЛГ-24-1",
+        "Додано:  20.10.2026"
+      ],
+      "short": "FM [Пз] ауд. 2002 ЛГ-24-1"
+    },
+    {
+      "date": "2026-10-28",
+      "pair": 4,
+      "start": "13:10",
+      "end": "14:30",
+      "subject": "Selection and reproduction of main forest species[Пз]",
+      "details": [
+        "ауд. 2519",
+        "ЛГ -25 -маг",
+        "Додано:  20.10.2026"
+      ],
+      "short": "SandRMFS [Пз] ауд. 2519 ЛГ -25 -маг"
+    },
+    {
       "date": "2026-10-29",
       "pair": 2,
       "start": "09:30",
@@ -153,17 +140,30 @@
       "short": "FM [Пз] ауд. 2515 ЛГ-24-1"
     },
     {
-      "date": "2026-11-06",
-      "pair": 3,
-      "start": "11:30",
-      "end": "12:50",
+      "date": "2026-10-29",
+      "pair": 5,
+      "start": "14:40",
+      "end": "16:00",
       "subject": "Selection and reproduction of main forest species[Пз]",
       "details": [
-        "ауд. 2519",
+        "ауд. 2302",
         "ЛГ -25 -маг",
-        "Додано:  05.08.2026"
+        "Додано:  20.10.2026"
       ],
-      "short": "SandRMFS [Пз] ауд. 2519 ЛГ -25 -маг"
+      "short": "SandRMFS [Пз] ауд. 2302 ЛГ -25 -маг"
+    },
+    {
+      "date": "2026-10-23",
+      "pair": 1,
+      "start": "08:00",
+      "end": "09:20",
+      "subject": "Selection and reproduction of main forest species[Лк]",
+      "details": [
+        "ауд. 2120",
+        "ЛГ -25 -маг",
+        "Додано:  20.10.2026"
+      ],
+      "short": "SandRMFS [Лк] ауд. 2120 ЛГ -25 -маг"
     }
   ]
 }

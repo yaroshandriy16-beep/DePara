@@ -5,23 +5,10 @@
     "chairId": "4",
     "chair": "Рослинництва та садівництва"
   },
-  "fetchedAt": "2026-10-19T15:55:27.175472+00:00",
-  "rangeStart": "2026-10-19",
-  "rangeEnd": "2026-11-23",
+  "fetchedAt": "2026-10-20T15:51:55.798446+00:00",
+  "rangeStart": "2026-10-20",
+  "rangeEnd": "2026-11-24",
   "lessons": [
-    {
-      "date": "2026-11-09",
-      "pair": 3,
-      "start": "11:30",
-      "end": "12:50",
-      "subject": "Computer technologies for designing landscape objects[Пз]",
-      "details": [
-        "ауд. 2401",
-        "СПГ-25-1 маг.",
-        "Додано:  05.08.2026"
-      ],
-      "short": "CTFDLO [Пз] ауд. 2401 СПГ-25-1 маг."
-    },
     {
       "date": "2026-10-26",
       "pair": 5,
@@ -49,30 +36,17 @@
       "short": "CTFDLO [Пз] ауд. 2404 СПГ-25-1 маг."
     },
     {
-      "date": "2026-11-03",
-      "pair": 3,
-      "start": "11:30",
-      "end": "12:50",
-      "subject": "Computer technologies for designing landscape objects[Пз]",
-      "details": [
-        "ауд. 2519",
-        "СПГ-25-1 маг.",
-        "Додано:  05.08.2026"
-      ],
-      "short": "CTFDLO [Пз] ауд. 2519 СПГ-25-1 маг."
-    },
-    {
       "date": "2026-10-27",
       "pair": 4,
       "start": "13:10",
       "end": "14:30",
       "subject": "Computer technologies for designing landscape objects[Лк]",
       "details": [
-        "ауд. 2401",
+        "ауд. 2501",
         "СПГ-25-1 маг.",
-        "Додано:  05.08.2026"
+        "Додано:  20.10.2026"
       ],
-      "short": "CTFDLO [Лк] ауд. 2401 СПГ-25-1 маг."
+      "short": "CTFDLO [Лк] ауд. 2501 СПГ-25-1 маг."
     },
     {
       "date": "2026-10-22",
@@ -112,6 +86,32 @@
         "Додано:  28.07.2026"
       ],
       "short": "ЛА [Лк] ауд. 2519 СПГ-2024-1"
+    },
+    {
+      "date": "2026-10-23",
+      "pair": 3,
+      "start": "11:30",
+      "end": "12:50",
+      "subject": "Computer technologies for designing landscape objects[Пз]",
+      "details": [
+        "ауд. 2413",
+        "СПГ-25-1 маг.",
+        "Додано:  20.10.2026"
+      ],
+      "short": "CTFDLO [Пз] ауд. 2413 СПГ-25-1 маг."
+    },
+    {
+      "date": "2026-10-23",
+      "pair": 5,
+      "start": "14:40",
+      "end": "16:00",
+      "subject": "Computer technologies for designing landscape objects[Пз]",
+      "details": [
+        "ауд. 3418к",
+        "СПГ-25-1 маг.",
+        "Додано:  20.10.2026"
+      ],
+      "short": "CTFDLO [Пз] ауд. 3418к СПГ-25-1 маг."
     }
   ]
 }
