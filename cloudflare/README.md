@@ -13,7 +13,7 @@
 
 ## Deployment blockers
 
-1. Import and review the **complete current deployed Worker source** as `preview/worker.js` and `production/worker.js`; the source files are not committed yet.
+1. Review the uploaded source snapshots `preview/worker.snapshot.js` and `production/worker.snapshot.js` against the live deployed Workers. These snapshots were reconstructed from Markdown copies and **must not be deployed as-is**. After parity review, create validated `worker.js` files for each environment.
 2. The available preview copy is a **bundled output** (`worker_default as default`, `sourceMappingURL`); validate parity with the actual deployed version, not merely JS syntax.
 3. Confirm all existing routes, especially social and Messenger 2.0 paths, and preserve existing functionality.
 4. Verify the existing `TELEGRAM_BOT_TOKEN` secret remains bound to the correct bot in each environment. Never put bot tokens into Git.
@@ -35,6 +35,6 @@ Production uses `cd cloudflare/production` and requires separate explicit approv
 ## Status
 
 - GitHub configuration staged on `cloudflare-worker-setup`.
-- No Worker code imported to this branch yet.
+- Source snapshots imported into this branch for audit; runnable `worker.js` not yet staged.
 - No Cloudflare Git integration enabled.
 - No Workers deployed or modified.
