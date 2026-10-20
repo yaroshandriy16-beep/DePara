@@ -353,3 +353,16 @@ test('REBORN MEGA: home task summary opens study and filters completed tasks', a
  await page.locator('#dp31-home').click();
  await expect(page.locator('#dp31-planner')).toBeVisible();
 });
+
+test('REBORN UX audit: no profile-style widgets inside study or duplicate appearance in profile', async ({ page }) => {
+ await page.locator('[data-dp-role="student"]').click();
+ await page.locator('#dp-group-search').fill('ЕІ-23-1');
+ await page.locator('#dp-search-results button').first().click();
+ await page.locator('#dp-setup-done').click();
+ await page.locator('#dp-success-enter').click();
+ await page.locator('#nav button[data-page="study"]').click();
+ await expect(page.locator('#screen > .card').filter({has:page.locator('h2', {hasText:/^(Мій стиль|Мій профіль|Твій профіль)$/})})).toHaveCount(0);
+ await page.locator('#nav button[data-page="profile"]').click();
+ await expect(page.locator('#rb40-slot .rb40-themes')).toHaveCount(1);
+ await expect(page.locator('#screen > .card').filter({has:page.locator('h2', {hasText:/^Оформлення$/})})).toHaveCount(0);
+});
