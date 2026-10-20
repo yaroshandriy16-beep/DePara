@@ -1,0 +1,8 @@
+/* REBORN 3.1 preview-only */
+#dp31-planner{padding:16px;margin-bottom:16px;border-radius:18px;display:grid;gap:12px;min-width:0}
+#dp31-planner h2{margin:0}#dp31-planner p{margin:0;font-size:12px;opacity:.7}
+#dp31-form{display:grid;gap:8px}#dp31-form input{box-sizing:border-box;min-width:0;width:100%;min-height:44px;border-radius:10px;padding:10px;background:transparent;color:inherit;border:1px solid currentColor}
+#dp31-form button{min-height:44px;border:0;border-radius:10px;background:var(--rb43-accent,#e9c478);color:var(--rb43-ink,#071b19);font-weight:700}
+.dp31-task{display:flex;gap:8px;align-items:center;border-top:1px solid rgba(255,255,255,.15);padding:8px 0;min-width:0}.dp31-task span{flex:1;min-width:0;overflow-wrap:anywhere}.dp31-task button{min-width:44px;min-height:44px;border:0;background:transparent;color:inherit;font-size:22px}
+#dp-teacher-app .dp-t-card,#dp-teacher-app .dp-t-hero{overflow-wrap:anywhere}
+#screen .daystrip{scrollbar-width:none}#screen .daystrip::-webkit-scrollbar{display:none}
