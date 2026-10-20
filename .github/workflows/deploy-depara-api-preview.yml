@@ -2,6 +2,13 @@ name: Deploy DePara API Preview (manual)
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - preview-r2-silent-share-20261021
+    paths:
+      - '.github/workflows/deploy-depara-api-preview.yml'
+      - 'cloudflare/preview/**'
+      - 'reborn-preview/schedule-share-v43.js'
 
 permissions:
   contents: read
