@@ -3,7 +3,7 @@ const screen=document.querySelector('#screen');if(!screen)return;
 const pad=n=>String(n).padStart(2,'0'),iso=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()),add=(d,n)=>new Date(d.getFullYear(),d.getMonth(),d.getDate()+n);
 const fmt=(d,o)=>d.toLocaleDateString('uk-UA',o),group=()=>{try{return JSON.parse(localStorage.getItem('dp_reborn2_group'))||'3641'}catch{return '3641'}};
 const css=document.createElement('style');css.textContent='#dp40-share{margin-top:12px;width:100%;border:1px solid rgba(233,198,124,.5);border-radius:14px;padding:13px;background:rgba(233,198,124,.12);color:#f4d895;font:700 14px system-ui}#dp40-modal{border:0;background:#13231d;color:white;border-radius:22px;width:min(94vw,460px);max-height:90dvh;padding:16px;box-sizing:border-box}#dp40-modal::backdrop{background:rgba(0,0,0,.78)}#dp40-modal img{display:block;width:100%;height:auto;max-height:65dvh;object-fit:contain;border-radius:12px}#dp40-modal .dp40-actions{display:flex;gap:9px;margin-top:12px}#dp40-modal button,#dp40-modal a{border:0;border-radius:12px;background:#e9c67c;color:#14251c;padding:12px;font-weight:750;text-align:center;text-decoration:none;flex:1}#dp40-modal .dp40-close{background:#31473c;color:#fff;flex:0 0 auto}';document.head.append(css);
-const dialog=document.createElement('dialog');dialog.id='dp40-modal';dialog.innerHTML='<h3>Поділитися розкладом</h3><p style="opacity:.7;font-size:12px">Тижневий розклад у форматі картинки</p><img alt="Попередній перегляд розкладу"><div class="dp40-actions"><button id="dp40-native">Поділитися</button><a id="dp40-save" download="depara-week.png">Зберегти</a><button class="dp40-close" aria-label="Закрити">✕</button></div>';document.body.append(dialog);dialog.querySelector('.dp40-close').onclick=()=>dialog.close();dialog.addEventListener('click',e=>{if(e.target===dialog)dialog.close()});
+const dialog=document.createElement('dialog');dialog.id='dp40-modal';dialog.innerHTML='<h3>Поділитися розкладом</h3><p style="opacity:.7;font-size:12px">Тижневий розклад у форматі картинки</p><img alt="Попередній перегляд розкладу"><div class="dp40-actions"><button id="dp40-bot">Через бота</button><button id="dp40-native">Картинкою</button><a id="dp40-save" download="depara-week.png">Зберегти</a><button class="dp40-close" aria-label="Закрити">✕</button></div>';document.body.append(dialog);dialog.querySelector('.dp40-close').onclick=()=>dialog.close();dialog.addEventListener('click',e=>{if(e.target===dialog)dialog.close()});
 let currentBlob=null;
 function rounded(ctx,x,y,w,h,r,color){ctx.fillStyle=color;ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill()}
 function wrap(ctx,text,max){const words=String(text||'').split(/\s+/),out=[];let line='';for(const w of words){const next=line?line+' '+w:w;if(ctx.measureText(next).width>max&&line){out.push(line);line=w}else line=next}if(line)out.push(line);return out}
@@ -15,6 +15,25 @@ let y=288;for(const day of days){rounded(ctx,38,y,W-76,64,14,'#244734');ctx.fill
 ctx.fillStyle='#8caf9a';ctx.font='21px system-ui';ctx.fillText('ДеПара? • ВНАУ',48,height-42);
 return new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(Error('Не вдалося створити зображення')),'image/png'))}
 let url=null;async function show(){try{const btn=screen.querySelector('#dp40-share');if(btn)btn.disabled=true;currentBlob=await make();if(url)URL.revokeObjectURL(url);url=URL.createObjectURL(currentBlob);dialog.querySelector('img').src=url;dialog.querySelector('#dp40-save').href=url;dialog.showModal()}catch(e){alert(e.message||'Помилка створення розкладу')}finally{const btn=screen.querySelector('#dp40-share');if(btn)btn.disabled=false}}
+const SHARE_API='https://depara-api-preview.yaroshandriy16.workers.dev';
+dialog.querySelector('#dp40-bot').onclick=async()=>{
+ const button=dialog.querySelector('#dp40-bot'),tg=window.Telegram?.WebApp;
+ if(!tg?.initData||typeof tg.shareMessage!=='function'){alert('Відкрий ДеПара? у тестовому Telegram-боті, щоб надіслати розклад від імені бота. Картинкою можна поділитися тут.');return}
+ button.disabled=true;
+ try{
+  const p=screen.querySelector('#dp35-schedule'),chosen=p?.querySelector('.dp35-days button.selected')?.dataset.dp35Date;
+  const selected=chosen?new Date(chosen+'T12:00:00'):new Date(),monday=add(selected,-((selected.getDay()+6)%7));
+  const response=await fetch('../data/groups/'+encodeURIComponent(String(group()))+'.json');
+  if(!response.ok)throw Error('Не вдалося отримати розклад');
+  const data=await response.json(),all=Array.isArray(data.lessons)?data.lessons:[];
+  const lines=Array.from({length:7},(_,i)=>{const d=add(monday,i),ls=all.filter(l=>l.date===iso(d)).sort((a,b)=>(a.start||'').localeCompare(b.start||''));return fmt(d,{weekday:'long',day:'numeric',month:'short'})+'\n'+(ls.length?ls.map(l=>(l.start||'—')+' '+(l.subject||'Заняття')).join('\n'):'Пар немає')}).join('\n\n');
+  const title='Розклад '+String(data.group_name||data.group||group())+' · '+iso(monday);
+  if(lines.length>3200)throw Error('Розклад завеликий для текстового повідомлення. Скористайся кнопкою «Картинкою».');
+  const prepared=await fetch(SHARE_API+'/api/share/prepare',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'tma '+tg.initData},body:JSON.stringify({title,schedule:lines})});
+  const result=await prepared.json();if(!prepared.ok||!result.ok||!result.id)throw Error('Не вдалося підготувати повідомлення Telegram');
+  tg.shareMessage(result.id,()=>{});
+ }catch(e){alert(e.message||'Помилка надсилання через бота')}finally{button.disabled=false}
+};
 dialog.querySelector('#dp40-native').onclick=async()=>{if(!currentBlob)return;const file=new File([currentBlob],'depara-week.png',{type:'image/png'});if(navigator.canShare?.({files:[file]})){try{await navigator.share({files:[file],title:'Розклад ДеПара?'})}catch(e){if(e.name!=='AbortError')alert('Не вдалося поділитися. Спробуй «Зберегти».')}}else{alert('На цьому пристрої обмін файлами недоступний. Натисни «Зберегти».')}};
 let pending=false;function mount(){pending=false;if(document.querySelector('#nav button.active')?.dataset.page!=='schedule')return;const panel=screen.querySelector('#dp35-schedule');if(!panel)return;let b=panel.querySelector('#dp40-share');if(!b){b=document.createElement('button');b.id='dp40-share';b.textContent='↗ Поділитися тижневим розкладом';b.onclick=show}if(panel.lastElementChild!==b)panel.append(b);b.onclick=show}
 new MutationObserver(()=>{if(!pending){pending=true;requestAnimationFrame(mount)}}).observe(screen,{childList:true,subtree:true});mount();
