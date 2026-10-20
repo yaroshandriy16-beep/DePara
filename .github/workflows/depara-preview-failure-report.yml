@@ -1,0 +1,23 @@
+name: Report DePara Preview Deploy Failure
+on:
+  workflow_run:
+    workflows: ["Deploy DePara API Preview"]
+    types: [completed]
+permissions:
+  actions: read
+  issues: write
+jobs:
+  report:
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish failed job details to GitHub issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const run = context.payload.workflow_run;
+            const {owner, repo} = context.repo;
+            const jobs = await github.paginate(github.rest.actions.listJobsForWorkflowRun, {owner, repo, run_id: run.id});
+            const failed = jobs.flatMap(job => (job.steps || []).filter(step => step.conclusion === 'failure').map(step => job.name + ' / ' + step.name));
+            const body = ['Preview deployment failed.', 'Run: ' + run.html_url, 'Commit: ' + run.head_sha, 'Failed steps:', ...failed.map(x => '- ' + x)].join('\n');
+            await github.rest.issues.create({owner, repo, title: 'Preview deploy failure #' + run.run_number, body, labels: []});
