@@ -333,3 +333,23 @@ test('REBORN 3.1: profile settings remain usable after navigating across tabs', 
  await page.locator('#rb43-profile-tabs [data-rb43-tab="settings"]').click();
  await expect(page.locator('#dp-v50-settings')).toBeVisible();
 });
+
+test('REBORN MEGA: home task summary opens study and filters completed tasks', async ({ page }) => {
+ await page.locator('[data-dp-role="student"]').click();
+ await page.locator('#dp-group-search').fill('ЕІ-23-1');
+ await page.locator('#dp-search-results button').first().click();
+ await page.locator('#dp-setup-done').click();
+ await page.locator('#dp-success-enter').click();
+ await page.locator('#nav button[data-page="study"]').click();
+ await page.locator('#dp31-title').fill('Мега перевірка');
+ await page.locator('#dp31-form button').click();
+ await page.locator('#dp31-list [data-action="done"]').first().click();
+ await page.locator('#dp31-filter').selectOption('open');
+ await expect(page.locator('#dp31-list')).not.toContainText('Мега перевірка');
+ await page.locator('#dp31-filter').selectOption('done');
+ await expect(page.locator('#dp31-list')).toContainText('Мега перевірка');
+ await page.locator('#nav button[data-page="today"]').click();
+ await expect(page.locator('#dp31-home')).toBeVisible();
+ await page.locator('#dp31-home').click();
+ await expect(page.locator('#dp31-planner')).toBeVisible();
+});
