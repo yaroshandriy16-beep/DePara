@@ -53,6 +53,7 @@ $('#dp-teacher-enter').addEventListener('click',()=>{if(!chosenTeacher)return;wr
 $('#dp-teacher-back').addEventListener('click',()=>show(roles));
 function start(){reveal();show(null);const role=read(roleKey);animationTimer=setTimeout(()=>{if(role==='student'&&read(setupKey)==='1'){document.body.dataset.dpRole='student';finish()}else if(role==='teacher'&&read(K+'teacher_v1')){document.body.dataset.dpRole='teacher';finish()}else show(roles)},1050)}
 window.DeParaChangeRole=()=>{clearTimeout(animationTimer);localStorage.removeItem(roleKey);document.body.dataset.dpRole='';document.body.classList.remove('dp-teacher-active');const dashboard=document.querySelector('#dp-teacher-app');if(dashboard){dashboard.hidden=true;dashboard.style.display='none'}reveal();show(roles)};
+window.DeParaChangeTeacher=()=>{clearTimeout(animationTimer);localStorage.removeItem(roleKey);document.body.classList.remove('dp-teacher-active');const dashboard=document.querySelector('#dp-teacher-app');if(dashboard){dashboard.hidden=true;dashboard.style.display='none'}teacherSetup()};
 window.DeParaChangeGroup=()=>{clearTimeout(animationTimer);mode='change';studentSetup()};
 window.DeParaReplayWelcome=()=>{clearTimeout(animationTimer);reveal();show(null);setTimeout(()=>show(roles),1100)};
 start();
