@@ -1066,7 +1066,7 @@ async function prepareScheduleShare(request, env) {
   }
   const buttons = { inline_keyboard: [[{
     text: "Відкрити ДеПара?",
-    url: "https://t.me/DePara_Reborn_Test_Bot?startapp=shared_schedule"
+    url: "https://t.me/DePara_Reborn_Test_Bot/app?startapp=shared_schedule"
   }]] };
   const result = photoFileId ? {
     type: "photo",
