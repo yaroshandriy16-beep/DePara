@@ -105,7 +105,8 @@ test('Teacher: failed refresh preserves cached schedule and shows warning', asyn
   const teacher=page.locator('#dp-teacher-app');
   await teacher.locator('.dp-t-nav [data-t-page="schedule"]').click();
   await expect(teacher.locator('#dp-t-refresh')).toBeVisible();
-  await page.waitForResponse(r => r.url().includes('/data/teachers/schedules/') && r.status() === 200);
+  await expect.poll(async () => page.evaluate(() => performance.getEntriesByType('resource').some(e => e.name.includes('/data/teachers/schedules/')))).toBe(true);
+  await expect(teacher.locator('.dp-t-card').filter({hasText:'Завантажуємо розклад'})).toHaveCount(0);
   const before=await teacher.locator('.dp-t-lesson').count();
   await page.route('**/data/teachers/schedules/**', route=>route.abort());
   await teacher.locator('#dp-t-refresh').click();
