@@ -7,3 +7,7 @@ workers_dev = true
 binding = "DB"
 database_name = "depara-preview-db"
 database_id = "c1602af7-3219-4d14-87af-8515c40193be"
+
+[[r2_buckets]]
+binding = "SHARE_IMAGES"
+bucket_name = "depara-preview-share-images"
