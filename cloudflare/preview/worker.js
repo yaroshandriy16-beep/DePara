@@ -1040,38 +1040,29 @@ async function prepareScheduleShare(request, env) {
   if (!schedule || schedule.length > 3200) return bad("INVALID_SCHEDULE");
   const title = typeof body?.title === "string" ? body.title.trim().slice(0, 100) : "Розклад пар";
   const message = "📅 " + (title || "Розклад пар") + "\n\n" + schedule + "\n\nДеПара? REBORN";
-  let photoFileId = null;
-  let photoError = typeof body?.imageBase64 === 'string' ? 'UPLOAD_NOT_COMPLETED' : 'IMAGE_NOT_RECEIVED';
+  // Upload the image directly to R2: no temporary Telegram DM or notification.
+  let photoUrl = null;
+  let photoError = typeof body?.imageBase64 === "string" ? "IMAGE_UPLOAD_FAILED" : "IMAGE_NOT_RECEIVED";
   if (typeof body?.imageBase64 === "string" && body.imageBase64.length <= 3800000 && /^[A-Za-z0-9+/]+={0,2}$/.test(body.imageBase64)) {
     try {
       const binary = atob(body.imageBase64);
-      if (binary.length <= 2800000) {
+      if (binary.length <= 2800000 && env.SHARE_IMAGES) {
         const bytes = Uint8Array.from(binary, ch => ch.charCodeAt(0));
-        const form = new FormData();
-        form.append("chat_id", String(user.id));
-        form.append("photo", new Blob([bytes], { type: "image/png" }), "depara-week.png");
-        form.append("disable_notification", "true");
-        const uploaded = await fetch("https://api.telegram.org/bot" + env.TELEGRAM_BOT_TOKEN + "/sendPhoto", { method: "POST", body: form });
-        const photoData = await uploaded.json().catch(() => null);
-        if (photoData?.ok && photoData.result?.photo?.length) {
-          photoFileId = photoData.result.photo[photoData.result.photo.length - 1].file_id;
-          const messageId = photoData.result.message_id;
-          if (messageId) await fetch("https://api.telegram.org/bot" + env.TELEGRAM_BOT_TOKEN + "/deleteMessage", {
-            method: "POST", headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ chat_id: user.id, message_id: messageId })
-          }).catch(() => null);
-        } else { photoError = "TELEGRAM_" + (photoData?.error_code || "ERROR") + "_" + String(photoData?.description || "upload rejected").slice(0, 130); console.warn("Share photo upload unavailable", photoData?.error_code); }
-      }
-    } catch (err) { photoError = "UPLOAD_EXCEPTION"; console.warn("Share photo upload failed", String(err)); }
+        const key = "shared/" + crypto.randomUUID() + ".png";
+        await env.SHARE_IMAGES.put(key, bytes, { httpMetadata: { contentType: "image/png" }, customMetadata: { expiresAt: String(Date.now() + 86400000) } });
+        photoUrl = new URL(request.url).origin + "/api/share/image/" + key.slice(7);
+        photoError = null;
+      } else photoError = env.SHARE_IMAGES ? "IMAGE_TOO_LARGE" : "R2_NOT_CONFIGURED";
+    } catch (err) { photoError = "R2_UPLOAD_FAILED"; console.warn("Share R2 upload failed", String(err)); }
   }
   const buttons = { inline_keyboard: [[{
     text: "Відкрити ДеПара?",
     url: "https://t.me/DePara_Reborn_Test_Bot?startapp=shared_schedule"
   }]] };
-  const result = photoFileId ? {
+  const result = photoUrl ? {
     type: "photo",
     id: "depara-photo-" + crypto.randomUUID(),
-    photo_file_id: photoFileId,
+    photo_url: photoUrl,
     caption: "",
     reply_markup: buttons
   } : {
@@ -1098,7 +1089,7 @@ async function prepareScheduleShare(request, env) {
     console.error("Telegram share preparation failed", response.status, data?.error_code);
     return bad("TELEGRAM_SHARE_FAILED", 502);
   }
-  return json({ ok: true, id: data.result.id, mode: photoFileId ? 'photo' : 'text', photoError: photoFileId ? null : photoError, expiration_date: data.result.expiration_date });
+  return json({ ok: true, id: data.result.id, mode: photoUrl ? 'photo' : 'text', photoError: photoUrl ? null : photoError, expiration_date: data.result.expiration_date });
 }
 
 var worker_default = {
@@ -1127,6 +1118,18 @@ var worker_default = {
 
       });
 
+    // Public image endpoint used by Telegram to fetch a prepared inline photo.
+    if (path.startsWith("/api/share/image/") && request.method === "GET") {
+      const id = path.slice("/api/share/image/".length);
+      if (!/^[0-9a-f-]{36}\\.png$/i.test(id) || !env.SHARE_IMAGES) return bad("NOT_FOUND", 404);
+      const object = await env.SHARE_IMAGES.get("shared/" + id);
+      if (!object) return bad("NOT_FOUND", 404);
+      if (Number(object.customMetadata?.expiresAt || 0) < Date.now()) {
+        await env.SHARE_IMAGES.delete("shared/" + id);
+        return bad("EXPIRED", 404);
+      }
+      return new Response(object.body, { headers: { "Content-Type": "image/png", "Cache-Control": "public, max-age=300", "X-Content-Type-Options": "nosniff" } });
+    }
     if (!env.DB || !env.TELEGRAM_BOT_TOKEN)
 
       return json({
