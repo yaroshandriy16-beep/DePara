@@ -36,7 +36,7 @@ function cleanProfile(){
 }
 function cleanStudy(){
  // Profile-only widgets must never appear among academic tools.
- for(const card of [...screen.children]){
+ for(const card of [...screen.querySelectorAll('.rb40-card, .card')]){
   const heading=card.querySelector?.('h2')?.textContent.trim();
   if(heading==='Мій стиль'||heading==='Мій профіль'||heading==='Твій профіль')card.remove();
  }
