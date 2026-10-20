@@ -19,10 +19,12 @@ function home(){
   while(node&&!node.classList.contains('home-section-head')&&!node.classList.contains('home-shortcuts')&&!node.classList.contains('home-metrics')){
     const next=node.nextElementSibling;
     if(node.classList.contains('lesson')||node.classList.contains('empty')){if(node.classList.contains('lesson'))n++;panel.append(node)}
-    else break;
+    else if(node.classList.contains('section')||node.classList.contains('card'))break;
+    else {node=next;continue;}
     node=next;
   }
   count.textContent=n+' '+(n===1?'пара':n>=2&&n<=4?'пари':'пар');
+  if(!panel.querySelector('.lesson,.empty')){const msg=document.createElement('p');msg.className='sub';msg.textContent='На вибрану дату пар немає або розклад ще не завантажився.';panel.append(msg)}
   feature.after(panel);
   day.remove();
  }
