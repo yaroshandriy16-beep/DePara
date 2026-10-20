@@ -1,0 +1,41 @@
+/* UI Revolution 2.3 — preview only */
+:root{--ui23-gap:12px}
+#screen .reborn-home{gap:0}
+#screen .home-heading{margin:5px 0 12px}
+#screen .home-heading .sub{margin-bottom:0}
+#screen .home-feature{margin-bottom:0!important}
+#screen .ui23-day-panel{margin:10px 0 12px;padding:12px;border:1px solid var(--rb43-border,rgba(233,196,120,.25));border-radius:18px;background:var(--rb43-card-soft,rgba(16,43,39,.92));min-width:0}
+#screen .ui23-day-panel-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+#screen .ui23-day-panel-head strong{font-size:15px}
+#screen .ui23-day-panel-head button{border:0;background:transparent;color:var(--rb43-accent,#e9c478);font:inherit;font-size:12px;padding:8px}
+#screen .ui23-day-panel .lesson{margin:6px 0!important;padding:10px!important;background:rgba(255,255,255,.025);border-radius:12px}
+#screen .ui23-day-panel .lesson .time{font-size:13px;min-width:48px}
+#screen .ui23-day-panel .lesson .info b{font-size:13px;line-height:1.35}
+#screen .ui23-day-panel .lesson .details{font-size:11px;line-height:1.3}
+#screen .ui23-day-panel .lesson .tag{font-size:10px}
+#screen .ui23-day-panel .empty{padding:8px 4px}
+#screen .ui23-day-panel .empty p{margin:4px 0}
+#screen .ui23-day-panel .empty .symbol{display:none}
+#screen .ui23-day-panel .ui23-day-count{font-size:12px;opacity:.7}
+#screen .ui23-secondary{margin-top:8px}
+#screen .ui23-secondary summary{cursor:pointer;list-style:none;padding:12px 13px;border:1px solid var(--rb43-border,rgba(233,196,120,.25));border-radius:13px;color:var(--rb43-accent,#e9c478);font-weight:700;font-size:13px}
+#screen .ui23-secondary summary::-webkit-details-marker{display:none}
+#screen .ui23-secondary summary:after{content:'⌄';float:right}
+#screen .ui23-secondary[open] summary:after{content:'⌃'}
+#screen .ui23-secondary[open]>*:not(summary){margin-top:10px}
+#screen .ui23-secondary .home-section-head{margin-top:12px}
+#screen .ui23-schedule-header{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+#screen .ui23-schedule-header button{border:1px solid var(--rb43-border,rgba(233,196,120,.3));border-radius:11px;padding:9px 11px;color:inherit;background:var(--rb43-card,#102b27);font:inherit}
+#screen .ui23-schedule-header .ui23-date{font-size:14px;font-weight:750}
+#screen .ui23-schedule-header button:disabled{opacity:.4}
+#screen .schedule-tools{scroll-snap-type:x proximity}
+#screen .schedule-tools>button{scroll-snap-align:start}
+#screen .week-board .week-day{border-radius:15px}
+#screen .ui23-profile-label{font-size:11px;text-transform:uppercase;letter-spacing:.1em;opacity:.7;margin:12px 0 8px}
+#screen #rb43-profile-tabs button{border-radius:12px}
+#screen #rb43-profile-tabs button.active{box-shadow:inset 0 0 0 1px var(--rb43-accent,#e9c478)}
+#screen .dp-v50-setting-row{border-radius:12px}
+#screen .dp-v50-setting-row:active{transform:scale(.995)}
+body.light #screen .ui23-day-panel .lesson{background:rgba(0,0,0,.025)}
+@media(max-width:390px){#screen .ui23-day-panel{padding:10px}#screen .ui23-day-panel .lesson{gap:7px}#screen .ui23-day-panel .lesson .tag{max-width:70px;overflow-wrap:anywhere}}
+@media(prefers-reduced-motion:reduce){#screen .ui23-secondary,#screen .ui23-day-panel{animation:none!important}}
