@@ -1121,7 +1121,7 @@ var worker_default = {
     // Public image endpoint used by Telegram to fetch a prepared inline photo.
     if (path.startsWith("/api/share/image/") && request.method === "GET") {
       const id = path.slice("/api/share/image/".length);
-      if (!/^[0-9a-f-]{36}\\.jpg$/i.test(id) || !env.SHARE_IMAGES) return bad("NOT_FOUND", 404);
+      if (!/^[0-9a-f-]{36}\.jpg$/i.test(id) || !env.SHARE_IMAGES) return bad("NOT_FOUND", 404);
       const object = await env.SHARE_IMAGES.get("shared/" + id);
       if (!object) return bad("NOT_FOUND", 404);
       if (Number(object.customMetadata?.expiresAt || 0) < Date.now()) {
