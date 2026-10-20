@@ -1,0 +1,33 @@
+name: Deploy DePara API Production
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'cloudflare/production/worker.js'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: depara-api-production-deploy
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify production Worker syntax and target
+        run: |
+          node --input-type=module --check < cloudflare/production/worker.js
+          grep -Fxq 'name = "depara-api"' cloudflare/production/wrangler.toml
+          grep -Fxq 'database_name = "depara-db"' cloudflare/production/wrangler.toml
+          grep -Fxq 'database_id = "6beccbd7-053f-491b-8d8a-77f2179c1041"' cloudflare/production/wrangler.toml
+          grep -q '/api/share/prepare' cloudflare/production/worker.js
+      - name: Deploy production API
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: '4'
+          command: deploy --config cloudflare/production/wrangler.toml
