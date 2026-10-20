@@ -1131,7 +1131,8 @@ var worker_default = {
 
         database: Boolean(env.DB),
 
-        telegramConfigured: Boolean(env.TELEGRAM_BOT_TOKEN)
+        telegramConfigured: Boolean(env.TELEGRAM_BOT_TOKEN),
+        shareImagesConfigured: Boolean(env.SHARE_IMAGES)
 
       });
 
