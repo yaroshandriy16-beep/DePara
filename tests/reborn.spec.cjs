@@ -205,3 +205,39 @@ test('UI 2.3: schedule day controls and profile settings on 375px iPhone',async(
  await expect(page.locator('#dp-v50-settings')).toBeVisible();
  expect(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+2)).toBe(false);
 });
+
+test('UI 2.3: home merges daily lessons and keeps secondary panels accessible', async ({ page }) => {
+  await page.locator('[data-dp-role="student"]').click();
+  await page.locator('#dp-group-search').fill('ЕІ-23-1');
+  await page.locator('#dp-search-results button').first().click();
+  await page.locator('#dp-setup-done').click();
+  await page.locator('#dp-success-enter').click();
+  await page.locator('#nav button[data-page="today"]').click();
+  await expect(page.locator('#ui23-day-panel')).toBeVisible();
+  await expect(page.locator('#ui23-day-panel .ui23-day-panel-head')).toContainText('Пари на сьогодні');
+  await expect(page.locator('#ui23-overview')).toHaveCount(1);
+  await page.locator('#ui23-overview summary').click();
+  await expect(page.locator('#ui23-overview')).toHaveAttribute('open','');
+  await page.locator('#ui23-day-panel button').first().click();
+  await expect(page.locator('#nav button[data-page="schedule"]')).toHaveClass(/active/);
+});
+test('UI 2.3: schedule date arrows and profile settings remain usable on 320px screen', async ({ page }) => {
+  await page.setViewportSize({width:320,height:700});
+  await page.locator('[data-dp-role="student"]').click();
+  await page.locator('#dp-group-search').fill('ЕІ-23-1');
+  await page.locator('#dp-search-results button').first().click();
+  await page.locator('#dp-setup-done').click();
+  await page.locator('#dp-success-enter').click();
+  await page.locator('#nav button[data-page="schedule"]').click();
+  await expect(page.locator('#ui23-schedule-date')).toBeVisible();
+  const buttons=page.locator('#ui23-schedule-date button');
+  await expect(buttons).toHaveCount(2);
+  if(await buttons.nth(1).isEnabled())await buttons.nth(1).click();
+  await expect(page.locator('#ui23-schedule-date')).toBeVisible();
+  await page.locator('#nav button[data-page="profile"]').click();
+  await expect(page.locator('#ui23-profile-label')).toBeVisible();
+  await page.locator('#rb43-profile-tabs [data-rb43-tab="settings"]').click();
+  await expect(page.locator('#dp-v50-settings')).toBeVisible();
+  const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth+2);
+  expect(overflow,'No horizontal overflow on 320px iPhone').toBe(false);
+});
