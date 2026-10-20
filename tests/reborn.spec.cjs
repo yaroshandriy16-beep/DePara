@@ -25,7 +25,7 @@ test('Teacher: selection, schedule, tabs, notes, change teacher and role', async
   const teacher = page.locator('#dp-teacher-app');
   await expect(teacher).toBeVisible();
   await expect(teacher.locator('.dp-t-nav')).toBeVisible();
-  await teacher.locator('[data-t-page="schedule"]').click();
+  await teacher.locator('.dp-t-nav [data-t-page="schedule"]').click();
   await expect(teacher.locator('#dp-t-refresh')).toBeVisible();
   await expect(teacher.locator('.dp-t-lesson').first()).toBeVisible({ timeout: 15000 }).catch(async () => {
     await expect(teacher.locator('.dp-t-empty')).toBeVisible();
