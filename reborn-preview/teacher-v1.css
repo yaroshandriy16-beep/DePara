@@ -8,3 +8,31 @@ body.dp-teacher-active #dp-teacher-app[hidden]{display:none!important}
 #dp-teacher-app .dp-t-outline{text-align:left;gap:10px;align-items:center;font-size:14px;line-height:1.4}
 #dp-teacher-app .dp-t-outline span{min-width:0;overflow-wrap:anywhere}
 #dp-teacher-app .dp-t-outline small{font-size:11px;color:#b9d0c1}
+
+/* Teacher REBORN multi-tab shell */
+#dp-teacher-app .dp-t-top{display:flex;align-items:center;gap:12px;padding:8px 2px 16px;margin-bottom:12px;border-bottom:1px solid #ffffff1b}
+#dp-teacher-app .dp-t-mark{display:grid;place-items:center;width:44px;height:44px;border:1px solid #c7a85a70;border-radius:15px;color:#e9c878;background:#24503e;font-size:25px}
+#dp-teacher-app .dp-t-top>span:nth-child(2){flex:1;display:grid;gap:3px}
+#dp-teacher-app .dp-t-top strong{font-size:23px;letter-spacing:-1px}
+#dp-teacher-app .dp-t-top small{font-size:11px;color:#a9c5b3}
+#dp-teacher-app .dp-t-gold{color:#e9c878}
+#dp-teacher-app .dp-t-top>button{border:1px solid #67877777;background:#19392e;color:#e6f1e9;border-radius:13px;width:42px;height:42px;font-size:24px}
+#dp-teacher-app .dp-t-head{padding:10px 0 16px}
+#dp-teacher-app .dp-t-head h1{font-size:clamp(27px,7vw,36px);line-height:1.12}
+#dp-teacher-app .dp-t-hero{background:linear-gradient(135deg,#286b4e,#173b30 70%);border:1px solid #b8c9a077;border-radius:26px;padding:24px 20px;box-shadow:0 16px 45px #0003}
+#dp-teacher-app .dp-t-hero h2{font-size:clamp(23px,6vw,31px);line-height:1.2;margin:22px 0 12px}
+#dp-teacher-app .dp-t-hero p{color:#d0e5d5;font-size:14px}
+#dp-teacher-app .dp-t-hero-action{background:#f0d99e;color:#18372a;border:0;border-radius:17px;width:100%;padding:17px;font-size:16px;font-weight:800;margin-top:22px}
+#dp-teacher-app .dp-t-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:15px 0}
+#dp-teacher-app .dp-t-stats>div{border:1px solid #8aa58a55;border-radius:17px;padding:18px 14px;background:#18392e}
+#dp-teacher-app .dp-t-stats strong{font-size:29px;color:#e9c878;display:block}
+#dp-teacher-app .dp-t-stats span{font-size:12px;color:#bbd2c2}
+#dp-teacher-app .dp-t-section-title{display:flex;align-items:center;justify-content:space-between;gap:10px}
+#dp-teacher-app .dp-t-section-title button{background:transparent;border:0;color:#e7c575;font-size:12px}
+#dp-teacher-app .dp-t-empty{padding:26px 6px;text-align:center;color:#a7c3b2}
+#dp-teacher-app .dp-t-nav{position:fixed;z-index:5010;left:50%;bottom:calc(env(safe-area-inset-bottom) + 12px);transform:translateX(-50%);width:min(calc(100% - 26px),700px);display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:3px;padding:7px;border:1px solid #9ab99b55;border-radius:24px;background:#0b211bfa;box-shadow:0 10px 45px #0008}
+#dp-teacher-app .dp-t-nav button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:10px 2px;background:transparent;border:0;color:#a5beaf;min-width:0;border-radius:17px}
+#dp-teacher-app .dp-t-nav button span{font-size:23px}
+#dp-teacher-app .dp-t-nav button small{font-size:10px;white-space:nowrap}
+#dp-teacher-app .dp-t-nav button.active{background:#e6c374;color:#122b20;font-weight:800}
+#dp-teacher-app #dp-t-notes{box-sizing:border-box;width:100%;padding:14px;border-radius:14px;border:1px solid #7f9e88;background:#0d251d;color:white;font:inherit;resize:vertical;margin-top:12px}
