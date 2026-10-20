@@ -10,7 +10,7 @@ function wrap(ctx,text,max){const words=String(text||'').split(/\s+/),out=[];let
 async function make(){const p=screen.querySelector('#dp35-schedule'),chosen=p?.querySelector('.dp35-days button.selected')?.dataset.dp35Date;const selected=chosen?new Date(chosen+'T12:00:00'):new Date();const monday=add(selected,-((selected.getDay()+6)%7));const sunday=add(monday,6);
 const r=await fetch('../data/groups/'+encodeURIComponent(String(group()))+'.json');if(!r.ok)throw Error('Не вдалося завантажити розклад');const data=await r.json(),all=Array.isArray(data.lessons)?data.lessons:[],days=Array.from({length:7},(_,i)=>{const d=add(monday,i);return{date:d,lessons:all.filter(l=>l.date===iso(d)).sort((a,b)=>(a.start||'').localeCompare(b.start||''))}}).filter(x=>x.lessons.length);
 const W=960,scale=2,canvas=document.createElement('canvas');canvas.width=W*scale;const height=Math.max(850,300+days.reduce((n,d)=>n+96+d.lessons.reduce((s,l)=>{return s+Math.max(90,Math.ceil(String(l.subject||'').length/44)*33+53)},0),0)+90);canvas.height=height*scale;const ctx=canvas.getContext('2d');ctx.scale(scale,scale);
-ctx.fillStyle='#071a12';ctx.fillRect(0,0,W,height);ctx.fillStyle='#163c2b';ctx.beginPath();ctx.arc(890,35,235,0,Math.PI*2);ctx.fill();ctx.fillStyle='#e9c67c';ctx.font='bold 36px system-ui';ctx.fillText('ДеПара?',48,72);ctx.fillStyle='#fff';ctx.font='bold 66px system-ui';ctx.fillText('Розклад на тиждень',48,155);ctx.fillStyle='#c4d5ca';ctx.font='28px system-ui';ctx.fillText(fmt(monday,{day:'numeric',month:'long'})+' — '+fmt(sunday,{day:'numeric',month:'long',year:'numeric'}),48,205);ctx.fillStyle='#e9c67c';ctx.font='bold 24px system-ui';ctx.fillText('Група '+String(data.meta?.group||data.meta?.group||data.group_name||data.group||group()),48,248);
+ctx.fillStyle='#071a12';ctx.fillRect(0,0,W,height);ctx.fillStyle='#163c2b';ctx.beginPath();ctx.arc(890,35,235,0,Math.PI*2);ctx.fill();ctx.fillStyle='#e9c67c';ctx.font='bold 36px system-ui';ctx.fillText('ДеПара?',48,72);ctx.fillStyle='#fff';ctx.font='bold 66px system-ui';ctx.fillText('Розклад на тиждень',48,155);ctx.fillStyle='#c4d5ca';ctx.font='28px system-ui';ctx.fillText(fmt(monday,{day:'numeric',month:'long'})+' — '+fmt(sunday,{day:'numeric',month:'long',year:'numeric'}),48,205);ctx.fillStyle='#e9c67c';ctx.font='bold 24px system-ui';ctx.fillText('Група '+String(data.meta?.group||data.group_name||data.group||group()),48,248);
 let y=288;for(const day of days){rounded(ctx,38,y,W-76,64,14,'#244734');ctx.fillStyle='#f5e4b7';ctx.font='bold 27px system-ui';ctx.fillText(fmt(day.date,{weekday:'long',day:'numeric',month:'long'}),60,y+42);y+=77;for(const l of day.lessons){ctx.font='bold 26px system-ui';const lines=wrap(ctx,l.subject||'Заняття',680),h=Math.max(90,lines.length*33+53);rounded(ctx,38,y,W-76,h,13,'#173827');rounded(ctx,38,y,7,h,3,'#e9c67c');ctx.fillStyle='#e9c67c';ctx.font='bold 24px system-ui';ctx.fillText(String(l.start||'—'),60,y+38);ctx.fillStyle='#f6f7ef';ctx.font='bold 26px system-ui';lines.forEach((t,i)=>ctx.fillText(t,210,y+37+i*33));ctx.fillStyle='#b2c9bb';ctx.font='20px system-ui';const meta=[l.type,l.teacher||l.teachers,l.room?'ауд. '+l.room:''].filter(Boolean).join(' · ');const ml=wrap(ctx,meta,690);ctx.fillText((ml[0]||'').slice(0,100),210,y+h-17);y+=h+10}y+=16}
 ctx.fillStyle='#8caf9a';ctx.font='21px system-ui';ctx.fillText('ДеПара? • ВНАУ',48,height-42);
 return new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(Error('Не вдалося створити зображення')),'image/png'))}
@@ -27,7 +27,7 @@ dialog.querySelector('#dp40-bot').onclick=async()=>{
   if(!response.ok)throw Error('Не вдалося отримати розклад');
   const data=await response.json(),all=Array.isArray(data.lessons)?data.lessons:[];
   const lines=Array.from({length:7},(_,i)=>{const d=add(monday,i),ls=all.filter(l=>l.date===iso(d)).sort((a,b)=>(a.start||'').localeCompare(b.start||''));return fmt(d,{weekday:'long',day:'numeric',month:'short'})+'\n'+(ls.length?ls.map(l=>(l.start||'—')+' '+(l.subject||'Заняття')).join('\n'):'Пар немає')}).join('\n\n');
-  const title='Розклад '+String(data.group_name||data.group||group())+' · '+iso(monday);
+  const title='Розклад '+String(data.meta?.group||data.group_name||data.group||group())+' · '+iso(monday);
   if(lines.length>3200)throw Error('Розклад завеликий для текстового повідомлення. Скористайся кнопкою «Картинкою».');
   let imageBase64=null;
   if(currentBlob&&currentBlob.size<=2800000){
@@ -35,6 +35,7 @@ dialog.querySelector('#dp40-bot').onclick=async()=>{
   }
   const prepared=await fetch(SHARE_API+'/api/share/prepare',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'tma '+tg.initData},body:JSON.stringify({title,schedule:lines,imageBase64})});
   const result=await prepared.json();if(!prepared.ok||!result.ok||!result.id)throw Error('Не вдалося підготувати повідомлення Telegram');
+  if(result.mode!=='photo')alert('Telegram надіслав текст замість картинки: '+(result.photoError||'зображення недоступне')+'. Перевіримо причину.');
   tg.shareMessage(result.id,()=>{});
  }catch(e){alert(e.message||'Помилка надсилання через бота')}finally{button.disabled=false}
 };
