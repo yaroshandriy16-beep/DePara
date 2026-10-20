@@ -141,6 +141,7 @@ test('UI 2.2: mobile home, schedule shortcut, profile and accessible tabs', asyn
   await page.locator('#dp-search-results button').first().click();
   await page.locator('#dp-setup-done').click();
   await page.locator('#dp-success-enter').click();
+  await page.locator('#nav button[data-page="today"]').click();
   await expect(page.locator('.reborn-home .home-feature')).toBeVisible();
   await expect(page.locator('.reborn-home .home-section-head h2').first()).toContainText('Пари на день');
   await page.locator('#nav button[data-page="schedule"]').click();
