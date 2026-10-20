@@ -1,0 +1,59 @@
+/* DePara REBORN — UI Revolution 2.2. Preview-only responsive design layer. */
+:root{--ui22-radius:20px;--ui22-ease:cubic-bezier(.2,.8,.2,1)}
+html{scroll-padding-bottom:110px;-webkit-text-size-adjust:100%}
+body{overflow-x:hidden}
+button,input,select,textarea{font-family:inherit}
+button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+button:focus-visible,[role="button"]:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--rb43-accent,#e9c478)!important;outline-offset:3px}
+#screen{min-width:0;overflow-wrap:anywhere;padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
+#screen .reborn-home{display:flex;flex-direction:column;gap:0;min-width:0}
+#screen .home-heading{margin-bottom:12px}
+#screen .home-heading h1{font-size:clamp(25px,6.7vw,35px);letter-spacing:-.04em;line-height:1.12}
+#screen .home-feature{border-radius:var(--ui22-radius);overflow:hidden;isolation:isolate;box-shadow:0 14px 35px rgba(0,0,0,.15)}
+#screen .feature-copy strong{overflow-wrap:anywhere;line-height:1.2}
+#screen .home-section-head{margin-top:17px;margin-bottom:9px;gap:8px}
+#screen .home-section-head h2{font-size:clamp(18px,4.8vw,22px)}
+#screen .home-small-link{white-space:nowrap;flex-shrink:0}
+#screen .lesson{min-width:0;border-radius:16px;transition:transform .18s var(--ui22-ease),border-color .18s}
+#screen .lesson:active{transform:scale(.99)}
+#screen .lesson .info{min-width:0;overflow-wrap:anywhere}
+#screen .lesson .details{overflow-wrap:anywhere}
+#screen .home-shortcuts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+#screen .home-shortcuts button{min-width:0;min-height:90px;border-radius:16px;overflow-wrap:anywhere;padding:12px 8px}
+#screen .home-shortcuts small{line-height:1.25}
+#screen .home-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+#screen .home-metric{min-width:0;padding:12px 9px;border-radius:15px}
+#screen .home-metric span{font-size:10px;line-height:1.25}
+#screen .home-metric strong{font-variant-numeric:tabular-nums}
+#screen .schedule-tools{display:flex;gap:8px;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-width:none;padding-bottom:5px}
+#screen .schedule-tools::-webkit-scrollbar{display:none}
+#screen .schedule-tools button{flex:0 0 auto;white-space:nowrap;min-height:42px}
+#screen .daystrip{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;min-width:0}
+#screen .daystrip button{min-width:0;min-height:54px;padding:7px 1px;border-radius:12px}
+#screen .daystrip button small{font-size:10px}
+#screen .week-board{min-width:0}
+#screen .week-day{min-width:0}
+#screen .module-hero{border-radius:var(--ui22-radius);overflow:hidden}
+#screen .rb45-tabs{display:flex;overflow-x:auto;scrollbar-width:none;gap:6px;overscroll-behavior-inline:contain;padding-bottom:6px}
+#screen .rb45-tabs::-webkit-scrollbar{display:none}
+#screen .rb45-tabs button{white-space:nowrap;flex-shrink:0;min-height:42px}
+#screen #rb43-profile-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+#screen #rb43-profile-tabs button{min-width:0;min-height:60px;padding:9px 5px;overflow-wrap:anywhere}
+#screen #rb43-profile-tabs small{font-size:10px;line-height:1.25}
+#screen .dp-v50-setting-row{width:100%;min-height:62px;text-align:left;display:flex;align-items:center;gap:10px}
+#screen .dp-v50-setting-row>span:nth-child(2){flex:1;min-width:0}
+#screen .dp-v50-setting-row small{display:block;overflow-wrap:anywhere}
+#nav{padding-bottom:max(8px,env(safe-area-inset-bottom,0px));z-index:100}
+#nav button{min-width:0;min-height:54px;touch-action:manipulation}
+#dp-teacher-app{padding-bottom:calc(110px + env(safe-area-inset-bottom,0px))!important}
+#dp-teacher-app .dp-t-hero{overflow-wrap:anywhere}
+#dp-teacher-app .dp-t-lesson>div{min-width:0}
+#dp-teacher-app .dp-t-nav{padding-bottom:max(8px,env(safe-area-inset-bottom,0px))}
+#dp-teacher-app .dp-t-nav button{min-width:0;min-height:52px}
+#dp-teacher-app #dp-t-notes{width:100%;min-height:160px;box-sizing:border-box;font-size:16px}
+#dp-onboarding .dp-v50-step[hidden],#dp-onboarding .dp-onboarding-roles[hidden]{display:none!important}
+#dp-onboarding .dp-search-result{min-height:48px}
+@media(max-width:390px){#screen .home-shortcuts{gap:6px}#screen .home-shortcuts button{padding:10px 5px}#screen .home-metrics{gap:6px}#screen .home-metric{padding:10px 6px}#screen #rb43-profile-tabs small{display:none}#screen #rb43-profile-tabs button{min-height:46px}#screen .daystrip{gap:3px}#screen .daystrip button{font-size:12px}}
+@media(max-width:350px){#screen .home-shortcuts small{display:none}#screen .home-shortcuts button{min-height:65px}#screen .home-metric span{font-size:9px}#nav button{font-size:10px}}
+@media(min-width:700px){#screen .reborn-home{max-width:760px;margin:auto}#screen .home-shortcuts{gap:14px}#screen .home-metrics{gap:14px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
