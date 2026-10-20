@@ -4,6 +4,21 @@ const screen=document.querySelector('#screen');if(!screen)return;
 const key='dp_reborn2_mega31_tasks';
 const read=()=>{try{const v=JSON.parse(localStorage.getItem(key)||'[]');return Array.isArray(v)?v.filter(x=>x&&typeof x.title==='string').slice(0,100):[]}catch{return []}};
 let tasks=read(),queued=false;
+const nativeKey='dp_reborn2_tasks';
+function migrateTasks(){
+ try{
+  if(localStorage.getItem('dp_reborn2_mega31_migrated')==='1')return;
+  const native=JSON.parse(localStorage.getItem(nativeKey)||'[]');
+  if(!Array.isArray(native))return;
+  const existing=new Set(native.map(t=>String(t.title)+'|'+String(t.due||'')));
+  for(const t of tasks){const signature=String(t.title)+'|'+String(t.date||'');if(!existing.has(signature)){native.push({title:t.title,due:t.date||'',done:!!t.done});existing.add(signature)}}
+  localStorage.setItem(nativeKey,JSON.stringify(native));
+  localStorage.setItem('dp_reborn2_mega31_migrated','1');
+ }catch{}
+}
+migrateTasks();
+function nativeTasks(){try{const a=JSON.parse(localStorage.getItem(nativeKey)||'[]');return Array.isArray(a)?a:[]}catch{return []}}
+
 const $=s=>document.querySelector(s);
 const esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function persist(){try{localStorage.setItem(key,JSON.stringify(tasks));return true}catch{return false}}
@@ -14,6 +29,8 @@ function mount(){
  if(page==='profile'){cleanProfile();return}
  if(page==='study')cleanStudy();
  if(page!=='study'||screen.querySelector('#dp31-planner'))return;
+ // One task manager only: the native Study task form is the canonical editor.
+ if(screen.querySelector('#task-form'))return;
  const box=document.createElement('section');box.id='dp31-planner';box.className='dp31-planner card';
  box.innerHTML='<div class="dp31-head"><div><small>НАВЧАННЯ 3.1</small><h2>Мої завдання</h2><p>Дедлайни й справи зберігаються на цьому пристрої.</p></div><span id="dp31-progress"></span></div><form id="dp31-form"><label for="dp31-title">Нове завдання</label><input id="dp31-title" maxlength="120" placeholder="Наприклад, підготувати лабораторну" required><label for="dp31-date">Дедлайн (необов’язково)</label><input id="dp31-date" type="date"><button type="submit">+ Додати завдання</button></form><label for="dp31-filter">Показати</label><select id="dp31-filter"><option value="all">Усі завдання</option><option value="open">Невиконані</option><option value="done">Виконані</option></select><div id="dp31-list" aria-live="polite"></div><p id="dp31-message" role="status"></p>';
  screen.prepend(box);
@@ -43,8 +60,8 @@ function cleanStudy(){
 }
 function mountHome(){
  const home=screen.querySelector('.reborn-home');if(!home||home.querySelector('#dp31-home'))return;
- const open=tasks.filter(t=>!t.done);const today=new Date();const day=[today.getFullYear(),String(today.getMonth()+1).padStart(2,'0'),String(today.getDate()).padStart(2,'0')].join('-');
- const due=open.filter(t=>t.date&&t.date<=day).length;
+ const open=nativeTasks().filter(t=>!t.done);const today=new Date();const day=[today.getFullYear(),String(today.getMonth()+1).padStart(2,'0'),String(today.getDate()).padStart(2,'0')].join('-');
+ const due=open.filter(t=>t.due&&t.due<=day).length;
  const card=document.createElement('button');card.type='button';card.id='dp31-home';card.className='dp31-home';card.innerHTML='<span>МОЇ ЗАВДАННЯ</span><strong>'+open.length+' невиконаних'+(due?' · '+due+' потребують уваги':'')+'</strong><small>Відкрити навчання →</small>';
  card.onclick=()=>document.querySelector('#nav button[data-page="study"]')?.click();
  const target=home.querySelector('#ui23-day-panel');(target||home).after(card);
