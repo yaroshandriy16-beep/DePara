@@ -1,0 +1,27 @@
+name: Preview static checks
+on:
+  push:
+    branches: [cloudflare-worker-setup]
+  pull_request:
+    paths:
+      - 'cloudflare/preview/**'
+      - 'reborn-preview/**'
+      - '.github/workflows/preview-static-check.yml'
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate preview Worker as ES module
+        run: node --input-type=module --check < cloudflare/preview/worker.js
+      - name: Validate REBORN app script
+        run: node --check reborn-preview/app.js
+      - name: Validate preview configuration and share route
+        run: |
+          grep -q 'name = "depara-api-preview"' cloudflare/preview/wrangler.toml
+          grep -q 'database_name = "depara-preview-db"' cloudflare/preview/wrangler.toml
+          grep -q '/api/share/prepare' cloudflare/preview/worker.js
+          grep -q '/api/share/prepare' reborn-preview/app.js
