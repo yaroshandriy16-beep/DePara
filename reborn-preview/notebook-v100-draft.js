@@ -3,6 +3,15 @@ const nav=document.querySelector('#nav'),screen=document.querySelector('#screen'
 const study=nav.querySelector('[data-page="study"]'),social=nav.querySelector('[data-page="social"]');if(!study||!social)return;
 study.dataset.page='notebook';study.innerHTML='<span>▤</span>Зошит';social.remove();
 const style=document.createElement('style');style.textContent=`
+.dpnotebook{max-width:540px!important;padding:8px 12px 108px!important}
+.dpnotebook .dpnrefhead{display:flex;flex-direction:column;gap:3px;margin:8px 2px 14px}
+.dpnotebook .dpnrefhead strong{font-size:25px;font-weight:800;line-height:1.2;color:#e7f6e9}
+.dpnotebook .dpnrefhead small{font-size:12px;color:#a5bbaa}
+.dpnotebook .dpntabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;background:#193629;border-radius:14px;padding:4px;margin-bottom:12px}
+.dpnotebook .dpntabs button{min-width:0;padding:9px 3px!important;font-size:11px!important;border-radius:11px}
+.dpnotebook .dpncard{padding:13px!important;margin-top:9px!important;border-radius:16px!important}
+.dpnotebook .dpnnotetop{margin-bottom:8px}
+
 .dpnotebook{max-width:760px;margin:0 auto;padding:12px 12px 130px!important;box-sizing:border-box}
 .dpnotebook .dpnhero{padding:19px;border-radius:22px;margin:0 0 12px}
 .dpnotebook .dpnhero strong{font-size:30px}
