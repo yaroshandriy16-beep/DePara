@@ -5,7 +5,7 @@
   "endPair": 1,
   "structureId": "0",
   "corpusId": "",
-  "fetchedAt": "2026-10-21T10:40:50.222611+00:00",
+  "fetchedAt": "2026-10-21T16:40:27.782051+00:00",
   "status": "official-site-snapshot",
   "rooms": [
     {
@@ -132,7 +132,7 @@
       "id": "325",
       "name": "1403",
       "capacity": 28,
-      "available": false,
+      "available": true,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=325"
     },
