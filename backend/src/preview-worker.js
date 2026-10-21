@@ -1632,7 +1632,7 @@ var worker_default = {
 
     const url = new URL(request.url);
 
-    const path = url.pathname.replace(/\\/+$/, "") || "/";
+    const path = url.pathname.replace(/\/+$/, "") || "/";
 
     if (path === "/health" && request.method === "GET")
 
