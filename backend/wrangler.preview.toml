@@ -7,7 +7,7 @@ compatibility_date = "2026-10-20"
 [[d1_databases]]
 binding = "DB"
 database_name = "depara-preview-db"
-database_id = "REPLACE_WITH_EXISTING_PREVIEW_D1_DATABASE_ID"
+database_id = "c1602af7-3219-4d14-87af-8515c40193be"
 
 [vars]
 ALLOWED_ORIGIN = "https://yaroshandriy16-beep.github.io"
