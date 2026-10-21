@@ -3,6 +3,10 @@ const nav=document.querySelector('#nav'),screen=document.querySelector('#screen'
 const study=nav.querySelector('[data-page="study"]'),social=nav.querySelector('[data-page="social"]');if(!study||!social)return;
 study.dataset.page='notebook';study.innerHTML='<span>▤</span>Зошит';social.remove();
 const style=document.createElement('style');style.textContent=`
+.dpnotebook .dpnrefattendance span{font-weight:700;min-height:38px;display:flex;align-items:center;justify-content:center}
+.dpnotebook .dpncalendar button[aria-pressed="true"]{outline:2px solid #e3c77a;outline-offset:-2px}
+.dpnotebook .dpncalendar button span{display:block;line-height:7px}
+
 .dpnotebook .dpnweeknav{display:grid;grid-template-columns:32px minmax(0,1fr) 32px auto;align-items:center;gap:5px;margin:12px 0}
 .dpnotebook .dpnweeknav span{text-align:center;font-size:10px;white-space:nowrap}
 .dpnotebook .dpnweeknav button{min-width:0!important;padding:8px 4px!important;font-size:12px!important}
