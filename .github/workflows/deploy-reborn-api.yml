@@ -1,0 +1,62 @@
+name: Deploy isolated DePara REBORN API
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "backend/**"
+      - ".github/workflows/deploy-reborn-api.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-depara-reborn-api
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify required deployment secrets
+        env:
+          CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN_REBORN }}
+          CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID_REBORN }}
+          D1_DATABASE_ID: ${{ secrets.DEPARA_REBORN_D1_DATABASE_ID }}
+        run: |
+          test -n "$CF_API_TOKEN" || { echo "::error::Missing CLOUDFLARE_API_TOKEN_REBORN"; exit 1; }
+          test -n "$CF_ACCOUNT_ID" || { echo "::error::Missing CLOUDFLARE_ACCOUNT_ID_REBORN"; exit 1; }
+          test -n "$D1_DATABASE_ID" || { echo "::error::Missing DEPARA_REBORN_D1_DATABASE_ID"; exit 1; }
+          echo "Required deployment settings are present."
+      - name: Create temporary Wrangler config with D1 ID
+        env:
+          D1_DATABASE_ID: ${{ secrets.DEPARA_REBORN_D1_DATABASE_ID }}
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          p=Path("wrangler.toml")
+          data=p.read_text()
+          assert 'REPLACE_WITH_D1_DATABASE_ID' in data
+          data=data.replace('REPLACE_WITH_D1_DATABASE_ID',os.environ['D1_DATABASE_ID'])
+          p.write_text(data)
+          PY
+      - name: Apply isolated D1 schema
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN_REBORN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID_REBORN }}
+          workingDirectory: backend
+          command: d1 execute depara-reborn --remote --file=./schema.sql
+      - name: Deploy isolated Worker
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN_REBORN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID_REBORN }}
+          workingDirectory: backend
+          command: deploy
