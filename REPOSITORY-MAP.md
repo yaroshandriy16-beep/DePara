@@ -34,3 +34,7 @@
 - Резервна гілка: `backup-before-repository-cleanup-20261021`.
 - Видалено 4 старі автономні HTML-сторінки тестів розкладу: `schedule-test-24.html`, `schedule-test-25.html`, `schedule-test-26.html`, `schedule-check-38.html` з `reborn-preview/`. Їхні попередні версії збережені у резервній гілці та історії Git.
 - Активні `index.html` і `reborn-preview/index.html` не змінювалися на цьому етапі.
+
+## Очищення 2026-10-21 (третій етап)
+- Після перевірки прямих посилань у двох HTML, основних скриптах і workflow видалено 9 історичних файлів: `app-reborn3.js`, `app-reborn31.js`, `app-reborn40.js`, `app-reborn42.js`, `app-reborn45.js`, `schedule-v34.js`, `schedule-v34.css`, `schedule-v35.js`, `schedule-v35.css` (усі з `reborn-preview/`).
+- Повний пошук по всіх можливих динамічних посиланнях і браузерні тести ще не завершені. За потреби файли відновлюються з `backup-before-repository-cleanup-20261021`.
