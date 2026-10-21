@@ -1,0 +1,31 @@
+name: Validate DePara Preview API
+
+on:
+  push:
+    paths:
+      - 'backend/src/preview-worker.js'
+      - 'backend/wrangler.preview.toml'
+      - '.github/workflows/validate-preview.yml'
+      - '.github/workflows/deploy-preview.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check JavaScript syntax
+        run: node --check backend/src/preview-worker.js
+      - name: Ensure sharing and social routes are preserved
+        shell: bash
+        run: |
+          grep -q 'savePreparedInlineMessage' backend/src/preview-worker.js
+          grep -q 'sendPhoto' backend/src/preview-worker.js
+          grep -q 'DePara_Reborn_Test_Bot' backend/src/preview-worker.js
+          grep -q 'path === "/api/share/prepare"' backend/src/preview-worker.js
+          grep -q 'path === "/api/social/inbox"' backend/src/preview-worker.js
+          grep -q 'name = "depara-api-preview"' backend/wrangler.preview.toml
+          grep -q 'database_name = "depara-preview-db"' backend/wrangler.preview.toml
