@@ -27,11 +27,11 @@ export default {async fetch(request,env){
  try{
  const url=new URL(request.url),path=url.pathname;
  if(path==='/health'&&request.method==='GET')return reply({ok:true,service:'depara-reborn-api'});
- if(!env.DB||!env.BOT_TOKEN)return reply({error:'server_not_configured'},503);
+ if(!env.DB||!(env.TELEGRAM_BOT_TOKEN||env.BOT_TOKEN))return reply({error:'server_not_configured'},503);
  if(origin&&origin!==allowed)return reply({error:'origin_not_allowed'},403);
  const bearer=request.headers.get('Authorization')||'';
  if(!bearer.startsWith('tma '))return reply({error:'telegram_auth_required'},401);
- const tg=await telegramUser(bearer.slice(4),env.BOT_TOKEN),uid=String(tg.id);
+ const tg=await telegramUser(bearer.slice(4),env.TELEGRAM_BOT_TOKEN||env.BOT_TOKEN),uid=String(tg.id);
  const existing=await env.DB.prepare('SELECT id,friend_code FROM users WHERE id=?').bind(uid).first();
  if(!existing){
  let inserted=false;
