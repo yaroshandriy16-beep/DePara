@@ -282,6 +282,7 @@ test('REBORN current: student tasks can be added, completed and removed', async 
  await expect(page.locator('#task-form')).toBeVisible();
  await page.locator('#task-form [name="title"]').fill('Лабораторна 3.1');
  await page.locator('#task-form button').click();
+ await expect.poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem('dp_reborn2_tasks') || '[]').map(t => t.title)), {message:'Task submission must persist Лабораторна 3.1'}).toContain('Лабораторна 3.1');
  await expect(page.locator('#screen .card.item').filter({hasText:'Лабораторна 3.1'})).toHaveCount(1);
  await page.locator('#screen .card.item').filter({hasText:'Лабораторна 3.1'}).locator('[data-task]').check();
  await page.locator('.study-filters [data-filter="done"]').click();
@@ -300,6 +301,7 @@ test('REBORN current: student task survives reload with deadline', async ({ page
  await page.locator('#task-form [name="title"]').fill('Перевірка збереження');
  await page.locator('#task-form [name="due"]').fill('2026-11-10');
  await page.locator('#task-form button').click();
+ await expect.poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem('dp_reborn2_tasks') || '[]').map(t => t.title)), {message:'Task submission must persist Перевірка збереження'}).toContain('Перевірка збереження');
  await expect(page.locator('#screen .card.item').filter({hasText:'Перевірка збереження'})).toContainText('2026-11-10');
  await page.reload();
  await page.locator('#nav button[data-page="study"]').click();
@@ -343,6 +345,7 @@ test('REBORN current: home and study use a single task list with working filters
  await page.locator('#nav button[data-page="study"]').click();
  await page.locator('#task-form [name="title"]').fill('Мега перевірка');
  await page.locator('#task-form button').click();
+ await expect.poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem('dp_reborn2_tasks') || '[]').map(t => t.title)), {message:'Task submission must persist Мега перевірка'}).toContain('Мега перевірка');
  await page.locator('#screen .card.item').filter({hasText:'Мега перевірка'}).locator('[data-task]').check();
  await page.locator('.study-filters [data-filter="active"]').click();
  await expect(page.locator('#screen .card.item').filter({hasText:'Мега перевірка'})).toHaveCount(0);
