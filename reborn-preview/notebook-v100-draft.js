@@ -3,6 +3,19 @@ const nav=document.querySelector('#nav'),screen=document.querySelector('#screen'
 const study=nav.querySelector('[data-page="study"]'),social=nav.querySelector('[data-page="social"]');if(!study||!social)return;
 study.dataset.page='notebook';study.innerHTML='<span>▤</span>Зошит';social.remove();
 const style=document.createElement('style');style.textContent=`
+.dpnotebook{max-width:760px;margin:0 auto;padding:12px 12px 130px!important;box-sizing:border-box}
+.dpnotebook .dpnhero{padding:19px;border-radius:22px;margin:0 0 12px}
+.dpnotebook .dpnhero strong{font-size:30px}
+.dpnotebook .dpncard{padding:16px!important;margin-top:12px!important;border-radius:18px!important}
+.dpnotebook .dpnnotetop{display:grid;grid-template-columns:1.3fr 1fr;gap:8px;margin:12px 0}
+.dpnotebook .dpnnotetop button{min-height:44px;border:0;border-radius:13px;background:#b5eac5;color:#173524;font-weight:750}
+.dpnotebook .dpnnotetop .dpnsecondary{background:#294737;color:#d6f3df;border:1px solid #52775d}
+.dpnotebook .dpnextras{border:1px solid #3d604b;border-radius:13px;padding:11px;margin:8px 0 14px;background:#1a3025}
+.dpnotebook .dpnextras summary{cursor:pointer;color:#b9d6c2;font-size:13px}
+.dpnotebook .dpntoolsbutton{margin-top:10px;background:transparent;color:#b9d6c2;border:0;font-size:12px;padding:5px 0}
+.dpnotebook .dpnitem{margin-top:8px;background:#20392c;border:1px solid #355a42;padding:13px!important}
+.dpnotebook input,.dpnotebook select,.dpnotebook textarea{font-size:16px!important}
+
 #nav{grid-template-columns:repeat(4,minmax(0,1fr))!important}
 .dpnotebook{padding:16px 0 125px;color:#f5f1e7}.dpnotebook h1{font-size:42px;letter-spacing:-.05em;margin:10px 0 3px}
 .dpnotebook .dpnmuted{color:#a5b5aa}.dpntabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;margin:20px 0}
