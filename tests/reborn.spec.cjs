@@ -286,7 +286,7 @@ test('REBORN current: student tasks can be added, completed and removed', async 
  console.log('DEPARA_TASK_DIAGNOSTIC',JSON.stringify(taskDebug));
  await expect.poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem('dp_reborn2_tasks') || '[]').map(t => t.title)), {message:'Task submission must persist Лабораторна 3.1'}).toContain('Лабораторна 3.1');
  await expect(page.locator('#screen .card.item').filter({hasText:'Лабораторна 3.1'})).toHaveCount(1);
- await page.locator('#screen .card.item').filter({hasText:'Лабораторна 3.1'}).locator('[data-task]').check();
+ await page.locator('#screen .card.item').filter({hasText:'Лабораторна 3.1'}).locator('[data-task]').click();
  await page.locator('.study-filters [data-filter="done"]').click();
  await expect(page.locator('#screen .card.item').filter({hasText:'Лабораторна 3.1'})).toHaveCount(1);
  await page.locator('#screen .card.item').filter({hasText:'Лабораторна 3.1'}).locator('[data-delete-task]').click();
@@ -348,7 +348,7 @@ test('REBORN current: home and study use a single task list with working filters
  await page.locator('#task-form [name="title"]').fill('Мега перевірка');
  await page.locator('#task-form button').click();
  await expect.poll(async () => page.evaluate(() => JSON.parse(localStorage.getItem('dp_reborn2_tasks') || '[]').map(t => t.title)), {message:'Task submission must persist Мега перевірка'}).toContain('Мега перевірка');
- await page.locator('#screen .card.item').filter({hasText:'Мега перевірка'}).locator('[data-task]').check();
+ await page.locator('#screen .card.item').filter({hasText:'Мега перевірка'}).locator('[data-task]').click();
  await page.locator('.study-filters [data-filter="active"]').click();
  await expect(page.locator('#screen .card.item').filter({hasText:'Мега перевірка'})).toHaveCount(0);
  await page.locator('.study-filters [data-filter="done"]').click();
