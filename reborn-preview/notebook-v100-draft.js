@@ -1,7 +1,7 @@
 (()=>{'use strict';
 const nav=document.querySelector('#nav'),screen=document.querySelector('#screen');if(!nav||!screen)return;
-const study=nav.querySelector('[data-page="study"]'),social=nav.querySelector('[data-page="social"]');if(!study||!social)return;
-study.dataset.page='notebook';study.innerHTML='<span>▤</span>Зошит';social.remove();
+const study=nav.querySelector('[data-page="study"]')||nav.querySelector('[data-page="notebook"]'),social=nav.querySelector('[data-page="social"]');if(!study)return;
+study.dataset.page='notebook';study.innerHTML='<span>▤</span>Зошит';if(social)social.remove();
 const style=document.createElement('style');style.textContent=`
 /* Video-aligned notebook editor and journal — preview only */
 
