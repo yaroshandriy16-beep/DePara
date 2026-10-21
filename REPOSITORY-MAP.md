@@ -38,3 +38,8 @@
 ## Очищення 2026-10-21 (третій етап)
 - Після перевірки прямих посилань у двох HTML, основних скриптах і workflow видалено 9 історичних файлів: `app-reborn3.js`, `app-reborn31.js`, `app-reborn40.js`, `app-reborn42.js`, `app-reborn45.js`, `schedule-v34.js`, `schedule-v34.css`, `schedule-v35.js`, `schedule-v35.css` (усі з `reborn-preview/`).
 - Повний пошук по всіх можливих динамічних посиланнях і браузерні тести ще не завершені. За потреби файли відновлюються з `backup-before-repository-cleanup-20261021`.
+
+## Очищення 2026-10-21 (четвертий етап)
+- Видалено 20 історичних файлів з `reborn-preview/`: `features-reborn40/41/42/47/48.js`, `organize-reborn44/45/47/48.js`, `style-reborn3/31/32/33/40/42/43/44/45/47/48.css`.
+- Прямих посилань на їхні імена не виявлено у двох HTML-сторінках, основних JS-модулях і `tests/reborn.spec.cjs`. Повний runtime-аудит та запуск браузерних тестів ще потрібні.
+- Оригінали доступні в `backup-before-repository-cleanup-20261021`.
