@@ -43,3 +43,19 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: backend
           command: deploy --config wrangler.preview.toml
+      - name: Smoke test preview health and bindings
+        shell: bash
+        run: |
+          set -euo pipefail
+          url="https://depara-api-preview.yaroshandriy16.workers.dev/health"
+          for attempt in 1 2 3 4 5; do
+            if curl --fail --silent --show-error --max-time 15 "$url" -o /tmp/depara-health.json; then
+              if node -e 'const h=require("/tmp/depara-health.json"); if(h.ok!==true || h.database!==true || h.telegramConfigured!==true) process.exit(1)'; then
+                echo "Preview health, D1 binding and Telegram secret are present."
+                exit 0
+              fi
+            fi
+            sleep 5
+          done
+          echo "::error::Preview health check failed after deployment."
+          exit 1
