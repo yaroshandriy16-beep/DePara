@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-10-20T15:46:53.672064+00:00",
+  "generatedAt": "2026-10-21T15:49:42.899286+00:00",
   "chairs": 39,
   "teachers": 513,
   "uniqueTeachers": 332,
   "schedulesUpdated": 332,
   "status": "success",
-  "lastSuccessfulAt": "2026-10-20T15:46:53.672064+00:00",
+  "lastSuccessfulAt": "2026-10-21T15:49:42.899286+00:00",
   "errors": []
 }
