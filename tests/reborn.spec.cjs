@@ -145,8 +145,8 @@ test('UI 2.2: mobile home, schedule shortcut, profile and accessible tabs', asyn
   await expect(page.locator('.reborn-home .home-feature')).toBeVisible();
   await expect(page.locator('#ui23-day-panel .ui23-day-panel-head')).toContainText('Пари на сьогодні');
   await page.locator('#nav button[data-page="schedule"]').click();
-  await expect(page.locator('#ui22-today-shortcut')).toBeVisible();
-  await page.locator('#ui22-today-shortcut').click();
+  await expect(page.locator('#dp35-schedule')).toBeVisible();
+  await page.locator('#dp35-schedule [data-dp35-today]').click();
   await expect(page.locator('#nav button[data-page="schedule"]')).toHaveAttribute('aria-current','page');
   await page.locator('#nav button[data-page="profile"]').click();
   await expect(page.locator('#rb43-profile-tabs')).toHaveAttribute('role','tablist');
@@ -328,7 +328,7 @@ test('REBORN 3.1: profile settings remain usable after navigating across tabs', 
  await page.locator('#rb43-profile-tabs [data-rb43-tab="settings"]').click();
  await expect(page.locator('#dp-v50-settings')).toBeVisible();
  await page.locator('#nav button[data-page="schedule"]').click();
- await expect(page.locator('#ui23-schedule-date')).toBeVisible();
+ await expect(page.locator('#dp35-schedule .dp35-monthbar')).toBeVisible();
  await page.locator('#nav button[data-page="profile"]').click();
  await page.locator('#rb43-profile-tabs [data-rb43-tab="settings"]').click();
  await expect(page.locator('#dp-v50-settings')).toBeVisible();
