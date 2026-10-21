@@ -1,12 +1,8 @@
 name: Deploy isolated DePara REBORN API
 
+# Manual only: never auto-deploy a new Worker while preview is being configured.
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - "backend/**"
-      - ".github/workflows/deploy-reborn-api.yml"
 
 permissions:
   contents: read
