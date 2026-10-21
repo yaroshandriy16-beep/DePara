@@ -5,6 +5,40 @@ study.dataset.page='notebook';study.innerHTML='<span>▤</span>Зошит';socia
 const style=document.createElement('style');style.textContent=`
 /* Video-aligned notebook editor and journal — preview only */
 
+/* iPhone screen recording 13:19:21 — compact readable preview refinement */
+@media(max-width:480px){
+.dpnotebook{padding-left:12px!important;padding-right:12px!important}
+.dpnotebook .dpnrefhead{margin-bottom:12px!important}
+.dpnotebook .dpntabs{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:3px!important;padding:4px!important}
+.dpnotebook .dpntabs button{min-width:0!important;padding:10px 3px!important;font-size:11px!important;white-space:nowrap}
+.dpnotebook .dpnnotetop{gap:8px;flex-wrap:wrap}
+.dpnotebook .dpnnotetop .dpnrefsection{font-size:15px!important}
+.dpnotebook .dpnrefsearch{min-height:42px!important}
+.dpnotebook .dpnviewtoggle{gap:5px!important}
+.dpnotebook .dpnviewtoggle button{min-width:0!important;padding:10px 5px!important;font-size:11px!important}
+.dpnotebook .dpnrefeditor .dpnformat{gap:4px!important;padding:5px 0!important}
+.dpnotebook .dpnrefeditor .dpnformat button{min-width:34px!important;padding:8px!important;font-size:12px!important}
+.dpnotebook.dpn-editor-mode .dpnrefeditor input,.dpnotebook.dpn-editor-mode .dpnrefeditor textarea{font-size:16px!important}
+.dpnotebook.dpn-editor-mode .dpnrefeditor textarea[name="detail"]{min-height:175px!important}
+.dpnotebook .dpnfriends-hero{margin-top:5px!important;padding:22px 16px!important;margin-bottom:20px!important}
+.dpnotebook .dpnfriends-hero p{font-size:12px!important;line-height:1.5!important}
+.dpnotebook .dpnfriends-avatars span{width:50px!important;height:50px!important;font-size:19px!important}
+.dpnotebook .dpnweeknav{gap:5px!important}
+.dpnotebook .dpnweeknav button{padding:8px 6px!important;font-size:11px!important}
+.dpnotebook .dpncalendar{gap:3px!important}
+.dpnotebook .dpncalendar button{padding:7px 1px!important;font-size:10px!important}
+.dpnotebook .dpncalendar small{font-size:10px!important}
+.dpnotebook .dpnlessonrow{margin-bottom:9px!important}
+.dpnotebook .dpnlessonrowhead{align-items:flex-start!important}
+.dpnotebook .dpnlessonrowhead>div{flex:1;min-width:0}
+.dpnotebook .dpnlessonrowhead>button{max-width:83px;white-space:normal!important;line-height:1.25}
+.dpnotebook .dpnlessonmarks{gap:5px!important}
+.dpnotebook .dpnlessonmarks button{padding:9px 4px!important;white-space:normal!important;line-height:1.3}
+.dpnotebook .dpnrefattendance{gap:4px!important}
+.dpnotebook .dpnrefattendance span{font-size:10px!important}
+}
+
+
 /* Friends layout from 04:40 reference; no fictitious invite-code backend */
 .dpnotebook .dpnfriends-page{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important}
 .dpnotebook .dpnfriends-hero{background:#19372b;border-radius:25px;padding:28px 20px 26px;text-align:center;margin:12px 0 30px}
