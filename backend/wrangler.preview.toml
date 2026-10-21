@@ -1,0 +1,13 @@
+# Isolated configuration for the EXISTING test Worker only.
+# Do not deploy until the existing D1 schema has been reviewed and database_id filled.
+name = "depara-api-preview"
+main = "src/index.js"
+compatibility_date = "2026-10-20"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "depara-preview-db"
+database_id = "REPLACE_WITH_EXISTING_PREVIEW_D1_DATABASE_ID"
+
+[vars]
+ALLOWED_ORIGIN = "https://yaroshandriy16-beep.github.io"
