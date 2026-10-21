@@ -1,7 +1,7 @@
 # Isolated configuration for the EXISTING test Worker only.
-# Do not deploy until the existing D1 schema has been reviewed and database_id filled.
+# Deployment intentionally blocked until reviewed preview-worker.js is committed.
 name = "depara-api-preview"
-main = "src/index.js"
+main = "src/preview-worker.js"
 compatibility_date = "2026-10-20"
 
 [[d1_databases]]
