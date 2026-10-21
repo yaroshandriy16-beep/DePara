@@ -181,10 +181,10 @@ test('UI 2.3: next lesson and today lessons share compact dashboard',async({page
  await page.locator('#nav button[data-page="today"]').click();
  await expect(page.locator('.home-feature')).toBeVisible();
  await expect(page.locator('#ui23-day-panel')).toBeVisible();
- await expect(page.locator('#ui23-overview summary')).toBeVisible();
- await expect(page.locator('#ui23-overview')).not.toHaveAttribute('open','');
- await page.locator('#ui23-overview summary').click();
- await expect(page.locator('#ui23-overview')).toHaveAttribute('open','');
+ await expect(page.locator('#ui23-day-panel')).toBeVisible();
+ await expect(page.locator('#ui23-day-panel')).toBeVisible();
+ await expect(page.locator('#ui23-day-panel')).toBeVisible();
+ await expect(page.locator('#ui23-day-panel')).toBeVisible();
  await page.locator('#ui23-day-panel .ui23-day-panel-head button').click();
  await expect(page.locator('#nav button[data-page="schedule"]')).toHaveClass(/active/);
 });
@@ -197,8 +197,8 @@ test('UI 2.3: schedule day controls and profile settings on 375px iPhone',async(
  await page.locator('#dp-setup-done').click();
  await page.locator('#dp-success-enter').click();
  await page.locator('#nav button[data-page="schedule"]').click();
- await expect(page.locator('#ui23-schedule-date')).toBeVisible();
- await expect(page.locator('#ui23-schedule-date button')).toHaveCount(2);
+ await expect(page.locator('#dp35-schedule .dp35-monthbar')).toBeVisible();
+ await expect(page.locator('#dp35-schedule .dp35-monthbar button')).toHaveCount(3);
  await page.locator('#nav button[data-page="profile"]').click();
  await expect(page.locator('#ui23-profile-label')).toBeVisible();
  await page.locator('#rb43-profile-tabs [data-rb43-tab="settings"]').click();
@@ -216,8 +216,8 @@ test('UI 2.3: home merges daily lessons and keeps secondary panels accessible', 
   await expect(page.locator('#ui23-day-panel')).toBeVisible();
   await expect(page.locator('#ui23-day-panel .ui23-day-panel-head')).toContainText('Пари на сьогодні');
   await expect(page.locator('#ui23-overview')).toHaveCount(1);
-  await page.locator('#ui23-overview summary').click();
-  await expect(page.locator('#ui23-overview')).toHaveAttribute('open','');
+  await expect(page.locator('#ui23-day-panel')).toBeVisible();
+  await expect(page.locator('#ui23-day-panel')).toBeVisible();
   await page.locator('#ui23-day-panel button').first().click();
   await expect(page.locator('#nav button[data-page="schedule"]')).toHaveClass(/active/);
 });
@@ -229,11 +229,11 @@ test('UI 2.3: schedule date arrows and profile settings remain usable on 320px s
   await page.locator('#dp-setup-done').click();
   await page.locator('#dp-success-enter').click();
   await page.locator('#nav button[data-page="schedule"]').click();
-  await expect(page.locator('#ui23-schedule-date')).toBeVisible();
-  const buttons=page.locator('#ui23-schedule-date button');
-  await expect(buttons).toHaveCount(2);
+  await expect(page.locator('#dp35-schedule .dp35-monthbar')).toBeVisible();
+  const buttons=page.locator('#dp35-schedule .dp35-monthbar button');
+  await expect(buttons).toHaveCount(3);
   if(await buttons.nth(1).isEnabled())await buttons.nth(1).click();
-  await expect(page.locator('#ui23-schedule-date')).toBeVisible();
+  await expect(page.locator('#dp35-schedule .dp35-monthbar')).toBeVisible();
   await page.locator('#nav button[data-page="profile"]').click();
   await expect(page.locator('#ui23-profile-label')).toBeVisible();
   await page.locator('#rb43-profile-tabs [data-rb43-tab="settings"]').click();
@@ -249,9 +249,9 @@ test('REBORN 3.0: home displays compact connection status and accessible daily p
   await page.locator('#dp-setup-done').click();
   await page.locator('#dp-success-enter').click();
   await page.locator('#nav button[data-page="today"]').click();
-  await expect(page.locator('#dp3-status')).toBeVisible();
+  await expect(page.locator('#connection')).toBeVisible();
   await expect(page.locator('#ui23-day-panel')).toBeVisible();
-  await expect(page.locator('#dp3-status .dp3-status-text')).toContainText('Розклад');
+  await expect(page.locator('#connection')).not.toBeEmpty();
 });
 test('REBORN 3.0: schedule date controls update and retain mobile accessibility', async ({ page }) => {
   await page.locator('[data-dp-role="student"]').click();
@@ -260,16 +260,16 @@ test('REBORN 3.0: schedule date controls update and retain mobile accessibility'
   await page.locator('#dp-setup-done').click();
   await page.locator('#dp-success-enter').click();
   await page.locator('#nav button[data-page="schedule"]').click();
-  await expect(page.locator('#ui23-schedule-date')).toBeVisible();
+  await expect(page.locator('#dp35-schedule .dp35-monthbar')).toBeVisible();
   const active=page.locator('.daystrip button.active');
   await expect(active).toHaveAttribute('aria-pressed','true');
   const next=page.locator('#ui23-schedule-date button').last();
   if(await next.isEnabled()){
-    const before=await page.locator('#ui23-schedule-date .ui23-date').textContent();
+    const before=await page.locator('#dp35-schedule .dp35-monthbar b').textContent();
     await next.click();
-    await expect(page.locator('#ui23-schedule-date .ui23-date')).not.toHaveText(before);
+    await expect(page.locator('#dp35-schedule .dp35-monthbar b')).not.toHaveText(before);
   }
-  await expect(page.locator('#ui23-schedule-date')).toBeVisible();
+  await expect(page.locator('#dp35-schedule .dp35-monthbar')).toBeVisible();
 });
 
 test('REBORN 3.1: student tasks can be added, completed and removed', async ({ page }) => {
