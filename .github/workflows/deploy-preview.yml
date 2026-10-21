@@ -1,0 +1,36 @@
+name: Deploy DePara Preview API
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: depara-preview-api
+  cancel-in-progress: false
+
+jobs:
+  deploy-preview:
+    runs-on: ubuntu-latest
+    environment: depara-preview
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Verify reviewed preview source exists
+        shell: bash
+        run: |
+          test -s backend/src/preview-worker.js || {
+            echo "::error::Reviewed preview Worker source is not committed. Deployment blocked."
+            exit 1
+          }
+          grep -q 'name = "depara-api-preview"' backend/wrangler.preview.toml
+          grep -q 'database_name = "depara-preview-db"' backend/wrangler.preview.toml
+          grep -q 'main = "src/preview-worker.js"' backend/wrangler.preview.toml
+      - name: Deploy preview Worker only
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: backend
+          command: deploy --config wrangler.preview.toml
