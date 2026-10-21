@@ -263,7 +263,7 @@ test('REBORN 3.0: schedule date controls update and retain mobile accessibility'
   await expect(page.locator('#dp35-schedule .dp35-monthbar')).toBeVisible();
   const active=page.locator('.daystrip button.active');
   await expect(active).toHaveAttribute('aria-pressed','true');
-  const next=page.locator('#ui23-schedule-date button').last();
+  const next=page.locator('#dp35-schedule [data-dp35-next]');
   if(await next.isEnabled()){
     const before=await page.locator('#dp35-schedule .dp35-monthbar b').textContent();
     await next.click();
@@ -272,38 +272,38 @@ test('REBORN 3.0: schedule date controls update and retain mobile accessibility'
   await expect(page.locator('#dp35-schedule .dp35-monthbar')).toBeVisible();
 });
 
-test('REBORN 3.1: student tasks can be added, completed and removed', async ({ page }) => {
+test('REBORN current: student tasks can be added, completed and removed', async ({ page }) => {
  await page.locator('[data-dp-role="student"]').click();
  await page.locator('#dp-group-search').fill('ЕІ-23-1');
  await page.locator('#dp-search-results button').first().click();
  await page.locator('#dp-setup-done').click();
  await page.locator('#dp-success-enter').click();
  await page.locator('#nav button[data-page="study"]').click();
- await expect(page.locator('#dp31-planner')).toBeVisible();
- await page.locator('#dp31-title').fill('Лабораторна 3.1');
- await page.locator('#dp31-form button').click();
- await expect(page.locator('#dp31-list')).toContainText('Лабораторна 3.1');
- await page.locator('#dp31-list [data-action="done"]').first().click();
- await expect(page.locator('#dp31-list .is-done')).toHaveCount(1);
- await page.locator('#dp31-list [data-action="remove"]').first().click();
- await expect(page.locator('#dp31-list')).not.toContainText('Лабораторна 3.1');
+ await expect(page.locator('#task-form')).toBeVisible();
+ await page.locator('#task-form [name="title"]').fill('Лабораторна 3.1');
+ await page.locator('#task-form button').click();
+ await expect(page.locator('#screen .card.item').filter({hasText:'Лабораторна 3.1'})).toHaveCount(1);
+ await page.locator('#screen .card.item').filter({hasText:'Лабораторна 3.1'}).locator('[data-task]').check();
+ await page.locator('.study-filters [data-filter="done"]').click();
+ await expect(page.locator('#screen .card.item').filter({hasText:'Лабораторна 3.1'})).toHaveCount(1);
+ await page.locator('#screen .card.item').filter({hasText:'Лабораторна 3.1'}).locator('[data-delete-task]').click();
+ await expect(page.locator('#screen .card.item').filter({hasText:'Лабораторна 3.1'})).toHaveCount(0);
 });
 
-test('REBORN 3.1: student task survives reload with deadline', async ({ page }) => {
+test('REBORN current: student task survives reload with deadline', async ({ page }) => {
  await page.locator('[data-dp-role="student"]').click();
  await page.locator('#dp-group-search').fill('ЕІ-23-1');
  await page.locator('#dp-search-results button').first().click();
  await page.locator('#dp-setup-done').click();
  await page.locator('#dp-success-enter').click();
  await page.locator('#nav button[data-page="study"]').click();
- await page.locator('#dp31-title').fill('Перевірка збереження');
- await page.locator('#dp31-date').fill('2026-11-10');
- await page.locator('#dp31-form button').click();
- await expect(page.locator('#dp31-list')).toContainText('2026-11-10');
+ await page.locator('#task-form [name="title"]').fill('Перевірка збереження');
+ await page.locator('#task-form [name="due"]').fill('2026-11-10');
+ await page.locator('#task-form button').click();
+ await expect(page.locator('#screen .card.item').filter({hasText:'Перевірка збереження'})).toContainText('2026-11-10');
  await page.reload();
  await page.locator('#nav button[data-page="study"]').click();
- await expect(page.locator('#dp31-list')).toContainText('Перевірка збереження');
- await expect(page.locator('#dp31-list')).toContainText('2026-11-10');
+ await expect(page.locator('#screen .card.item').filter({hasText:'Перевірка збереження'})).toContainText('2026-11-10');
 });
 
 test('REBORN 3.1: teacher note persists after reload', async ({ page }) => {
@@ -334,24 +334,24 @@ test('REBORN 3.1: profile settings remain usable after navigating across tabs', 
  await expect(page.locator('#dp-v50-settings')).toBeVisible();
 });
 
-test('REBORN MEGA: home task summary opens study and filters completed tasks', async ({ page }) => {
+test('REBORN current: home and study use a single task list with working filters', async ({ page }) => {
  await page.locator('[data-dp-role="student"]').click();
  await page.locator('#dp-group-search').fill('ЕІ-23-1');
  await page.locator('#dp-search-results button').first().click();
  await page.locator('#dp-setup-done').click();
  await page.locator('#dp-success-enter').click();
  await page.locator('#nav button[data-page="study"]').click();
- await page.locator('#dp31-title').fill('Мега перевірка');
- await page.locator('#dp31-form button').click();
- await page.locator('#dp31-list [data-action="done"]').first().click();
- await page.locator('#dp31-filter').selectOption('open');
- await expect(page.locator('#dp31-list')).not.toContainText('Мега перевірка');
- await page.locator('#dp31-filter').selectOption('done');
- await expect(page.locator('#dp31-list')).toContainText('Мега перевірка');
+ await page.locator('#task-form [name="title"]').fill('Мега перевірка');
+ await page.locator('#task-form button').click();
+ await page.locator('#screen .card.item').filter({hasText:'Мега перевірка'}).locator('[data-task]').check();
+ await page.locator('.study-filters [data-filter="active"]').click();
+ await expect(page.locator('#screen .card.item').filter({hasText:'Мега перевірка'})).toHaveCount(0);
+ await page.locator('.study-filters [data-filter="done"]').click();
+ await expect(page.locator('#screen .card.item').filter({hasText:'Мега перевірка'})).toHaveCount(1);
  await page.locator('#nav button[data-page="today"]').click();
- await expect(page.locator('#dp31-home')).toBeVisible();
- await page.locator('#dp31-home').click();
- await expect(page.locator('#dp31-planner')).toBeVisible();
+ await expect(page.locator('.reborn-home .home-feature')).toBeVisible();
+ await page.locator('#nav button[data-page="study"]').click();
+ await expect(page.locator('#task-form')).toBeVisible();
 });
 
 test('REBORN UX audit: no profile-style widgets inside study or duplicate appearance in profile', async ({ page }) => {
