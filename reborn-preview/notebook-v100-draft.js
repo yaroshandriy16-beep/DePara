@@ -3,6 +3,16 @@ const nav=document.querySelector('#nav'),screen=document.querySelector('#screen'
 const study=nav.querySelector('[data-page="study"]'),social=nav.querySelector('[data-page="social"]');if(!study||!social)return;
 study.dataset.page='notebook';study.innerHTML='<span>▤</span>Зошит';social.remove();
 const style=document.createElement('style');style.textContent=`
+.dpnotebook .dpncard h2{font-size:16px!important;margin:0 0 10px}
+.dpnotebook .dpncard h3{font-size:14px!important}
+.dpnotebook .dpnitem{border-radius:13px!important}
+.dpnotebook .dpnmessages .dpnitem{padding:10px 12px!important;margin:7px 0!important}
+.dpnotebook .dpnmessages .dpnitem small{font-size:10px}
+.dpnotebook .dpnmessages .dpnitem p{font-size:13px;line-height:1.5;margin:6px 0 0}
+.dpnotebook .dpnformat{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none}
+.dpnotebook .dpnformat button{flex:0 0 auto;min-width:34px}
+.dpnotebook .dpnrefsubjecthead button{background:transparent!important;border:0!important;color:#c9e6cd!important;padding:5px!important}
+
 .dpnotebook .dpnrefbanner{display:flex;align-items:center;gap:10px;background:linear-gradient(110deg,#2e4830,#172d25 78%);border:1px solid #bd9c48;border-radius:15px;padding:12px;margin:7px 0 14px;color:#f5e6b4}
 .dpnotebook .dpnrefbanner>span:first-child{font-size:25px;flex:none}
 .dpnotebook .dpnrefbanner>div{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}
