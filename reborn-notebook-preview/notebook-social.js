@@ -14,13 +14,15 @@ const owner=()=>String(window.Telegram?.WebApp?.initDataUnsafe?.user?.id||'local
 const draftKey=()=>owner()==='local'?LEGACY:'dp_reborn2_nb_drafts_'+owner();
 const vis={private:'Лише я',friends:'Вибрані друзі',group:'Моя група',course:'Мій курс',faculty:'Мій факультет'};
 const privacy={none:'Приховати',busy:'Зайнятий / вільний',subject:'Назва пари й час',room:'Пара, час та аудиторія',inherit:'Як у загальних налаштуваннях'};
-const errors={AUTH_REQUIRED:'Для спільних функцій відкрий застосунок із тестового Telegram-бота.',SESSION_EXPIRED:'Сесія Telegram закінчилася. Закрий і відкрий мініапп заново.',INVALID_AUTH:'Не вдалося перевірити вхід Telegram. Відкрий тестового бота заново.',SERVICE_UNAVAILABLE:'Сервер тимчасово недоступний. Чернетки залишаються на пристрої.',FORBIDDEN:'Ця дія недоступна для твого облікового запису.',WAIT_48_HOURS:'Голосувати й висуватися можна після 48 годин у групі.',NEED_TWO_MEMBERS:'Для виборів потрібні щонайменше двоє учасників із правом голосу.',ELECTION_ACTIVE:'У групі вже триває голосування.',ELECTION_COOLDOWN:'Нове голосування можна почати через добу після попереднього.',FRIEND_NOT_FOUND:'Друга з таким кодом не знайдено. Він має відкрити вкладку «Зошит» у тестовому боті.',REQUEST_EXISTS:'Запит уже існує. Перевір вхідні або вихідні запити.',NOTE_NOT_SHARED:'Адресати цього чату не мають доступу до конспекту. Спочатку зміни його видимість.',TOO_FAST:'Зачекай кілька секунд перед наступною дією.',MUTED:'Модератор тимчасово обмежив надсилання повідомлень.',TOO_LARGE:'Вкладення завеликі. Обери менший файл.',REVISION_CONFLICT:'Цей запис змінився на іншому пристрої. Твоя чернетка збережена; онови список і порівняй версії.',NOT_FRIEND:'Спочатку підтвердіть дружбу.',INVALID_DATE:'Перевір дату й час зустрічі.',NOTE_LIMIT:'Досягнуто ліміту 500 записів.',SCHEDULE_UNAVAILABLE:'Розклад друга зараз не вдалося завантажити.'};
+const errors={AUTH_REQUIRED:'Для спільних функцій відкрий застосунок із тестового Telegram-бота.',SESSION_EXPIRED:'Сесія Telegram закінчилася. Закрий і відкрий мініапп заново.',INVALID_AUTH:'Не вдалося перевірити вхід Telegram. Відкрий тестового бота заново.',SERVICE_UNAVAILABLE:'Сервер тимчасово недоступний. Чернетки залишаються на пристрої.',FORBIDDEN:'Ця дія недоступна для твого облікового запису.',WAIT_48_HOURS:'Голосувати й висуватися можна після 48 годин у групі.',NEED_TWO_MEMBERS:'Для виборів потрібні щонайменше двоє учасників із правом голосу.',ELECTION_ACTIVE:'У групі вже триває голосування.',ELECTION_COOLDOWN:'Нове голосування можна почати через добу після попереднього.',FRIEND_NOT_FOUND:'Друга з таким кодом не знайдено. Він має відкрити вкладку «Зошит» у тестовому боті.',REQUEST_EXISTS:'Запит уже існує. Перевір вхідні або вихідні запити.',NOTE_NOT_SHARED:'Адресати цього чату не мають доступу до конспекту. Спочатку зміни його видимість.',TOO_FAST:'Зачекай кілька секунд перед наступною дією.',MUTED:'Модератор тимчасово обмежив надсилання повідомлень.',TOO_LARGE:'Вкладення завеликі. Обери менший файл.',REVISION_CONFLICT:'Цей запис змінився на іншому пристрої. Твоя чернетка збережена; онови список і порівняй версії.',NOT_FRIEND:'Спочатку підтвердіть дружбу.',INVALID_FIELD:'Вкажи назву запису перед збереженням.',LOCAL_STORAGE:'Не вдалося оновити локальне сховище. Перевір вільне місце й повтори дію.',INVALID_DATE:'Перевір дату й час зустрічі.',NOTE_LIMIT:'Досягнуто ліміту 500 записів.',SCHEDULE_UNAVAILABLE:'Розклад друга зараз не вдалося завантажити.'};
 let S={tab:'notes',subject:null,note:null,notes:[],drafts:get(draftKey(),[]),me:null,friends:[],channels:[],ready:false,loading:false,error:'',search:'',filter:'all',section:'note',thread:null,messages:[],reply:0,chatDraft:'',chatFiles:[],chatSearch:'',canModerate:false,election:null,electionData:null,invitations:[],friendDetail:null,availability:null,customSubjects:get('dp_reborn2_nb_subjects',[]),saving:false};
 S.messageMenu=null;S.attachMenu=false;S.chatSearchOpen=false;
 let booting=null,lastGroup=null,attemptedGroup=null,saveTimer,saveChain=Promise.resolve(),requestEpoch=0;
+const edits=new Map(),deleting=new Set();
+let pendingSaves=0;
 function localNotes(){const d=get(draftKey(),[]);return Array.isArray(d)?d:[]}
 function localStore(){try{localStorage.setItem(draftKey(),JSON.stringify(S.drafts));return true}catch{S.error='Не вистачає місця на пристрої. Збережи копію тексту.';return false}}
-function persist(n){const at=S.drafts.findIndex(x=>x.id===n.id);if(at<0)S.drafts.unshift({...n});else S.drafts[at]={...n};return localStore()}
+function persist(n){const at=S.drafts.findIndex(x=>x.id===n.id),copy=JSON.parse(JSON.stringify(n));if(at<0)S.drafts.unshift(copy);else S.drafts[at]=copy;return localStore()}
 function listNotes(){const m=new Map(S.notes.map(n=>[n.id,n]));for(const d of S.drafts)if(!m.has(d.id)||d.dirty)m.set(d.id,d);return [...m.values()].sort((a,b)=>(b.updated_at||b.updated||0)-(a.updated_at||a.updated||0))}
 const date=n=>new Date(n.updated_at||n.updated||n.created_at||n.created||Date.now()).toLocaleDateString('uk-UA',{day:'numeric',month:'short'});
 const btn=(label,action,extra='',cls='')=>'<button type="button" class="nb-btn '+cls+'" data-action="'+action+'" '+extra+'>'+label+'</button>';
@@ -60,11 +62,12 @@ function notesView(){
  if(S.note)return editorView();
  const all=listNotes().filter(n=>!n.deleted_at),allSubjects=subjects();
  let notes=all.filter(n=>S.subject===null||n.subject===S.subject);
- if(S.search)notes=notes.filter(n=>(n.title+' '+n.subject+' '+n.body).toLocaleLowerCase('uk').includes(S.search.toLocaleLowerCase('uk')));
+ const search=S.search.trim().normalize('NFC').toLocaleLowerCase('uk');
+ if(search)notes=notes.filter(n=>[n.title,n.subject,n.body].join(' ').normalize('NFC').toLocaleLowerCase('uk').includes(search));
  if(S.filter==='mine')notes=notes.filter(n=>!n.owner_id||n.owner_id===S.me?.id);if(S.filter==='shared')notes=notes.filter(n=>n.owner_id&&n.owner_id!==S.me?.id);
  if(S.subject!==null)notes=notes.filter(n=>(n.kind||'note')===S.section);
  let out='';
- if(S.subject===null&&!S.search){out+=intro('notes')+'<div class="nb-library-hero"><div class="nb-hero-copy"><span class="nb-eyebrow">ДЛЯ ТВОЇХ ІДЕЙ</span><h2>Усе з пар.<br>Під рукою.</h2><p>Конспекти, завдання й матеріали до пар.</p>'+btn(icon('plus')+' Новий запис','note-new','data-nb="new"','nb-primary')+'</div><div class="nb-book-art" aria-hidden="true"><div class="nb-art-book nb-art-back"></div><div class="nb-art-book nb-art-front"><span>ДеПара?</span>'+icon('book')+'<small>МОЇ КОНСПЕКТИ</small></div><span class="nb-art-spark">✦</span></div></div><div class="nb-metrics"><span><strong>'+allSubjects.length+'</strong> предметів</span><span><strong>'+all.length+'</strong> записів</span><span>'+icon('lock')+' Твій простір</span></div>';}
+ if(S.subject===null&&!S.search){out+='<div class="nb-library-hero"><div class="nb-hero-copy"><span class="nb-eyebrow">ДЛЯ ТВОЇХ ІДЕЙ</span><h2>Усе з пар.<br>Під рукою.</h2><p>Конспекти, завдання й матеріали до пар.</p>'+btn(icon('plus')+' Новий запис','note-new','data-nb="new"','nb-primary')+'</div><div class="nb-book-art" aria-hidden="true"><div class="nb-art-book nb-art-back"></div><div class="nb-art-book nb-art-front"><span>ДеПара?</span>'+icon('book')+'<small>МОЇ КОНСПЕКТИ</small></div><span class="nb-art-spark">✦</span></div></div><div class="nb-metrics"><span><strong>'+allSubjects.length+'</strong> предметів</span><span><strong>'+all.length+'</strong> записів</span><span>'+icon('lock')+' Твій простір</span></div>';}
  if(S.subject!==null)out+='<div class="nb-row nb-between nb-section-head">'+btn('← Предмети','subjects')+btn(icon('plus')+' Новий запис','note-new','','nb-primary')+'</div><div class="nb-subject-heading"><span class="nb-subject-icon">'+icon('book')+'</span><div><span class="nb-eyebrow">МІЙ ЗОШИТ</span><h2>'+esc(S.subject||'Без предмета')+'</h2><p class="nb-sub">'+noteCount(all.filter(n=>n.subject===S.subject).length)+'</p></div></div>';
  out+='<div class="nb-search-wrap">'+icon('search')+'<input id="nb-search" class="nb-search" type="search" aria-label="Пошук конспектів" placeholder="Знайти конспект або тему…" value="'+esc(S.search)+'"></div>';
  out+='<div class="nb-row nb-filters">'+[['all','Усе'],['mine','Мої'],['shared','Спільні']].map(([k,v])=>btn(v,'filter','data-value="'+k+'" aria-pressed="'+(S.filter===k)+'"',S.filter===k?'nb-filter-active':'')).join('')+'</div>';
@@ -155,28 +158,70 @@ function render(){
 }
 function draw(){
  if(!active())return;const screen=$('#screen');if(!screen)return;
- const y=window.scrollY,old=$('#nb-message-list'),scroll=old?{top:old.scrollTop,height:old.scrollHeight,bottom:old.scrollHeight-old.scrollTop-old.clientHeight<70}:null,input=$('#nb-message'),focused=input&&document.activeElement===input,selection=focused?[input.selectionStart,input.selectionEnd]:null;
+ const y=window.scrollY,old=$('#nb-message-list'),scroll=old?{top:old.scrollTop,height:old.scrollHeight,bottom:old.scrollHeight-old.scrollTop-old.clientHeight<70}:null,input=document.activeElement,focused=input?.closest('#dp-nb')&&input.matches('input,textarea,select')?input.id:null,selection=focused&&typeof input.selectionStart==='number'?[input.selectionStart,input.selectionEnd]:null;
  const opened=[...screen.querySelectorAll('#dp-nb details[open]>summary')].map(x=>x.textContent);screen.innerHTML=render();
  for(const summary of screen.querySelectorAll('#dp-nb details>summary'))if(opened.includes(summary.textContent))summary.parentElement.open=true;
  const fresh=$('#nb-message-list');if(fresh){if(S.preserveOlder&&scroll){fresh.scrollTop=scroll.top+fresh.scrollHeight-scroll.height;S.preserveOlder=false;}else fresh.scrollTop=S.scrollToEnd||!scroll||scroll.bottom?fresh.scrollHeight:scroll.top;S.scrollToEnd=false;}
- resizeChatInput();if(focused){const field=$('#nb-message');field?.focus({preventScroll:true});if(selection)field?.setSelectionRange(...selection);}
+ resizeChatInput();if(focused){const field=document.getElementById(focused);field?.focus({preventScroll:true});if(selection)try{field?.setSelectionRange(...selection)}catch{}}
  if(S.messageMenu)$('#dp-nb .nb-message-sheet button')?.focus({preventScroll:true});
  if(!fresh&&window.scrollY!==y)window.scrollTo(0,y);
 }
 function resizeChatInput(){const input=$('#nb-message');if(!input)return;const list=$('#nb-message-list'),bottom=list&&list.scrollHeight-list.scrollTop-list.clientHeight<70;input.style.height='auto';input.style.height=Math.min(input.scrollHeight,128)+'px';if(bottom)list.scrollTop=list.scrollHeight;}
 function syncChatViewport(){const v=window.visualViewport,root=document.documentElement,list=$('#nb-message-list'),bottom=list&&list.scrollHeight-list.scrollTop-list.clientHeight<70;root.style.setProperty('--nb-viewport-height',(v?.height||window.innerHeight)+'px');root.style.setProperty('--nb-viewport-top',(v?.offsetTop||0)+'px');if(bottom)requestAnimationFrame(()=>{if(list.isConnected)list.scrollTop=list.scrollHeight;});}
 syncChatViewport();window.visualViewport?.addEventListener('resize',syncChatViewport);window.visualViewport?.addEventListener('scroll',syncChatViewport);window.addEventListener('resize',syncChatViewport);
-function newNote(){const n={id:uuid(),title:'Новий конспект',body:'',subject:S.subject||'',kind:S.subject?S.section:'note',due:'',done:0,visibility:'private',audience:[],attachments:[],created_at:Date.now(),updated_at:Date.now(),dirty:true,owner_id:S.me?.id||undefined};S.note=n;persist(n);draw();$('#dp-nb-title')?.focus()}
-function updateDraft(){const n=S.note;if(!n)return;n.updated_at=Date.now();n.dirty=true;const ok=persist(n);const status=$('#dp-nb-status');if(status)status.textContent=ok?'✓ Чернетку збережено на цьому пристрої':'Не вдалося зберегти — скопіюй текст';clearTimeout(saveTimer);if(S.ready&&n.visibility==='private')saveTimer=setTimeout(()=>{void saveNote(false).catch(e=>{S.error=messageError(e);draw()})},1000)}
-async function saveNote(explicit){
- const n=S.note;if(!n)return;
- if(!n.title.trim())throw Error('INVALID_FIELD');
- if(!S.ready){if(n.visibility!=='private')throw Error('AUTH_REQUIRED');persist(n);toast('Збережено на цьому пристрої');return}
+function newNote(){const n={id:uuid(),title:'Новий конспект',body:'',subject:S.subject||'',kind:S.subject?S.section:'note',due:'',done:0,visibility:'private',audience:[],attachments:[],created_at:Date.now(),updated_at:Date.now(),dirty:true,owner_id:S.me?.id||undefined};flushDraft();S.note=n;persist(n);draw();$('#dp-nb-title')?.focus()}
+function saveStatus(n,text){if(S.note?.id===n.id){const status=$('#dp-nb-status');if(status)status.textContent=text}}
+function backgroundSave(n){void saveNote(false,n).catch(e=>{S.error=messageError(e);saveStatus(n,'Не вдалося синхронізувати. Чернетка залишається на пристрої.');})}
+function flushDraft(){clearTimeout(saveTimer);const n=S.note;if(n?.dirty&&n.visibility==='private'&&S.ready)backgroundSave(n)}
+function updateDraft(){
+ const n=S.note;if(!n||deleting.has(n.id))return;
+ n.updated_at=Date.now();n.dirty=true;edits.set(n.id,(edits.get(n.id)||0)+1);
+ const ok=persist(n);saveStatus(n,ok?'✓ Чернетку збережено на цьому пристрої':'Не вдалося зберегти — скопіюй текст');
+ clearTimeout(saveTimer);if(S.ready&&n.visibility==='private')saveTimer=setTimeout(()=>backgroundSave(n),1000);
+}
+async function saveNote(explicit,n=S.note){
+ if(!n||deleting.has(n.id))return;
+ if(!n.title.trim()){if(explicit)throw Error('INVALID_FIELD');return}
+ if(!S.ready){if(n.visibility!=='private')throw Error('AUTH_REQUIRED');if(persist(n))toast('Збережено на цьому пристрої');return}
  if(n.visibility!=='private'&&!explicit)return;
  if(explicit&&n.visibility!=='private'&&!confirm(scopeLabel(n.visibility)+' Опублікувати цей запис?'))return;
- const snapshot=JSON.parse(JSON.stringify(n));S.saving=true;
- const task=async()=>{try{const result=await api('notes/save','POST',{...snapshot,revision:n.revision});n.revision=result.note.revision;const latest=S.drafts.find(x=>x.id===n.id);if(latest&&latest.updated_at===snapshot.updated_at){Object.assign(latest,{revision:n.revision,dirty:false});n.dirty=false;}else if(latest)latest.revision=n.revision;const stored={...snapshot,revision:n.revision,dirty:false};const at=S.notes.findIndex(x=>x.id===n.id);if(at<0)S.notes.unshift(stored);else S.notes[at]=stored;localStore();if(explicit)toast('Збережено');}finally{S.saving=false;const status=$('#dp-nb-status');if(status)status.textContent=n.dirty?'Чернетку збережено':'✓ Збережено в хмарі'}};
+ const snapshot=JSON.parse(JSON.stringify(n)),version=edits.get(n.id)||0,generation=requestEpoch;
+ pendingSaves++;S.saving=true;saveStatus(n,'Збереження…');
+ const task=async()=>{
+  try{
+   if(deleting.has(n.id)||generation!==requestEpoch)return;
+   // Resolve the revision when this queued write starts, after previous writes.
+   const draft=S.drafts.find(x=>x.id===n.id);
+   const result=await api('notes/save','POST',{...snapshot,revision:draft?.revision??n.revision});
+   if(generation!==requestEpoch)return;
+   n.revision=result.note.revision;
+   const latest=S.drafts.find(x=>x.id===n.id),unchanged=(edits.get(n.id)||0)===version;
+   if(latest){latest.revision=n.revision;if(unchanged)latest.dirty=false;}
+   if(unchanged){n.dirty=false;if(S.note?.id===n.id){S.note.revision=n.revision;S.note.dirty=false;}}
+   const stored={...snapshot,revision:n.revision,dirty:false},at=S.notes.findIndex(x=>x.id===n.id);
+   if(at<0)S.notes.unshift(stored);else S.notes[at]=stored;
+   const localOK=localStore();
+   saveStatus(n,!localOK?'Хмарну копію збережено. Не вдалося оновити локальну копію.':unchanged?'✓ Збережено в хмарі':'Нові правки залишаються в чернетці');
+   if(explicit)toast('Збережено');
+  }catch(e){saveStatus(n,'Не вдалося синхронізувати. Чернетка залишається на пристрої.');throw e}
+  finally{pendingSaves--;S.saving=pendingSaves>0;}
+ };
  const next=saveChain.catch(()=>{}).then(task);saveChain=next;return next;
+}
+async function deleteNote(){
+ const n=S.note,generation=requestEpoch;if(!n||!confirm('Видалити цей запис?'))return;
+ clearTimeout(saveTimer);deleting.add(n.id);
+ try{
+  // Let an in-flight create finish before issuing its delete; queued saves skip it.
+  await saveChain.catch(()=>{});
+  if(generation!==requestEpoch)return;
+  if(S.ready&&(n.revision||S.drafts.find(x=>x.id===n.id)?.revision))await api('notes/delete','POST',{id:n.id});
+  if(generation!==requestEpoch)return;
+  const previousNotes=S.notes,previousDrafts=S.drafts;
+  S.notes=S.notes.filter(x=>x.id!==n.id);S.drafts=S.drafts.filter(x=>x.id!==n.id);
+  if(!localStore()){S.notes=previousNotes;S.drafts=previousDrafts;throw Error('LOCAL_STORAGE')}
+  edits.delete(n.id);if(S.note?.id===n.id)S.note=null;
+ }finally{deleting.delete(n.id)}
 }
 async function openThread(key,title){S.tab='chats';S.messageMenu=null;S.attachMenu=false;S.chatSearchOpen=false;S.threadElection=false;S.chatSearch='';S.thread={key,title};S.messages=[];S.reply=0;S.chatDraft='';S.chatFiles=[];S.chatSearch='';await refreshThread();}
 async function refreshThread(older=false){if(!S.thread)return;const channel=S.thread.key;const before=older&&S.messages.length?'&before='+S.messages[0].id:'';const r=await api('messages?channel='+encodeURIComponent(channel)+before);if(S.thread?.key!==channel)return;if(older)S.preserveOlder=true;S.messages=older?[...r.messages,...S.messages]:r.messages;S.canModerate=r.canModerate;if(S.messages.length)await api('messages/read','POST',{channel,id:S.messages.at(-1).id});}
@@ -188,6 +233,7 @@ async function addFiles(file,chat){if(!file)return;let data,type=file.type||'app
 function downloadFile(context,index){const files=context==='note'?S.note?.attachments:context==='chat'?S.chatFiles:S.messages.find(m=>'message-'+m.id===context)?.attachments;const f=files?.[index];if(!f)return;const encoded=f.data.split(',')[1],binary=atob(encoded),array=Uint8Array.from(binary,c=>c.charCodeAt(0));const url=URL.createObjectURL(new Blob([array],{type:f.type})),a=document.createElement('a');a.href=url;a.download=f.name;a.click();setTimeout(()=>URL.revokeObjectURL(url),30000)}
 document.addEventListener('click',async e=>{
  const nav=e.target.closest('#nav [data-page="notebook"]');if(nav){setTimeout(()=>{draw();ensure()},0);return}
+ if(e.target.closest('#nav [data-page]')){flushDraft();return}
  if(!e.target.closest('#dp-nb'))return;e.stopPropagation();const b=e.target.closest('[data-action]');if(!b)return;if(b.dataset.action==='message-send')e.preventDefault();const a=b.dataset.action,id=b.dataset.id;
  if(a==='message-menu'){S.messageMenu=Number(id);draw();return}if(a==='message-menu-close'){S.messageMenu=null;draw();return}
  if(a==='chat-attachments'){S.attachMenu=!S.attachMenu;draw();return}
@@ -195,15 +241,15 @@ document.addEventListener('click',async e=>{
  if(a==='thread-search-close'){S.chatSearchOpen=false;S.chatSearch='';draw();return}
  if(a==='thread-election'){b.closest('details')?.removeAttribute('open');S.threadElection=!S.threadElection;draw();return}
  S.messageMenu=null;b.closest('.nb-thread-options')?.removeAttribute('open');
- if(a==='tab'){clearTimeout(saveTimer);S.tab=b.dataset.value;S.error='';draw();if(S.tab==='chats'&&S.ready)void act(async()=>{S.electionData=await api('elections')});return}
+ if(a==='tab'){flushDraft();S.tab=b.dataset.value;S.error='';draw();if(S.tab==='chats'&&S.ready)void act(async()=>{S.electionData=await api('elections')});return}
  if(a==='download'){downloadFile(b.dataset.context,Number(b.dataset.index));return}
  if(a==='subject'){S.subject=b.dataset.value;S.section='note';S.search='';draw();return}
  if(a==='subjects'){S.subject=null;S.search='';draw();return}
- if(a==='subject-new'){const name=prompt('Назва предмета');if(name?.trim()){S.customSubjects.push(name.trim().slice(0,180));localStorage.setItem('dp_reborn2_nb_subjects',JSON.stringify(S.customSubjects));S.subject=name.trim().slice(0,180);draw()}return}
+ if(a==='subject-new'){const name=prompt('Назва предмета');if(name?.trim()){const clean=name.trim().slice(0,180),existing=subjects().find(s=>s.toLocaleLowerCase('uk')===clean.toLocaleLowerCase('uk'));if(existing){S.subject=existing;draw();return}S.customSubjects.push(clean);localStorage.setItem('dp_reborn2_nb_subjects',JSON.stringify(S.customSubjects));S.subject=name.trim().slice(0,180);draw()}return}
  if(a==='filter'){S.filter=b.dataset.value;draw();return}if(a==='section'){S.section=b.dataset.value;draw();return}
  if(a==='note-new'){newNote();return}
  if(a==='note-open'){const n=listNotes().find(n=>n.id===id);if(n){if(S.ready&&n.attachments===undefined){await act(async()=>{S.note=(await api('notes/get?id='+encodeURIComponent(id))).note})}else{S.note=JSON.parse(JSON.stringify(n));draw()}}return}
- if(a==='note-back'){clearTimeout(saveTimer);if(S.ready&&S.note?.visibility==='private'&&S.note?.dirty)void saveNote(false).catch(e=>{S.error=messageError(e);draw()});S.note=null;draw();return}
+ if(a==='note-back'){flushDraft();S.note=null;draw();return}
  if(a==='format'){const input=$('#dp-nb-body');if(!input)return;const v=b.dataset.value,start=input.selectionStart,end=input.selectionEnd,selected=input.value.slice(start,end);input.setRangeText(v+selected+(['**','*','=='].includes(v)?v:''),start,end,'end');input.dispatchEvent(new Event('input',{bubbles:true}));input.focus();return}
  if(a==='note-file'){$('#nb-file')?.click();return}if(a==='chat-file'){S.attachMenu=false;$('#nb-chat-file')?.click();return}
  if(a==='file-remove'){S.note.attachments.splice(Number(b.dataset.index),1);updateDraft();draw();return}
@@ -216,7 +262,7 @@ document.addEventListener('click',async e=>{
   if(a==='refresh'){if(S.ready){await refreshNotes();await refreshFriends();if(S.thread)await refreshThread()}else await bootstrap();}
   if(a==='note-save'){clearTimeout(saveTimer);await saveNote(true)}
   if(a==='note-copy'){const source=S.note;S.note={...source,id:uuid(),title:source.title+' (копія)',owner_id:S.me?.id,visibility:'private',audience:[],revision:undefined,created_at:Date.now(),updated_at:Date.now(),dirty:true,author:undefined};persist(S.note);await saveNote(false)}
-  if(a==='note-delete'){if(!confirm('Видалити цей запис?'))return;const n=S.note;if(S.ready&&n.revision)await api('notes/delete','POST',{id:n.id});S.notes=S.notes.filter(x=>x.id!==n.id);S.drafts=S.drafts.filter(x=>x.id!==n.id);localStore();S.note=null;}
+  if(a==='note-delete')await deleteNote();
   if(a==='note-reload'){await refreshNotes();const current=S.notes.find(n=>n.id===S.note.id);if(current){if(confirm('Твоя чернетка залишиться окремою копією. Відкрити серверну версію?')){S.drafts=S.drafts.filter(n=>n.id!==current.id);S.drafts.push({...S.note,id:uuid(),revision:undefined,visibility:'private',title:S.note.title+' (чернетка)',dirty:true});localStore();S.note={...current};S.error='';}}}
   if(a==='legacy-import'){if(!confirm('Додати попередні локальні записи до твого особистого облікового запису?'))return;const old=get(LEGACY,[]);let count=0;for(const n of old){if(S.notes.some(x=>x.id===n.id)||!n.title)continue;S.note={...n,subject:n.subject||'',visibility:'private',audience:[],attachments:[],kind:'note',owner_id:S.me.id,updated_at:Date.now(),dirty:true};persist(S.note);await saveNote(false);count++;}S.note=null;toast('Імпортовано: '+count);}
   if(a==='thread')await openThread(b.dataset.channel,b.dataset.title);
@@ -256,9 +302,11 @@ document.addEventListener('change',e=>{const el=e.target;if(!el.closest('#dp-nb'
  if(el.id==='nb-file'||el.id==='nb-chat-file'){const file=el.files?.[0];el.value='';void act(()=>addFiles(file,el.id==='nb-chat-file'));}
 });
 document.addEventListener('submit',e=>{if(e.target.id!=='nb-compose')return;e.preventDefault();void act(async()=>{if(!S.chatDraft.trim()&&!S.chatFiles.length)return;await api('messages/send','POST',{channel:S.thread.key,body:S.chatDraft,attachments:S.chatFiles,replyId:S.reply});S.chatDraft='';S.chatFiles=[];S.reply=0;await refreshThread()})});
-window.addEventListener('depara:student-group',()=>{requestEpoch++;attemptedGroup=null;S.ready=false;S.me=null;S.thread=null;S.note=null;S.notes=[];S.subject=null;S.friendDetail=null;S.availability=null;S.electionData=null;if(active())setTimeout(()=>void bootstrap(),0)});
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&active()&&S.ready&&!S.loading)void act(async()=>{await refreshFriends();if(S.thread)await refreshThread()})});
+window.addEventListener('depara:student-group',()=>{clearTimeout(saveTimer);requestEpoch++;attemptedGroup=null;S.ready=false;S.me=null;S.thread=null;S.note=null;S.notes=[];S.subject=null;S.friendDetail=null;S.availability=null;S.electionData=null;if(active())setTimeout(()=>void bootstrap(),0)});
+window.addEventListener('pagehide',flushDraft);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')flushDraft();if(document.visibilityState==='visible'&&active()&&S.ready&&!S.loading)void act(async()=>{await refreshFriends();if(S.thread)await refreshThread()})});
 setInterval(async()=>{if(!active()||!S.ready||S.loading||!S.thread||document.visibilityState==='hidden'||document.activeElement?.matches('input,textarea,select'))return;try{const before=JSON.stringify(S.messages);await refreshThread();if(before!==JSON.stringify(S.messages))draw()}catch{}},7000);
 document.addEventListener('DOMContentLoaded',()=>{const original=window.DeParaShowLesson;if(typeof original!=='function')return;window.DeParaShowLesson=lesson=>{original(lesson);if(document.body.dataset.dpRole==='teacher')return;const dialog=$('dialog.dp-lesson-dialog[open]');if(!dialog||!lesson?.subject)return;const button=document.createElement('button');button.type='button';button.className='dp-lesson-done';button.id='nb-lesson-note';button.textContent='▤ Конспект до цієї пари';button.onclick=()=>{dialog.close();S.tab='notes';S.subject=String(lesson.subject);$('#nav [data-page="notebook"]')?.click();newNote();S.note.title=String(lesson.subject).slice(0,95)+' · '+(lesson.date||'');S.note.lesson=JSON.stringify({date:lesson.date,start:lesson.start,subject:lesson.subject}).slice(0,600);updateDraft();draw()};dialog.querySelector('.dp-lesson-fields')?.after(button)}});
 window.DeParaNotebook={render,version:2};
 })();
+

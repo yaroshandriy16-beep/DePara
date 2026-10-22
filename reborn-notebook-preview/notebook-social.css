@@ -205,7 +205,7 @@ body.light #dp-nb .nb-danger,body.light #dp-nb .nb-error{color:#9d2626}
 #dp-nb .nb-toolbar .nb-btn{padding:5px 7px;border:0;background:transparent;font-size:10px;min-width:30px;min-height:34px;border-radius:7px;color:#d5dfc9}
 #dp-nb .nb-toolbar .nb-btn:first-child{font-weight:800;font-size:14px}
 #dp-nb .nb-toolbar .nb-btn:nth-child(2){font-style:italic;font-family:Georgia,serif;font-size:15px}
-#dp-nb #dp-nb-body{min-height:280px;background:repeating-linear-gradient(transparent 0 30px,#aec5980b 30px 31px),#09201733;background-position:0 12px;border:1px solid #ffffff10;line-height:31px;font-size:15px;border-radius:12px;padding:12px 14px}
+#dp-nb #dp-nb-body{min-height:45vh;min-height:45svh;background:repeating-linear-gradient(transparent 0 30px,#aec5980b 30px 31px),#09201733;background-position:0 12px;border:1px solid #ffffff10;line-height:31px;font-size:16px;border-radius:12px;padding:12px 14px}
 #dp-nb .nb-editor>.nb-sub{font-size:10px;line-height:1.7}
 #dp-nb .nb-editor>.nb-row:has([data-action=note-save]){padding-top:9px}
 #dp-nb [data-action=note-save]{flex:1}
@@ -412,3 +412,21 @@ body:has(#dp-nb[data-view=thread]) .app{padding:0}
 #dp-nb[data-view=thread] .nb-thread-header{margin:0!important;padding:10px 12px 10px 5px!important}
 
 body:has(#dp-nb[data-view=thread]) #toast{z-index:100;bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+
+
+/* Notebook editor: keep text readable and controls reachable in iPhone WebViews. */
+#dp-nb[data-view=editor]{padding-bottom:calc(110px + env(safe-area-inset-bottom,0px))}
+#dp-nb .nb-editor-nav{position:sticky;top:0;z-index:3;background:var(--nb-editor-surface,#14231c);padding:8px 0}
+body.light #dp-nb{--nb-editor-surface:#f4f6ed}
+#dp-nb .nb-editor input,#dp-nb .nb-editor textarea,#dp-nb .nb-editor select{font-size:16px;scroll-margin-top:76px}
+#dp-nb .nb-editor textarea{min-height:45vh;min-height:45svh;resize:vertical}
+#dp-nb :is(button,input,textarea,select):focus-visible{outline:2px solid #b4cd8c;outline-offset:3px}
+#dp-nb .nb-editor-nav .nb-btn{min-height:44px}
+@media(max-width:420px){
+ #dp-nb[data-view=editor] .nb-header,#dp-nb[data-view=editor] .nb-connection{display:none}
+ #dp-nb .nb-editor-nav{flex-wrap:wrap;gap:6px}
+ #dp-nb .nb-editor-nav .nb-eyebrow{font-size:10px}
+ #dp-nb .nb-toolbar{flex-wrap:nowrap;overflow-x:auto;padding:4px 2px;scrollbar-width:thin}
+ #dp-nb .nb-toolbar .nb-btn{flex-shrink:0;white-space:nowrap}
+ #dp-nb .nb-editor>.nb-row>.nb-grow{flex:1 1 140px;min-width:0}
+}
