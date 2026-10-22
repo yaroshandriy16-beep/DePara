@@ -86,6 +86,22 @@ async function channelAccess(db,me,key) {
   } else if(key!==`group:${g.id}`&&key!==`course:${g.facultyId}:${g.course}`&&key!==`faculty:${g.facultyId}`&&!new RegExp('^subject:'+g.id+':[^:]{1,1800}$').test(key))fail('FORBIDDEN',403);
   return true;
 }
+async function canShareNote(db,n,me,channel){
+  if(!await canRead(db,n,me)||n.visibility==='private')return false;
+  if(channel.startsWith('dm:')){const other=await one(db,'SELECT * FROM nb_profiles WHERE id=?',channel.slice(3).split(':').find(x=>x!==me.id));return !!other&&await canRead(db,n,other);}
+  const g=groups[n.group_id],mine=groups[me.group_id];
+  return n.visibility==='faculty'&&g.facultyId===mine.facultyId||n.visibility==='course'&&g.facultyId===mine.facultyId&&g.course===mine.course&&(channel.startsWith('course:')||channel.startsWith('group:')||channel.startsWith('subject:'))||n.visibility==='group'&&g.id===mine.id&&(channel.startsWith('group:')||channel.startsWith('subject:'));
+}
+async function channelSummaries(db,me,channels){
+  for(let offset=0;offset<channels.length;offset+=30){
+    const batch=channels.slice(offset,offset+30),keys=batch.map(c=>c.key),marks=keys.map(()=>'?').join(',');
+    const latest=await all(db,`SELECT id,channel,name,author_id,body,created_at,deleted,note_id,json_array_length(attachments) AS files FROM nb_messages WHERE id IN (SELECT max(id) FROM nb_messages WHERE channel IN (${marks}) GROUP BY channel)`,...keys);
+    const unread=await all(db,`SELECT m.channel,count(*) AS n FROM nb_messages m LEFT JOIN nb_reads r ON r.channel=m.channel AND r.user_id=? WHERE m.channel IN (${marks}) AND m.id>COALESCE(r.last_id,0) AND m.author_id<>? AND m.deleted=0 GROUP BY m.channel`,me.id,...keys,me.id);
+    for(const c of batch){const last=latest.find(m=>m.channel===c.key);c.unread=unread.find(r=>r.channel===c.key)?.n||0;c.last=last?{id:last.id,author:last.name,mine:last.author_id===me.id,at:last.created_at,text:last.deleted?'Повідомлення видалено':last.body.slice(0,160)||(last.note_id?'Конспект':last.files?'Вкладення':'Повідомлення')}:null;}
+  }
+  return channels;
+}
+const searchGlob=text=>'*'+[...text].map(c=>c.toUpperCase()!==c.toLowerCase()?'['+c.toUpperCase()+c.toLowerCase()+']':c==='*'?'[*]':c==='?'?'[?]':c==='['?'[[]':c).join('')+'*';
 async function throttle(db,table,field,user,millis) {
   const last=await one(db,`SELECT created_at FROM ${table} WHERE ${field}=? ORDER BY created_at DESC LIMIT 1`,user);
   if(last&&now()-last.created_at<millis)fail('TOO_FAST',429);
@@ -128,7 +144,7 @@ export async function notebookApi(request,env) {
   if(request.headers.get('Origin')&&request.headers.get('Origin')!==ALLOWED) return reply({ok:false,error:'FORBIDDEN'},403);
   try {
     if(url.pathname===PREFIX+'health'){
-      await one(env.DB,'SELECT 1 AS connected');let schemaReady=false;try{await one(env.DB,'SELECT id FROM nb_profiles LIMIT 1');schemaReady=true}catch{}return reply({ok:true,version:VERSION,database:true,schemaReady});
+      await one(env.DB,'SELECT 1 AS connected');let schemaReady=false;try{await one(env.DB,'SELECT id FROM nb_profiles LIMIT 1');schemaReady=true}catch{}return reply({ok:true,version:VERSION,features:['notebook-upgrade-5'],database:true,schemaReady});
     }
     const user=await authenticate(request,env.TELEGRAM_BOT_TOKEN),db=env.DB;
     await ensureSchema(db);
@@ -159,8 +175,11 @@ export async function notebookApi(request,env) {
       await closeElection(db,await one(db,"SELECT * FROM nb_elections WHERE group_id=? AND state='open'",me.group_id));
       const fs=await friendViews(db,me),leader=await one(db,'SELECT user_id FROM nb_leaders WHERE group_id=?',me.group_id);
       const g=groups[me.group_id],channels=[{key:`group:${g.id}`,title:g.name},{key:`course:${g.facultyId}:${g.course}`,title:`${g.course} курс · ${g.faculty}`},{key:`faculty:${g.facultyId}`,title:g.faculty}];
-      for(const c of channels){const r=await one(db,'SELECT count(*) AS n FROM nb_messages WHERE channel=? AND id>COALESCE((SELECT last_id FROM nb_reads WHERE user_id=? AND channel=?),0) AND author_id<>? AND deleted=0',c.key,me.id,c.key,me.id);c.unread=r.n;}
-      return reply({ok:true,version:VERSION,me:{...me,group:g,isLeader:leader?.user_id===me.id},friends:fs,channels});
+      const subjectChats=await all(db,'SELECT channel,max(id) AS latest FROM nb_messages WHERE channel LIKE ? GROUP BY channel ORDER BY latest DESC LIMIT 60',`subject:${g.id}:%`);
+      for(const row of subjectChats){let title=row.channel.split(':').slice(2).join(':');try{title=decodeURIComponent(title)}catch{}channels.push({key:row.channel,title});}
+      const direct=fs.filter(f=>f.state==='accepted').map(f=>({key:'dm:'+pair(me.id,f.id).join(':'),title:f.name,friendId:f.id}));
+      await channelSummaries(db,me,[...channels,...direct]);
+      return reply({ok:true,version:VERSION,features:['notebook-upgrade-5'],me:{...me,group:g,isLeader:leader?.user_id===me.id},friends:fs,channels,direct});
     }
     if(route==='friends/request'&&method==='POST') {
       const code=clean(b.code,32,true).replace(/[\s-]/g,'').toUpperCase();
@@ -188,14 +207,19 @@ export async function notebookApi(request,env) {
       const options=await one(db,'SELECT privacy FROM nb_friend_options WHERE user_id=? AND friend_id=?',other.id,me.id);
       const level=options&&options.privacy!=='inherit'?options.privacy:other.privacy;
       if(level==='none')return reply({ok:true,hidden:true});
-      const clock=kyivClock(),date=url.searchParams.get('date')||clock.date;if(!/^\d{4}-\d\d-\d\d$/.test(date))fail('INVALID_DATE');
+      const clock=kyivClock(),date=url.searchParams.get('date')||clock.date;if(!/^\d{4}-\d\d-\d\d$/.test(date)||!Number.isFinite(Date.parse(date+'T12:00:00Z'))||new Date(date+'T12:00:00Z').toISOString().slice(0,10)!==date)fail('INVALID_DATE');
       const [theirs,mine]=await Promise.all([schedule(other.group_id),schedule(me.group_id)]);
       const selected=theirs.filter(l=>l.date===date),today=theirs.filter(l=>l.date===clock.date);
       const current=today.find(l=>minutes(l.start)<=clock.minute&&minutes(l.end)>clock.minute);
       const later=today.filter(l=>minutes(l.start)>clock.minute).sort((a,b)=>minutes(a.start)-minutes(b.start))[0];
       const busy=[...selected,...mine.filter(l=>l.date===date)].map(l=>[minutes(l.start),minutes(l.end)]).filter(x=>x.every(Number.isFinite)).sort((a,b)=>a[0]-b[0]);
       let cursor=date===clock.date?Math.max(480,clock.minute):480;const common=[];for(const [start,end]of busy){if(start-cursor>=20)common.push({start:timeText(cursor),end:timeText(Math.min(start,1200))});cursor=Math.max(cursor,end);if(cursor>=1200)break;}if(1200-cursor>=20)common.push({start:timeText(cursor),end:'20:00'});
-      return reply({ok:true,privacy:level,busy:!!current,ends:current?.end||null,nextStart:later?.start||null,subject:level==='subject'||level==='room'?current?.subject||null:null,room:level==='room'?current?.room||null:null,common:common.filter(w=>minutes(w.end)>minutes(w.start)),date,notice:'За розкладом, не фактичне місцеперебування'});
+      return reply({ok:true,privacy:level,busy:!!current,ends:current?.end||null,nextStart:later?.start||null,subject:level==='subject'||level==='room'?current?.subject||null:null,room:level==='room'?current?.room||null:null,group:level==='subject'||level==='room'?groups[other.group_id].name:null,common:date<clock.date?[]:common.filter(w=>minutes(w.end)>minutes(w.start)&&minutes(w.start)>=480&&minutes(w.end)<=1200),date,notice:'За розкладом, не фактичне місцеперебування'});
+    }
+    if(route==='notes/shareable'&&method==='GET'){
+      const channel=url.searchParams.get('channel');await channelAccess(db,me,channel);
+      const rows=await all(db,"SELECT id,owner_id,group_id,visibility,audience,deleted_at,title,subject,kind,updated_at FROM nb_notes WHERE deleted_at=0 AND visibility<>'private' ORDER BY updated_at DESC LIMIT 500");
+      const notes=[];for(const n of rows)if(await canShareNote(db,n,me,channel))notes.push({id:n.id,title:n.title,subject:n.subject,visibility:n.visibility,kind:n.kind,updated_at:n.updated_at});return reply({ok:true,notes});
     }
     if(route==='notes'&&method==='GET'){
       const fields='n.id,n.owner_id,n.subject,n.title,n.body,n.kind,n.due,n.done,n.visibility,n.audience,n.group_id,n.lesson,n.revision,n.created_at,n.updated_at,n.deleted_at,json_array_length(n.attachments) AS attachment_count,p.name AS author';
@@ -233,9 +257,14 @@ export async function notebookApi(request,env) {
     if(route==='messages'&&method==='GET'){
       const channel=url.searchParams.get('channel');await channelAccess(db,me,channel);
       const before=Number(url.searchParams.get('before'))||Number.MAX_SAFE_INTEGER;
-      const messages=await all(db,'SELECT m.*,CASE WHEN l.user_id=m.author_id THEN 1 ELSE 0 END AS isLeader FROM nb_messages m LEFT JOIN nb_leaders l ON l.group_id=m.group_id WHERE m.channel=? AND m.id<? ORDER BY m.id DESC LIMIT 60',channel,before);messages.reverse();
+      const query=clean(url.searchParams.get('q')||'',120),around=Number(url.searchParams.get('around'))||0;
+      const select='SELECT m.*,CASE WHEN l.user_id=m.author_id THEN 1 ELSE 0 END AS isLeader FROM nb_messages m LEFT JOIN nb_leaders l ON l.group_id=m.group_id WHERE m.channel=?';
+      let messages;
+      if(around){const earlier=await all(db,select+' AND m.id<=? ORDER BY m.id DESC LIMIT 31',channel,around),later=await all(db,select+' AND m.id>? ORDER BY m.id ASC LIMIT 29',channel,around);messages=[...earlier.reverse(),...later];}
+      else{messages=await all(db,select+(query?' AND m.deleted=0 AND m.body GLOB ?':'')+' AND m.id<? ORDER BY m.id DESC LIMIT 60',channel,...(query?[searchGlob(query)]:[]),before);messages.reverse();}
       const reactions=messages.length?await all(db,'SELECT r.message_id,r.emoji,count(*) AS total,max(r.user_id=?) AS mine FROM nb_reactions r JOIN nb_messages m ON m.id=r.message_id WHERE m.channel=? AND m.id>=? AND m.id<=? GROUP BY r.message_id,r.emoji',me.id,channel,messages[0].id,messages.at(-1).id):[];
-      return reply({ok:true,messages:messages.map(m=>({...m,body:m.deleted?'Повідомлення видалено':m.body,note_id:m.deleted?'':m.note_id,attachments:m.deleted?[]:parse(m.attachments),group:groups[m.group_id]?.name||'',reactions:reactions.filter(r=>r.message_id===m.id)})),canModerate:await moderator(db,me,channel)});
+      const pins=await all(db,'SELECT id,name,body FROM nb_messages WHERE channel=? AND pinned=1 AND deleted=0 ORDER BY id DESC LIMIT 20',channel);
+      return reply({ok:true,query,pins,messages:messages.map(m=>({...m,body:m.deleted?'Повідомлення видалено':m.body,note_id:m.deleted?'':m.note_id,attachments:m.deleted?[]:parse(m.attachments),group:groups[m.group_id]?.name||'',reactions:reactions.filter(r=>r.message_id===m.id)})),canModerate:await moderator(db,me,channel)});
     }
     if(route==='messages/send'&&method==='POST'){
       const channel=clean(b.channel,2000,true);await channelAccess(db,me,channel);
@@ -243,17 +272,14 @@ export async function notebookApi(request,env) {
       await throttle(db,'nb_messages','author_id',me.id,1500);
       const text=clean(b.body||'',4000),attachments=attachmentList(b.attachments||[]),noteId=clean(b.noteId||'',80);
       if(!text&&!attachments.length&&!noteId)fail('EMPTY_MESSAGE');
-      if(noteId){const n=await one(db,'SELECT * FROM nb_notes WHERE id=?',noteId);if(!await canRead(db,n,me))fail('NOTE_NOT_SHARED',403);
-        if(channel.startsWith('dm:')){const other=await one(db,'SELECT * FROM nb_profiles WHERE id=?',channel.slice(3).split(':').find(x=>x!==me.id));if(!await canRead(db,n,other))fail('NOTE_NOT_SHARED',403);}
-        else {const g=groups[n.group_id];const audience=n.visibility==='faculty'?`faculty:${g.facultyId}`:n.visibility==='course'?`course:${g.facultyId}:${g.course}`:n.visibility==='group'?`group:${g.id}`:'';const mg=groups[me.group_id];const fits=audience===channel||(n.visibility==='faculty'&&g.facultyId===mg.facultyId)||(n.visibility==='course'&&g.facultyId===mg.facultyId&&g.course===mg.course&&(channel.startsWith('group:')||channel.startsWith('subject:')))||(n.visibility==='group'&&g.id===mg.id&&channel.startsWith('subject:'));if(!fits)fail('NOTE_NOT_SHARED',403);}
-      }
+      if(noteId&&!await canShareNote(db,await one(db,'SELECT * FROM nb_notes WHERE id=?',noteId),me,channel))fail('NOTE_NOT_SHARED',403);
       const replyId=Number(b.replyId)||0;if(replyId&&!await one(db,'SELECT 1 FROM nb_messages WHERE id=? AND channel=?',replyId,channel))fail('INVALID_REPLY');
       const r=await run(db,'INSERT INTO nb_messages(channel,author_id,group_id,name,body,note_id,attachments,reply_id,created_at) VALUES(?,?,?,?,?,?,?,?,?)',channel,me.id,me.group_id,user.name,text,noteId,JSON.stringify(attachments),replyId,now());return reply({ok:true,id:r.meta.last_row_id});
     }
     if(route==='messages/action'&&method==='POST'){
       const m=await one(db,'SELECT * FROM nb_messages WHERE id=?',Number(b.id));if(!m)fail('NOT_FOUND',404);await channelAccess(db,me,m.channel);
       const mod=await moderator(db,me,m.channel);
-      if(b.action==='react') {if(m.deleted)fail('NOT_FOUND',404);const emoji=['👍','❤️','✅','🔥','❓'].includes(b.emoji)?b.emoji:'👍';const old=await one(db,'SELECT emoji FROM nb_reactions WHERE message_id=? AND user_id=?',m.id,me.id);if(old?.emoji===emoji)await run(db,'DELETE FROM nb_reactions WHERE message_id=? AND user_id=?',m.id,me.id);else await run(db,'INSERT INTO nb_reactions(message_id,user_id,emoji) VALUES(?,?,?) ON CONFLICT(message_id,user_id) DO UPDATE SET emoji=excluded.emoji',m.id,me.id,emoji);}
+      if(b.action==='react') {if(m.deleted)fail('NOT_FOUND',404);const emoji=['👍','❤️','✅','🔥','❓','😂','😮','👎'].includes(b.emoji)?b.emoji:'👍';const old=await one(db,'SELECT emoji FROM nb_reactions WHERE message_id=? AND user_id=?',m.id,me.id);if(old?.emoji===emoji)await run(db,'DELETE FROM nb_reactions WHERE message_id=? AND user_id=?',m.id,me.id);else await run(db,'INSERT INTO nb_reactions(message_id,user_id,emoji) VALUES(?,?,?) ON CONFLICT(message_id,user_id) DO UPDATE SET emoji=excluded.emoji',m.id,me.id,emoji);}
       else if(b.action==='edit'){if(m.author_id!==me.id||m.deleted)fail('FORBIDDEN',403);await run(db,'UPDATE nb_messages SET body=?,edited_at=? WHERE id=?',clean(b.body,4000,true),now(),m.id);}
       else if(b.action==='delete'){if(m.author_id!==me.id&&!mod)fail('FORBIDDEN',403);await run(db,"UPDATE nb_messages SET body='',attachments='[]',note_id='',deleted=1,pinned=0 WHERE id=?",m.id);}
       else if(b.action==='pin'){if(!mod||m.deleted)fail('FORBIDDEN',403);await run(db,'UPDATE nb_messages SET pinned=? WHERE id=?',m.pinned?0:1,m.id);}

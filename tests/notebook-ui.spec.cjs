@@ -3,7 +3,7 @@ test.use({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
 const API='https://depara-api-preview.yaroshandriy16.workers.dev/api/notebook/';
 const me={id:'100',name:'Андрій',group_id:'3641',group:{id:'3641',name:'ЕІ-23-1',faculty:'Інженерно-технологійний факультет',facultyId:'1',course:'4'},friend_code:'ABCD1234TEST',privacy:'none',status:'',status_until:0};
 async function launch(page,options={}){
- const calls=[],notes=[];
+ const calls=[],notes=options.notes||[];
  await page.route('https://telegram.org/js/telegram-web-app.js',r=>r.fulfill({contentType:'text/javascript',body:`window.Telegram={WebApp:{initData:'signed-test-fixture',initDataUnsafe:{user:{id:100,first_name:'Андрій'}},ready(){},expand(){},onEvent(){},setHeaderColor(){},setBackgroundColor(){},HapticFeedback:{impactOccurred(){}}}};`}));
  await page.route(API+'**',async route=>{
   const req=route.request(),url=new URL(req.url()),path=url.pathname.split('/api/notebook/')[1];let data={};try{data=req.postDataJSON()||{}}catch{}
@@ -11,14 +11,17 @@ async function launch(page,options={}){
   if(options.down)return route.fulfill({status:503,headers:{'access-control-allow-origin':'*'},json:{ok:false,error:'SERVICE_UNAVAILABLE'}});
   if(path==='profile')result.me={...me,privacy:data.privacy||'none'};
   if(path==='bootstrap')result={ok:true,me,friends:[{id:'101',name:'Друг',state:'accepted',favorite:false,privacy:'none',shareWith:'inherit'},{id:'102',name:'Новий друг',state:'pending',incoming:true}],channels:[{key:'group:3641',title:'ЕІ-23-1',unread:0},{key:'course:1:4',title:'4 курс',unread:2},{key:'faculty:1',title:'Факультет',unread:0}]};
+  if(path==='bootstrap'){if(options.friends)result.friends=options.friends;if(options.channels)result.channels=options.channels;result.direct=options.direct||[];}
   if(path==='notes')result.notes=notes.map(({attachments,...n})=>n);
+  if(path==='notes/shareable')result.notes=notes.filter(n=>n.visibility!=='private');
   if(path==='notes/get')result.note=notes.find(n=>n.id===url.searchParams.get('id'));
   if(path==='notes/save'){const i=notes.findIndex(n=>n.id===data.id),n={...data,owner_id:'100',revision:(data.revision||0)+1,updated_at:Date.now()};if(i<0)notes.push(n);else notes[i]=n;result.note=n;}
   if(path==='notes/delete'){const i=notes.findIndex(n=>n.id===data.id);if(i>=0)notes.splice(i,1);}
   if(path==='messages')result={ok:true,canModerate:false,messages:options.messages||[{id:1,channel:'course:1:4',author_id:'101',name:'Друг',group:'ЕІ-23-2',body:'Привіт курсу',created_at:Date.now(),attachments:[],reactions:[],deleted:0}]};
+  if(path==='messages'&&url.searchParams.has('q'))result.messages=result.messages.filter(m=>m.body.toLocaleLowerCase('uk').includes(url.searchParams.get('q').toLocaleLowerCase('uk')));
   if(path==='invitations')result.invitations=[];
   if(path==='elections')result={ok:true,election:null,leader:null,eligibleAt:Date.now()+172800000};
-  if(path==='friends/availability')result={ok:true,hidden:true};
+  if(path==='friends/availability')result=options.availability?{ok:true,...options.availability,date:url.searchParams.get('date')||options.availability.date}:{ok:true,hidden:true};
   await route.fulfill({headers:{'access-control-allow-origin':'*','access-control-allow-headers':'authorization,content-type','access-control-allow-methods':'GET,POST,OPTIONS'},json:result});
  });
  await page.goto('/reborn-notebook-preview/');
@@ -116,6 +119,52 @@ test('Long conversation starts at the latest message and refresh preserves readi
  await expect.poll(()=>page.locator('#nb-message-list').evaluate(el=>el.scrollTop)).toBe(80);
 });
 
+test('Rich notes format selections, keep inline photos and remember personal organization',async({page})=>{
+ const {calls}=await launch(page);await expect(page.locator('#dp-nb')).toContainText('Підключено');await page.locator('[data-nb="new"]').click();
+ await page.locator('#dp-nb-title').fill('Форматований конспект');await page.locator('#dp-nb-body').fill('Закон Ома');
+ await page.locator('#dp-nb-body').evaluate(el=>{const range=document.createRange();range.selectNodeContents(el);getSelection().removeAllRanges();getSelection().addRange(range);});
+ await page.getByRole('button',{name:'Жирний',exact:true}).click();await expect(page.locator('#dp-nb-body b,#dp-nb-body strong')).toHaveText('Закон Ома');
+ await expect.poll(()=>calls.some(c=>c.path==='notes/save'&&c.data.body.includes('**Закон Ома**'))).toBeTruthy();
+ await page.locator('[data-action="note-pin"]').click();await page.locator('#nb-topic').fill('Модуль 1');
+ const png=await page.evaluate(()=>{const c=document.createElement('canvas');c.width=4;c.height=4;c.getContext('2d').fillRect(0,0,4,4);return c.toDataURL('image/png').split(',')[1]});
+ await page.locator('#nb-file').setInputFiles({name:'formula.png',mimeType:'image/png',buffer:Buffer.from(png,'base64')});
+ await expect(page.locator('#dp-nb-body figure img')).toHaveCount(1);
+ await expect.poll(()=>calls.some(c=>c.path==='notes/save'&&c.data.body.includes('[[image:0]]')&&c.data.attachments?.length===1)).toBeTruthy();
+ await page.locator('[data-nb="back"]').click();await page.locator('[data-action="filter"][data-value="pinned"]').click();
+ await expect(page.locator('[data-action="note-open"]')).toContainText('Форматований конспект');await expect(page.locator('[data-action="note-open"]')).toContainText('Модуль 1');
+ await page.locator('[data-action="note-open"]').click();await expect(page.locator('#dp-nb-body figure img')).toHaveCount(1);await expect(page.locator('#dp-nb-body b,#dp-nb-body strong')).toContainText('Закон Ома');await page.screenshot({path:'test-results/notebook-upgrade-editor.png',fullPage:true});
+});
+
+test('Conversation list shows real previews, history search and composer editing',async({page})=>{
+ const messages=[{id:1,author_id:'100',name:'Андрій',group:'ЕІ-23-1',body:'Старий конспект',created_at:Date.now(),attachments:[],reactions:[],deleted:0}];
+ const channels=[{key:'course:1:4',title:'4 курс',unread:3,last:{id:1,author:'Андрій',mine:true,text:'Старий конспект',at:Date.now()}}];
+ const {calls}=await launch(page,{messages,channels});await expect(page.locator('#dp-nb')).toContainText('Підключено');await page.locator('[data-action="tab"][data-value="chats"]').click();
+ await expect(page.locator('.nb-chat-row').first()).toContainText('Ти: Старий конспект');await expect(page.locator('.nb-chat-row').first()).toContainText('3');
+ await page.locator('[data-channel="course:1:4"]').click();await page.locator('.nb-thread-options summary').click();await page.locator('[data-action="thread-search"]').click();
+ await page.locator('#nb-chat-search').fill('конспект');await expect(page.locator('.nb-search-result-label')).toContainText('Знайдено 1');
+ await page.locator('[data-action="message-jump"]').click();await expect(page.locator('#nb-chat-search')).toHaveCount(0);
+ await page.locator('.nb-bubble-more').click();await page.locator('[data-action="message-edit"]').click();await expect(page.locator('#nb-message')).toHaveValue('Старий конспект');
+ await page.locator('#nb-message').fill('Виправлений конспект');await page.getByRole('button',{name:'Зберегти зміни',exact:true}).click();
+ await expect.poll(()=>calls.some(c=>c.path==='messages/action'&&c.data.action==='edit'&&c.data.body==='Виправлений конспект')).toBeTruthy();
+});
+
+test('Note picker shares a selected card without requesting a typed number',async({page})=>{
+ const notes=[{id:'public-note',owner_id:'100',title:'Лекція для групи',subject:'Електротехніка',body:'Текст',visibility:'faculty',attachments:[],updated_at:Date.now()}];
+ const {calls}=await launch(page,{notes});await expect(page.locator('#dp-nb')).toContainText('Підключено');await page.locator('[data-action="tab"][data-value="chats"]').click();await page.locator('[data-channel="course:1:4"]').click();
+ await page.locator('[data-action="chat-attachments"]').click();await page.locator('[data-action="chat-note"]').click();
+ await expect(page.getByRole('dialog',{name:'Поділитися конспектом'})).toBeVisible();await page.locator('#nb-picker-search').fill('Лекція');await page.locator('[data-action="picker-send"]').click();
+ await expect.poll(()=>calls.some(c=>c.path==='messages/send'&&c.data.noteId==='public-note')).toBeTruthy();
+});
+
+test('Shared free window pre-fills a meeting and sends Kyiv time from another time zone',async({browser})=>{
+ const context=await browser.newContext({viewport:{width:390,height:844},timezoneId:'America/New_York'}),page=await context.newPage();
+ try{
+ const {calls}=await launch(page,{friends:[{id:'101',name:'Друг',state:'accepted',privacy:'room',shareWith:'inherit'}],availability:{date:'2030-01-10',hidden:false,busy:false,subject:null,common:[{start:'10:00',end:'11:00'}],notice:'За розкладом'}});
+ await expect(page.locator('#dp-nb')).toContainText('Підключено');await page.locator('[data-action="tab"][data-value="friends"]').click();await page.locator('[data-action="friend-open"]').click();
+ await page.locator('[data-action="window-invite"]').click();await expect(page.locator('#nb-invite-date')).toHaveValue('2030-01-10T10:00');await page.locator('#nb-invite-place').fill('Бібліотека');await page.locator('[data-action="invite"]').click();
+ await expect.poll(()=>calls.some(c=>c.path==='invitations'&&c.data.startsAt==='2030-01-10T08:00:00.000Z'&&c.data.place==='Бібліотека')).toBeTruthy();
+ }finally{await context.close();}
+});
 
 test('Leaving the editor immediately saves its latest private changes',async({page})=>{
  const {calls}=await launch(page);await expect(page.locator('#dp-nb')).toContainText('Підключено');
@@ -132,7 +181,6 @@ test('Deleting a draft cancels its pending autosave and survives reload',async({
  await expect(page.locator('.nb-note-title')).toHaveCount(0);
  await expect.poll(()=>page.evaluate(()=>JSON.parse(localStorage.getItem('dp_reborn2_nb_drafts_100')||'[]').length)).toBe(0);
  const savesAfterDelete=calls.filter(c=>c.path==='notes/save').length;
- // Wait past the debounce to catch writes that would resurrect the deleted draft.
  await page.waitForTimeout(1200);
  await page.locator('[data-action="tab"][data-value="friends"]').click();await page.locator('[data-action="tab"][data-value="notes"]').click();
  expect(calls.filter(c=>c.path==='notes/save')).toHaveLength(savesAfterDelete);

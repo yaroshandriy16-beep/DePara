@@ -122,3 +122,42 @@ test('Meetings only between friends and only recipient can answer; files are val
  assert.equal((await f.save(100,'unsafe','private',{attachments:[{name:'x',type:'text/html',data:'javascript:alert(1)'}]})).status,400);
  assert.equal((await f.save(100,'safe','private',{attachments:[{name:'note.txt',type:'text/plain',data:'data:text/plain;base64,SGVsbG8='}]})).status,200);
 });
+
+test('Conversation previews and unread totals include only accessible community and confirmed direct chats',async()=>{
+ const f=fixture();await f.profile(100);await f.profile(101);await f.profile(102,otherFaculty.id);await f.becomeFriends(100,101);
+ const insert=f.db.prepare('INSERT INTO nb_messages(channel,author_id,group_id,name,body,created_at) VALUES(?,?,?,?,?,?)');
+ insert.run('group:'+home.id,'101',home.id,'Друг','Реальне останнє повідомлення',Date.now());
+ insert.run('dm:100:101','101',home.id,'Друг','Приватна розмова для друга',Date.now());
+ insert.run('dm:101:102','102',otherFaculty.id,'Інший','Чужий приватний текст',Date.now());
+ let r=await f.call(100,'bootstrap');assert.equal(r.channels[0].last.text,'Реальне останнє повідомлення');assert.equal(r.channels[0].unread,1);
+ assert.equal(r.direct.length,1);assert.equal(r.direct[0].last.text,'Приватна розмова для друга');assert.equal(r.direct[0].unread,1);assert(!JSON.stringify(r).includes('Чужий приватний текст'));
+ await f.call(100,'friends/options',{userId:'101',remove:true});r=await f.call(100,'bootstrap');assert.equal(r.direct.length,0);
+});
+
+test('History search handles Ukrainian case and literal wildcard characters, jumps to context and returns old pins',async()=>{
+ const f=fixture();await f.profile(100);await f.profile(101,otherFaculty.id);const channel='group:'+home.id;
+ const insert=f.db.prepare('INSERT INTO nb_messages(channel,author_id,group_id,name,body,created_at,pinned,deleted) VALUES(?,?,?,?,?,?,?,?)');
+ for(let i=0;i<90;i++)insert.run(channel,'100',home.id,'Автор',i===0?'СЕКРЕТНИЙ конспект [*?]':i===1?'секретний видалений':'Звичайне повідомлення '+i,Date.now()+i,i===0?1:0,i===1?1:0);
+ let r=await f.call(100,'messages?channel='+channel+'&q='+encodeURIComponent('секретний'));assert.equal(r.messages.length,1);assert.equal(r.messages[0].id,1);
+ r=await f.call(100,'messages?channel='+channel+'&q='+encodeURIComponent('[*?]'));assert.equal(r.messages.length,1);
+ r=await f.call(100,'messages?channel='+channel);assert(!r.messages.some(m=>m.id===1));assert.equal(r.pins[0].id,1);
+ r=await f.call(100,'messages?channel='+channel+'&around=1');assert.equal(r.messages[0].id,1);assert(r.messages.length>1);
+ assert.equal((await f.call(101,'messages?channel='+channel+'&q=конспект')).status,403);
+});
+
+test('Note picker includes only notes the entire target audience can read',async()=>{
+ const f=fixture();await f.profile(100);await f.profile(101,otherFaculty.id);await f.becomeFriends(100,101);
+ await f.save(100,'private');await f.save(100,'group','group');await f.save(100,'chosen','friends',{audience:['101']});
+ let r=await f.call(100,'notes/shareable?channel=dm:100:101');assert.deepEqual(r.notes.map(n=>n.id),['chosen']);
+ r=await f.call(100,'notes/shareable?channel=group:'+home.id);assert.deepEqual(r.notes.map(n=>n.id),['group']);
+ assert.equal((await f.call(101,'notes/shareable?channel=group:'+home.id)).status,403);
+});
+
+test('Shared free windows clip overlaps and respect privacy changes and calendar dates',async(t)=>{
+ const f=fixture();await f.profile(100);await f.profile(101,otherGroup.id);await f.becomeFriends(100,101);
+ await f.call(101,'profile',{groupId:otherGroup.id,privacy:'busy'});
+ const date='2030-01-10';t.mock.method(globalThis,'fetch',async url=>new Response(JSON.stringify({lessons:String(url).includes('/'+home.id+'.json')?[{date,start:'09:00',end:'10:00'},{date,start:'10:30',end:'11:00'}]:[{date,start:'09:30',end:'10:30'},{date,start:'11:10',end:'12:00'}]}),{headers:{'Content-Type':'application/json'}}));
+ let r=await f.call(100,'friends/availability?userId=101&date='+date);assert.equal(r.status,200);assert.deepEqual(r.common,[{start:'08:00',end:'09:00'},{start:'12:00',end:'20:00'}]);assert.equal(r.subject,null);assert.equal(r.group,null);
+ assert.equal((await f.call(100,'friends/availability?userId=101&date=2030-02-30')).status,400);
+ await f.call(101,'profile',{groupId:otherGroup.id,privacy:'none'});r=await f.call(100,'friends/availability?userId=101&date='+date);assert.deepEqual(r,{status:200,ok:true,hidden:true});
+});
