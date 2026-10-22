@@ -4,6 +4,7 @@ import { DatabaseSync } from 'node:sqlite';
 import { createHmac } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { notebookApi } from '../backend/src/notebook-api.mjs';
+import productionWorker from '../cloudflare/production/worker.js';
 import catalog from '../backend/src/notebook-catalog.json' with { type:'json' };
 import schema from '../backend/src/notebook-schema.mjs';
 
@@ -35,6 +36,21 @@ test('Authenticated additive runtime bootstrap preserves existing data and healt
  assert.equal(f.db.prepare("SELECT count(*) AS n FROM sqlite_master WHERE name='nb_profiles'").get().n,0);
  await f.profile(100);assert.equal(f.db.prepare('SELECT value FROM existing_data').get().value,'preserve');
  assert.equal(f.db.prepare('SELECT count(*) AS n FROM nb_profiles').get().n,1);
+});
+
+test('Production Worker routes notebook requests with its own Telegram token and database',async()=>{
+ const f=fixture(true);
+ const request=(path,method='GET',body)=>new Request('https://depara-api.example/api/notebook/'+path,{
+  method,headers:{Authorization:f.signed(100),'Content-Type':'application/json',Origin:'https://yaroshandriy16-beep.github.io'},
+  ...(body?{body:JSON.stringify(body)}:{})
+ });
+ const created=await productionWorker.fetch(request('profile','POST',{groupId:home.id}),f.env);
+ assert.equal(created.status,200,await created.text());
+ const bootstrap=await productionWorker.fetch(request('bootstrap'),f.env);
+ const data=await bootstrap.json();assert.equal(data.me.id,'100');
+ assert.equal(data.me.group_id,home.id);
+ const denied=await productionWorker.fetch(new Request('https://depara-api.example/api/notebook/bootstrap'),f.env);
+ assert.equal(denied.status,401);
 });
 
 test('Telegram signature, expiry, duplicate keys and origin checks',async()=>{

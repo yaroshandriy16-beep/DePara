@@ -4,6 +4,9 @@ on:
     branches: [main]
     paths:
       - 'cloudflare/production/worker.js'
+      - 'backend/src/notebook-api.mjs'
+      - 'backend/src/notebook-schema.mjs'
+      - 'backend/src/notebook-catalog.json'
   workflow_dispatch:
 permissions:
   contents: read

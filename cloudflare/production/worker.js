@@ -1,5 +1,7 @@
 
 
+import { notebookApi } from '../../backend/src/notebook-api.mjs';
+
 const encoder = new TextEncoder();
 
 
@@ -995,6 +997,9 @@ async function prepareScheduleShare(request, env) {
 export default {
 
   async fetch(request, env) {
+
+    if (new URL(request.url).pathname.startsWith('/api/notebook/'))
+      return notebookApi(request, env);
 
     if (request.method === 'OPTIONS')
 
