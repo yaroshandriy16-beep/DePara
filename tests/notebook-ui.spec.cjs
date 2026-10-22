@@ -14,6 +14,7 @@ async function launch(page,options={}){
   if(path==='notes')result.notes=notes.map(({attachments,...n})=>n);
   if(path==='notes/get')result.note=notes.find(n=>n.id===url.searchParams.get('id'));
   if(path==='notes/save'){const i=notes.findIndex(n=>n.id===data.id),n={...data,owner_id:'100',revision:(data.revision||0)+1,updated_at:Date.now()};if(i<0)notes.push(n);else notes[i]=n;result.note=n;}
+  if(path==='notes/delete'){const i=notes.findIndex(n=>n.id===data.id);if(i>=0)notes.splice(i,1);}
   if(path==='messages')result={ok:true,canModerate:false,messages:options.messages||[{id:1,channel:'course:1:4',author_id:'101',name:'Друг',group:'ЕІ-23-2',body:'Привіт курсу',created_at:Date.now(),attachments:[],reactions:[],deleted:0}]};
   if(path==='invitations')result.invitations=[];
   if(path==='elections')result={ok:true,election:null,leader:null,eligibleAt:Date.now()+172800000};
@@ -113,4 +114,27 @@ test('Long conversation starts at the latest message and refresh preserves readi
  await page.locator('#nb-message-list').evaluate(el=>el.scrollTop=80);
  await page.locator('.nb-thread-options summary').click();await page.locator('[data-action="thread-refresh"]').click();
  await expect.poll(()=>page.locator('#nb-message-list').evaluate(el=>el.scrollTop)).toBe(80);
+});
+
+
+test('Leaving the editor immediately saves its latest private changes',async({page})=>{
+ const {calls}=await launch(page);await expect(page.locator('#dp-nb')).toContainText('Підключено');
+ await page.locator('[data-action="note-new"]').click();await page.locator('#dp-nb-title').fill('Швидке повернення');await page.locator('#dp-nb-body').fill('Остання думка перед виходом');
+ await page.locator('[data-action="note-back"]').click();
+ await expect.poll(()=>calls.some(c=>c.path==='notes/save'&&c.data.body==='Остання думка перед виходом')).toBeTruthy();
+ await page.locator('#nb-search').fill('  ШВИДКЕ  ');await expect(page.locator('.nb-note-title')).toHaveText('Швидке повернення');
+});
+
+test('Deleting a draft cancels its pending autosave and survives reload',async({page})=>{
+ const {calls}=await launch(page);await expect(page.locator('#dp-nb')).toContainText('Підключено');
+ await page.locator('[data-action="note-new"]').click();await page.locator('#dp-nb-title').fill('Тимчасовий запис');await page.locator('#dp-nb-body').fill('Видалити');
+ page.once('dialog',d=>d.accept());await page.locator('[data-action="note-delete"]').click();
+ await expect(page.locator('.nb-note-title')).toHaveCount(0);
+ await expect.poll(()=>page.evaluate(()=>JSON.parse(localStorage.getItem('dp_reborn2_nb_drafts_100')||'[]').length)).toBe(0);
+ const savesAfterDelete=calls.filter(c=>c.path==='notes/save').length;
+ // Wait past the debounce to catch writes that would resurrect the deleted draft.
+ await page.waitForTimeout(1200);
+ await page.locator('[data-action="tab"][data-value="friends"]').click();await page.locator('[data-action="tab"][data-value="notes"]').click();
+ expect(calls.filter(c=>c.path==='notes/save')).toHaveLength(savesAfterDelete);
+ await page.reload();await page.locator('#nav [data-page="notebook"]').click();await expect(page.locator('.nb-note-title')).toHaveCount(0);
 });

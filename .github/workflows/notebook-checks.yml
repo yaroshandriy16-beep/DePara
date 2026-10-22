@@ -20,6 +20,8 @@ jobs:
           node-version: '24'
       - name: Test signed authentication and access controls against SQLite
         run: node --test tests/notebook-api.test.mjs
+      - name: Test notebook save and delete races
+        run: node tests/notebook-persistence.test.cjs
       - name: Install mobile browser
         run: |
           npm install --no-save @playwright/test
