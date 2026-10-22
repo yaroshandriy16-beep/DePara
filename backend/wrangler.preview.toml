@@ -4,6 +4,9 @@ name = "depara-api-preview"
 main = "src/preview-worker.js"
 compatibility_date = "2026-10-20"
 
+# Dedicated migrations for the preview D1 database only.
+migrations_dir = "preview-migrations"
+
 [[d1_databases]]
 binding = "DB"
 database_name = "depara-preview-db"
