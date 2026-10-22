@@ -146,7 +146,8 @@ export async function notebookApi(request,env) {
     if(url.pathname===PREFIX+'health'){
       await one(env.DB,'SELECT 1 AS connected');let schemaReady=false;try{await one(env.DB,'SELECT id FROM nb_profiles LIMIT 1');schemaReady=true}catch{}return reply({ok:true,version:VERSION,features:['notebook-upgrade-5'],database:true,schemaReady});
     }
-    // Accept the same bot secret aliases as the legacy API.\n    const user=await authenticate(request,env.TELEGRAM_BOT_TOKEN||env.BOT_TOKEN),db=env.DB;
+    // Accept the same bot secret aliases as the legacy API.
+    const user=await authenticate(request,env.TELEGRAM_BOT_TOKEN||env.BOT_TOKEN),db=env.DB;
     await ensureSchema(db);
     const b=request.method==='POST'?await body(request):{};
     const route=url.pathname.slice(PREFIX.length),method=request.method;
