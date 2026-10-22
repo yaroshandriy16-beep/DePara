@@ -14,6 +14,12 @@ test('Student schedule, countdown, settings',async({page})=>{
  await expect(page.locator('#dp-live-lesson-clock')).toBeAttached();
  await page.locator('#nav button[data-page="schedule"]').click();
  await expect(page.locator('#screen')).toContainText('Розклад');
+ await expect(page.locator('#dp40-share')).toBeVisible();
+ await page.locator('#dp40-share').click();
+ await expect(page.locator('#dp40-modal')).toBeVisible();
+ await expect(page.locator('#dp40-bot')).toContainText('Telegram');
+ await expect(page.locator('#dp40-modal img')).toHaveAttribute('src',/^blob:/);
+ await page.locator('#dp40-modal .dp40-close').click();
  await page.locator('#nav button[data-page="notebook"]').click();
  await expect(page.locator('#dp-nb')).toBeVisible();
  await page.locator('#dp-nb [data-nb="new"]').click();
