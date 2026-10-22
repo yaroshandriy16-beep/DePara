@@ -1,9 +1,0 @@
-name = "depara-api"
-main = "worker.js"
-compatibility_date = "2026-10-20"
-workers_dev = true
-
-[[d1_databases]]
-binding = "DB"
-database_name = "depara-db"
-database_id = "6beccbd7-053f-491b-8d8a-77f2179c1041"
