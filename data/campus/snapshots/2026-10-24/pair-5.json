@@ -5,7 +5,7 @@
   "endPair": 5,
   "structureId": "0",
   "corpusId": "",
-  "fetchedAt": "2026-10-22T10:40:20.075799+00:00",
+  "fetchedAt": "2026-10-22T16:41:53.470219+00:00",
   "status": "official-site-snapshot",
   "rooms": [
     {
@@ -404,7 +404,7 @@
       "id": "6",
       "name": "2402",
       "capacity": 28,
-      "available": false,
+      "available": true,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=6"
     },
@@ -500,7 +500,7 @@
       "id": "24",
       "name": "2502",
       "capacity": 20,
-      "available": false,
+      "available": true,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=24"
     },
@@ -508,7 +508,7 @@
       "id": "21",
       "name": "2512",
       "capacity": 90,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=21"
     },
@@ -548,7 +548,7 @@
       "id": "10",
       "name": "2521",
       "capacity": 76,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=10"
     },
@@ -564,7 +564,7 @@
       "id": "11",
       "name": "2524",
       "capacity": 24,
-      "available": false,
+      "available": true,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=11"
     },
@@ -572,7 +572,7 @@
       "id": "9",
       "name": "2531",
       "capacity": 30,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=9"
     },
