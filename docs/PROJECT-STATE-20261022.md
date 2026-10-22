@@ -78,4 +78,4 @@
 
 Початкова спроба git clone у sandbox не мала доступу до proxy. Після надання процесу мережевого доступу повний репозиторій успішно клоновано. Локальна робоча копія: /workspace/DePara, гілка test/notebook-stability-20261022. Коміт побудований поверх вихідного GitHub tree зі збереженням усіх незмінених файлів та інфраструктури.
 
-Cloudflare deployment, міграції, production-бот, production-код та main не змінювалися. Локальне збереження синхронне; фоновий HTTP при закритті WebView не гарантується, тому локальна чернетка залишається основою відновлення.
+PR #12 merged у main о 18:02 UTC. Автоматичний GitHub Pages deployment завершився успішно; тестова сторінка `/reborn-preview/` веде на `reborn-notebook-preview/` з build `notebook-stability-5`. Перевірено опублікований HTML та preview API health (`database: true`, `schemaReady: true`). Цей PR оновив тестовий frontend; файли production-коду, Worker, D1 migrations і конфігурація бота не змінювалися. Локальне збереження синхронне; фоновий HTTP при закритті WebView не гарантується, тому локальна чернетка залишається основою відновлення.
