@@ -53,6 +53,8 @@ test('Note audiences, signed ownership, copies and conflict protection',async()=
  const ids=async u=>(await f.call(u,'notes')).notes.map(n=>n.id).sort();
  assert.deepEqual(await ids(101),['course','faculty','group']);assert.deepEqual(await ids(102),['course','faculty']);assert.deepEqual(await ids(103),['faculty']);assert.deepEqual(await ids(104),[]);
  assert.equal((await f.save(101,'private')).status,403);
+ assert.equal((await f.call(101,'notes/get?id=private')).status,403);
+ assert.equal((await f.call(101,'notes/get?id=faculty')).note.owner_id,'100');
  let r=await f.save(100,'private','private',{revision:1,body:'Новий текст'});assert.equal(r.note.revision,2);
  r=await f.save(100,'private','private',{revision:1,body:'Застарілий текст'});assert.equal(r.status,409);assert.equal(r.note.body,'Новий текст');
  await f.becomeFriends(100,101);r=await f.save(100,'friends','friends',{audience:['101']});assert.equal(r.status,200);

@@ -4,6 +4,8 @@ on:
     branches: [main]
     paths:
       - 'reborn-preview/**'
+      - 'reborn-notebook-preview/**'
+      - 'backend/src/notebook*'
       - 'data/**'
       - 'tests/**'
       - '.github/workflows/reborn-browser-tests.yml'
