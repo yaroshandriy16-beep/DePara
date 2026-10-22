@@ -29,6 +29,7 @@
   <style>header .brand .logo{display:flex;align-items:center;justify-content:center;overflow:hidden;padding:0}header .brand .logo img{display:block;width:100%;height:100%;object-fit:cover;border-radius:inherit}</style>
   <link rel="stylesheet" href="schedule-v36.css?v=40">
   <link rel="stylesheet" href="schedule-polish-v38.css?v=40">
+  <style>#nav{grid-template-columns:repeat(4,minmax(0,1fr))}.dp-nb{max-width:850px;margin:auto;padding:14px 4px 110px}.dp-nb-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:12px 0 24px}.dp-nb-kicker{font-size:10px;letter-spacing:.2em;color:#e9c478;font-weight:800}.dp-nb h1{font-size:30px;margin:8px 0}.dp-nb-head p,.dp-nb-count{opacity:.65;font-size:13px}.dp-nb button,.dp-nb input,.dp-nb textarea{font:inherit}.dp-nb-primary{border:0;border-radius:14px;padding:13px 17px;background:#e9c478;color:#14251b;font-weight:800;white-space:nowrap}.dp-nb-search{display:flex;gap:10px;align-items:center;border:1px solid #879f8b55;border-radius:15px;padding:13px;margin-bottom:18px}.dp-nb-search input{background:transparent;border:0;outline:0;color:inherit;width:100%}.dp-nb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:13px;margin-top:12px}.dp-nb-card{text-align:left;display:flex;flex-direction:column;gap:10px;min-height:165px;padding:18px;background:#8cae9120;border:1px solid #8cae9140;border-radius:18px;color:inherit}.dp-nb-card-icon{font-size:28px;color:#e9c478}.dp-nb-card strong{font-size:17px}.dp-nb-preview{font-size:13px;opacity:.7;overflow-wrap:anywhere}.dp-nb-card small{margin-top:auto;opacity:.55}.dp-nb-empty{text-align:center;padding:50px 12px;opacity:.7}.dp-nb-empty>div{font-size:42px}.dp-nb-editor{padding:18px;border:1px solid #8cae9140;border-radius:18px;background:#8cae9114}.dp-nb-editor label{display:block;margin:17px 0 8px;font-size:13px}.dp-nb-editor input,.dp-nb-editor textarea{box-sizing:border-box;width:100%;background:#071b1933;border:1px solid #8cae9160;border-radius:12px;padding:14px;color:inherit}.dp-nb-editor textarea{min-height:42vh;resize:vertical;line-height:1.6}.dp-nb-back,.dp-nb-danger{background:transparent;border:0;color:inherit;padding:8px 0}.dp-nb-danger{color:#ef9c9c}.dp-nb-foot{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-top:14px;font-size:12px;opacity:.8}@media(max-width:420px){.dp-nb-head{align-items:flex-start}.dp-nb h1{font-size:26px}.dp-nb-primary{font-size:12px!important;padding:12px!important}.dp-nb-grid{grid-template-columns:1fr 1fr;gap:9px}.dp-nb-card{padding:13px;min-height:160px}}</style>
 </head>
 
 <body>
@@ -69,6 +70,8 @@
         <span>▦</span>Розклад
       </button>
 
+      <button data-page="notebook"><span>▤</span>Зошит</button>
+
       <button data-page="profile">
         <span>◇</span>Налаштування
       </button>
@@ -81,7 +84,8 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <!-- Основний застосунок -->
-  <script src="app-reborn46.js?v=github-pages-cleanup-20261022"></script>
+  <script src="notebook-fresh-v1.js?v=1"></script>
+  <script src="app-reborn46.js?v=notebook-fresh-1"></script>
   <script src="polish-reborn43.js?v=cleanup-20261022"></script>
   <script src="countdown-live.js?v=32-bugfix1"></script>
   <script src="onboarding-v50.js?v=23-catalog-race"></script>
