@@ -12,10 +12,11 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta name="theme-color" content="#080e0e">
 
   <title>ДеПара? · Тест зошита</title>
-  <meta name="depara-build" content="premium-welcome-6">
+  <meta name="depara-build" content="premium-motion-7">
   <script>
     // Decide before first paint so returning users never see the role picker flash.
     try {
+      document.documentElement.dataset.dpTheme=JSON.parse(localStorage.getItem('dp_reborn2_theme')||'"dark"');
       const role=localStorage.getItem('dp_reborn2_role');
       const student=role==='student'&&localStorage.getItem('dp_reborn2_student_setup')==='1'&&localStorage.getItem('dp_reborn2_group');
       const teacher=role==='teacher'&&JSON.parse(localStorage.getItem('dp_reborn2_teacher_v1')||'null')?.teacherId;
@@ -42,9 +43,28 @@
   <style>#nav{grid-template-columns:repeat(4,minmax(0,1fr))}</style>
   <link rel="stylesheet" href="notebook-social.css?v=notebook-upgrade-5">
   <link rel="stylesheet" href="welcome-premium.css?v=premium-welcome-6">
+  <link rel="stylesheet" href="launch-motion.css?v=premium-motion-7">
 </head>
 
 <body>
+  <section id="dp-launch" role="dialog" aria-modal="true" aria-label="Вітаємо в ДеПара?">
+    <div class="dp-launch-light dp-launch-light-one" aria-hidden="true"></div>
+    <div class="dp-launch-light dp-launch-light-two" aria-hidden="true"></div>
+    <div class="dp-launch-grid" aria-hidden="true"></div>
+    <div class="dp-launch-top"><span>ВНАУ <i></i> ТВІЙ ПРОСТІР</span><button id="dp-launch-skip" type="button">Пропустити <span aria-hidden="true">↗</span></button></div>
+    <div class="dp-launch-scene">
+      <div class="dp-launch-emblem" aria-hidden="true">
+        <div class="dp-launch-orbit"></div><div class="dp-launch-orbit dp-launch-orbit-two"></div>
+        <svg class="dp-launch-trace" viewBox="0 0 180 180" fill="none"><rect x="33" y="33" width="114" height="114" rx="34" pathLength="1"/></svg>
+        <div class="dp-launch-icon"><img src="depara-app-icon.svg" width="88" height="88" alt=""></div>
+        <span class="dp-launch-spark dp-launch-spark-one"></span><span class="dp-launch-spark dp-launch-spark-two"></span>
+      </div>
+      <h1><span>Де</span><span>Пара</span><em>?</em></h1>
+      <div class="dp-launch-rule" aria-hidden="true"></div>
+      <p>Твій день починається тут.</p>
+    </div>
+    <div class="dp-launch-bottom"><span>НАВЧАННЯ У ТВОЄМУ РИТМІ</span><div aria-hidden="true"><i></i><i></i><i></i></div></div>
+  </section>
   <div id="dp-onboarding" class="dp-onboarding" aria-label="Початок роботи"><div class="dp-onboarding-inner"><div class="dp-onboarding-logo">✦</div><div class="dp-onboarding-brand">ДеПара<span>?</span></div><p class="dp-onboarding-sub">Твій університет. Твій ритм.</p><div class="dp-onboarding-roles" id="dp-onboarding-roles" hidden></div></div></div>
   <div class="ambient"></div>
   <div class="reborn-orbit" aria-hidden="true"></div>
@@ -101,7 +121,7 @@
   <script src="app-reborn46.js?v=premium-welcome-6"></script>
   <script src="polish-reborn43.js?v=cleanup-20261022"></script>
   <script src="countdown-live.js?v=32-bugfix1"></script>
-  <script src="onboarding-v50.js?v=premium-welcome-6"></script>
+  <script src="onboarding-v50.js?v=premium-motion-7"></script>
   <script src="settings-v50.js?v=notebook-social-2"></script>
   <script src="../production-v50/lesson-detail.js?v=1"></script>
   <script src="teacher-v1.js?v=premium-welcome-6"></script>
@@ -116,5 +136,6 @@
   <script src="schedule-polish-v38.js?v=40"></script>
   <script src="schedule-lesson-v39.js?v=40"></script>
   <script src="schedule-share-v43.js?v=offline-20261022"></script>
+  <script src="launch-motion.js?v=premium-motion-7"></script>
 </body>
 </html>

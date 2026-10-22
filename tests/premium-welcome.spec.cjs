@@ -5,6 +5,9 @@ test.beforeEach(async({page})=>{
 });
 test('Welcome, student selection, back navigation and immediate cached return',async({page})=>{
  await page.goto('/reborn-notebook-preview/');
+ await expect(page.locator('#dp-launch')).toBeVisible();
+ await page.locator('#dp-launch-skip').click();
+ await expect(page.locator('#dp-launch')).toBeHidden();
  await expect(page.locator('[data-dp-role]')).toHaveCount(2);
  await page.screenshot({path:'/tmp/depara-welcome-dark.png',animations:'disabled'});
  await page.locator('[data-dp-role=student]').click();
@@ -24,6 +27,7 @@ test('Welcome, student selection, back navigation and immediate cached return',a
  await page.route('**/data/**',r=>r.abort());
  await page.reload({waitUntil:'domcontentloaded'});
  expect(await page.locator('#dp-onboarding').isVisible()).toBe(false);
+ await expect(page.locator('#dp-launch')).toBeHidden();
  await expect(page.locator('#connection')).toContainText('Офлайн');
  await page.evaluate(()=>window.DeParaChangeGroup());
  await expect(page.locator('#dp-group')).toHaveValue('3641');
@@ -33,6 +37,8 @@ test('Light welcome fits a small phone and teacher returns directly to dashboard
  await page.addInitScript(()=>localStorage.setItem('dp_reborn2_theme',JSON.stringify('light')));
  await page.setViewportSize({width:320,height:568});
  await page.goto('/reborn-notebook-preview/');
+ await page.locator('#dp-launch-skip').click();
+ await expect(page.locator('#dp-launch')).toBeHidden();
  await expect(page.locator('body')).toHaveClass(/light/);
  expect(await page.locator('#dp-onboarding').evaluate(e=>e.scrollWidth<=e.clientWidth)).toBe(true);
  await page.screenshot({path:'/tmp/depara-welcome-light.png',animations:'disabled'});
@@ -44,4 +50,18 @@ test('Light welcome fits a small phone and teacher returns directly to dashboard
  await page.reload({waitUntil:'domcontentloaded'});
  expect(await page.locator('#dp-onboarding').isVisible()).toBe(false);
  await expect(page.locator('#dp-teacher-app')).toBeVisible();
+});
+test('Intro can replay and escape; reduced motion skips the sequence',async({page})=>{
+ await page.goto('/reborn-notebook-preview/');
+ await expect(page.locator('#dp-launch')).toBeHidden();
+ await page.evaluate(()=>window.DeParaReplayWelcome());
+ await expect(page.locator('#dp-launch')).toBeVisible();
+ await page.keyboard.press('Escape');
+ await expect(page.locator('#dp-launch')).toBeHidden();
+ expect(await page.locator('#dp-onboarding').evaluate(e=>e.inert)).toBe(false);
+ await page.emulateMedia({reducedMotion:'reduce'});
+ await page.evaluate(()=>window.DeParaReplayWelcome());
+ expect(await page.locator('#dp-launch').isVisible()).toBe(false);
+ await page.locator('[data-dp-role=student]').click();
+ await expect(page.locator('#dp-faculty')).toBeVisible();
 });
