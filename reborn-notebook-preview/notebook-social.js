@@ -107,7 +107,7 @@ function threadView(){
   return '<article class="nb-message '+(mine?'nb-mine ':'')+(m.pinned?'nb-pinned':'')+'"><div class="nb-message-name">'+esc(m.name)+(S.thread.key.startsWith('course:')||S.thread.key.startsWith('faculty:')?' · '+esc(m.group):'')+(m.isLeader?' · Староста':'')+'</div>'+(quoted?'<div class="nb-reply">↳ '+esc(quoted.name)+': '+esc(quoted.body.slice(0,100))+'</div>':'')+'<div class="nb-message-body">'+esc(m.body)+'</div>'+filesHtml(m.attachments,'message-'+m.id)+(m.note_id?btn('▤ Відкрити конспект','note-from-chat','data-id="'+esc(m.note_id)+'"'):'')+'<div class="nb-message-time">'+new Date(m.created_at).toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'})+(m.edited_at?' · змінено':'')+'</div>'+(m.deleted?'':'<div class="nb-row">'+(m.reactions||[]).map(r=>btn(r.emoji+' '+r.total,'react','data-id="'+m.id+'" data-emoji="'+r.emoji+'" aria-pressed="'+!!r.mine+'"')).join('')+btn('👍','react','data-id="'+m.id+'"')+btn('Відповісти','reply','data-id="'+m.id+'"')+'</div><details><summary>Дії</summary><div class="nb-row">'+(mine?btn('Редагувати','message-edit','data-id="'+m.id+'"'):'')+(mine||S.canModerate?btn('Видалити','message-delete','data-id="'+m.id+'"','',''):'')+(S.canModerate?btn(m.pinned?'Відкріпити':'Закріпити','message-pin','data-id="'+m.id+'"')+(!mine&&!m.isLeader?btn('Обмежити на 1 год','message-mute','data-id="'+m.id+'"'):''):'')+'</div></details>')+'</article>';
  }).join('')+(ms.length?'':empty('Повідомлень поки немає. Почни розмову.'))+'</div>';
  const quote=S.messages.find(m=>m.id===S.reply);
- out+='<form id="nb-compose" class="nb-compose">'+(quote?'<div class="nb-reply">Відповідь '+esc(quote.name)+': '+esc(quote.body.slice(0,100))+btn('×','reply-clear')+'</div>':'')+'<label for="nb-message">Повідомлення</label><textarea id="nb-message" maxlength="4000" placeholder="Напиши повідомлення…">'+esc(S.chatDraft)+'</textarea>'+filesHtml(S.chatFiles,'chat')+'<div class="nb-row">'+btn('Фото / файл','chat-file')+btn('Конспект','chat-note')+'<button type="submit" class="nb-btn nb-primary" '+(S.loading?'disabled':'')+'>Надіслати</button></div><input type="file" id="nb-chat-file" accept="image/jpeg,image/png,image/webp,application/pdf,.doc,.docx,.txt" hidden></form>';
+ out+='<form id="nb-compose" class="nb-compose">'+(quote?'<div class="nb-reply">Відповідь '+esc(quote.name)+': '+esc(quote.body.slice(0,100))+btn('×','reply-clear')+'</div>':'')+'<label for="nb-message">Повідомлення</label><textarea id="nb-message" maxlength="4000" placeholder="Напиши повідомлення…">'+esc(S.chatDraft)+'</textarea>'+filesHtml(S.chatFiles,'chat')+'<div class="nb-row">'+btn('Фото / файл','chat-file')+btn('Конспект','chat-note')+'<button type="submit" data-action="message-send" class="nb-btn nb-primary" '+(S.loading?'disabled':'')+'>Надіслати</button></div><input type="file" id="nb-chat-file" accept="image/jpeg,image/png,image/webp,application/pdf,.doc,.docx,.txt" hidden></form>';
  return out;
 }
 function friendsView(){
@@ -131,7 +131,7 @@ function render(){
  ensure();const head='<section id="dp-nb"><div class="nb-header"><div><span class="nb-kicker">DEPARA · НАВЧАННЯ РАЗОМ</span><h1>Зошит</h1></div>'+btn('↻','refresh','aria-label="Оновити зошит"')+'</div><div class="nb-tabs" role="tablist" aria-label="Розділи зошита">'+[['notes','Конспекти'],['chats','Чати'],['friends','Друзі']].map(([k,v])=>'<button type="button" role="tab" aria-selected="'+(S.tab===k)+'" data-action="tab" data-value="'+k+'">'+v+'</button>').join('')+'</div>';
  return head+(S.error?'<div class="nb-alert nb-error" role="alert">'+esc(S.error)+' '+btn('Повторити','refresh')+'</div>':'')+(!auth()?'<div class="nb-alert">Особисті записи зберігаються на цьому пристрої. Для чатів, друзів і публікації відкрий тестовий Telegram-бот.</div>':'')+'<span class="nb-status" aria-live="polite">'+(S.loading?'Оновлення…':S.ready?'Підключено · '+esc(S.me.group.name):'Локальні записи')+'</span><div role="tabpanel">'+(S.tab==='notes'?notesView():S.tab==='chats'?chatsView():friendsView())+'</div></section>';
 }
-function draw(){if(!active())return;const screen=$('#screen');if(!screen)return;const y=window.scrollY;screen.innerHTML=render();if(window.scrollY!==y)window.scrollTo(0,y)}
+function draw(){if(!active())return;const screen=$('#screen');if(!screen)return;const y=window.scrollY;const opened=[...screen.querySelectorAll('#dp-nb details[open]>summary')].map(x=>x.textContent);screen.innerHTML=render();for(const summary of screen.querySelectorAll('#dp-nb details>summary'))if(opened.includes(summary.textContent))summary.parentElement.open=true;if(window.scrollY!==y)window.scrollTo(0,y)}
 function newNote(){const n={id:uuid(),title:'Новий зошит',body:'',subject:S.subject||'',kind:S.subject?S.section:'note',due:'',done:0,visibility:'private',audience:[],attachments:[],created_at:Date.now(),updated_at:Date.now(),dirty:true,owner_id:S.me?.id||undefined};S.note=n;persist(n);draw();$('#dp-nb-title')?.focus()}
 function updateDraft(){const n=S.note;if(!n)return;n.updated_at=Date.now();n.dirty=true;const ok=persist(n);const status=$('#dp-nb-status');if(status)status.textContent=ok?'✓ Чернетку збережено на цьому пристрої':'Не вдалося зберегти — скопіюй текст';clearTimeout(saveTimer);if(S.ready&&n.visibility==='private')saveTimer=setTimeout(()=>{void saveNote(false).catch(e=>{S.error=messageError(e);draw()})},1000)}
 async function saveNote(explicit){
@@ -154,7 +154,7 @@ async function addFiles(file,chat){if(!file)return;let data,type=file.type||'app
 function downloadFile(context,index){const files=context==='note'?S.note?.attachments:context==='chat'?S.chatFiles:S.messages.find(m=>'message-'+m.id===context)?.attachments;const f=files?.[index];if(!f)return;const encoded=f.data.split(',')[1],binary=atob(encoded),array=Uint8Array.from(binary,c=>c.charCodeAt(0));const url=URL.createObjectURL(new Blob([array],{type:f.type})),a=document.createElement('a');a.href=url;a.download=f.name;a.click();setTimeout(()=>URL.revokeObjectURL(url),30000)}
 document.addEventListener('click',async e=>{
  const nav=e.target.closest('#nav [data-page="notebook"]');if(nav){setTimeout(()=>{draw();ensure()},0);return}
- const b=e.target.closest('#dp-nb [data-action]');if(!b)return;const a=b.dataset.action,id=b.dataset.id;
+ if(!e.target.closest('#dp-nb'))return;e.stopPropagation();const b=e.target.closest('[data-action]');if(!b)return;if(b.dataset.action==='message-send')e.preventDefault();const a=b.dataset.action,id=b.dataset.id;
  if(a==='tab'){clearTimeout(saveTimer);S.tab=b.dataset.value;S.error='';draw();if(S.tab==='chats'&&S.ready)void act(async()=>{S.electionData=await api('elections')});return}
  if(a==='download'){downloadFile(b.dataset.context,Number(b.dataset.index));return}
  if(a==='subject'){S.subject=b.dataset.value;S.section='note';S.search='';draw();return}
@@ -171,6 +171,7 @@ document.addEventListener('click',async e=>{
  if(a==='thread-back'){S.thread=null;S.chatDraft='';S.chatFiles=[];draw();return}
  if(a==='reply'){S.reply=Number(id);draw();$('#nb-message')?.focus();return}if(a==='reply-clear'){S.reply=0;draw();return}
  await act(async()=>{
+  if(a==='message-send'){if(!S.chatDraft.trim()&&!S.chatFiles.length)return;await api('messages/send','POST',{channel:S.thread.key,body:S.chatDraft,attachments:S.chatFiles,replyId:S.reply});S.chatDraft='';S.chatFiles=[];S.reply=0;await refreshThread();}
   if(a==='refresh'){if(S.ready){await refreshNotes();await refreshFriends();if(S.thread)await refreshThread()}else await bootstrap();}
   if(a==='note-save'){clearTimeout(saveTimer);await saveNote(true)}
   if(a==='note-copy'){const source=S.note;S.note={...source,id:uuid(),title:source.title+' (копія)',owner_id:S.me?.id,visibility:'private',audience:[],revision:undefined,created_at:Date.now(),updated_at:Date.now(),dirty:true,author:undefined};persist(S.note);await saveNote(false)}
@@ -195,7 +196,7 @@ document.addEventListener('click',async e=>{
   if(a==='election-start'){if(!confirm('Почати голосування на 48 годин? Правила показані в розділі виборів.'))return;await api('elections/start','POST',{action:b.dataset.value});S.electionData=await api('elections');}
   if(a==='vote'){await api('elections/vote','POST',{id:S.electionData.election.id,yes:b.dataset.yes==='true'});S.electionData=await api('elections');}
  });
-});
+},true);
 document.addEventListener('input',e=>{
  const el=e.target;if(!el.closest('#dp-nb'))return;
  if(el.id==='nb-search'||el.id==='nb-chat-search'){const pos=el.selectionStart,key=el.id==='nb-search'?'search':'chatSearch';S[key]=el.value;draw();const fresh=$('#'+el.id);fresh?.focus();try{fresh?.setSelectionRange(pos,pos)}catch{}return}

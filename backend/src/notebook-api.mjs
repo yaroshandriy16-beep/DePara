@@ -76,11 +76,11 @@ async function moderator(db, me, channel) {
   return channel===`group:${g.id}` || channel.startsWith(`subject:${g.id}:`) || channel===`course:${g.facultyId}:${g.course}` || channel===`faculty:${g.facultyId}`;
 }
 async function channelAccess(db,me,key) {
-  if(typeof key!=='string'||key.length>500)fail('INVALID_CHANNEL');
+  if(typeof key!=='string'||key.length>2000)fail('INVALID_CHANNEL');
   const g=groups[me.group_id];
   if(key.startsWith('dm:')){
     const ids=key.slice(3).split(':');if(ids.length!==2||ids[0]===ids[1]||!ids.includes(me.id)||pair(...ids).join(':')!==ids.join(':')||!await friends(db,...ids))fail('FORBIDDEN',403);
-  } else if(key!==`group:${g.id}`&&key!==`course:${g.facultyId}:${g.course}`&&key!==`faculty:${g.facultyId}`&&!new RegExp('^subject:'+g.id+':[^:]{1,400}$').test(key))fail('FORBIDDEN',403);
+  } else if(key!==`group:${g.id}`&&key!==`course:${g.facultyId}:${g.course}`&&key!==`faculty:${g.facultyId}`&&!new RegExp('^subject:'+g.id+':[^:]{1,1800}$').test(key))fail('FORBIDDEN',403);
   return true;
 }
 async function throttle(db,table,field,user,millis) {
@@ -227,7 +227,7 @@ export async function notebookApi(request,env) {
       return reply({ok:true,messages:messages.map(m=>({...m,body:m.deleted?'Повідомлення видалено':m.body,note_id:m.deleted?'':m.note_id,attachments:m.deleted?[]:parse(m.attachments),group:groups[m.group_id]?.name||'',reactions:reactions.filter(r=>r.message_id===m.id)})),canModerate:await moderator(db,me,channel)});
     }
     if(route==='messages/send'&&method==='POST'){
-      const channel=clean(b.channel,500,true);await channelAccess(db,me,channel);
+      const channel=clean(b.channel,2000,true);await channelAccess(db,me,channel);
       const mute=await one(db,'SELECT until_at FROM nb_mutes WHERE channel=? AND user_id=?',channel,me.id);if(mute?.until_at>now())fail('MUTED',403);
       await throttle(db,'nb_messages','author_id',me.id,1500);
       const text=clean(b.body||'',4000),attachments=attachmentList(b.attachments||[]),noteId=clean(b.noteId||'',80);

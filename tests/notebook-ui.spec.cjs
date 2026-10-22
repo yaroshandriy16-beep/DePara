@@ -8,7 +8,7 @@ async function launch(page,options={}){
  await page.route(API+'**',async route=>{
   const req=route.request(),url=new URL(req.url()),path=url.pathname.split('/api/notebook/')[1];let data={};try{data=req.postDataJSON()||{}}catch{}
   calls.push({path,data});let result={ok:true};
-  if(options.down)return route.fulfill({status:503,json:{ok:false,error:'SERVICE_UNAVAILABLE'}});
+  if(options.down)return route.fulfill({status:503,headers:{'access-control-allow-origin':'*'},json:{ok:false,error:'SERVICE_UNAVAILABLE'}});
   if(path==='profile')result.me={...me,privacy:data.privacy||'none'};
   if(path==='bootstrap')result={ok:true,me,friends:[{id:'101',name:'Друг',state:'accepted',favorite:false,privacy:'none',shareWith:'inherit'},{id:'102',name:'Новий друг',state:'pending',incoming:true}],channels:[{key:'group:3641',title:'ЕІ-23-1',unread:0},{key:'course:1:4',title:'4 курс',unread:2},{key:'faculty:1',title:'Факультет',unread:0}]};
   if(path==='notes')result.notes=notes;
@@ -17,7 +17,7 @@ async function launch(page,options={}){
   if(path==='invitations')result.invitations=[];
   if(path==='elections')result={ok:true,election:null,leader:null,eligibleAt:Date.now()+172800000};
   if(path==='friends/availability')result={ok:true,hidden:true};
-  await route.fulfill({json:result});
+  await route.fulfill({headers:{'access-control-allow-origin':'*','access-control-allow-headers':'authorization,content-type','access-control-allow-methods':'GET,POST,OPTIONS'},json:result});
  });
  await page.goto('/reborn-notebook-preview/');
  await page.locator('[data-dp-role="student"]').click();await page.locator('#dp-group-search').fill('ЕІ-23-1');await page.locator('#dp-search-results button').first().click();await page.locator('#dp-setup-done').click();await page.locator('#dp-success-enter').click();
@@ -33,6 +33,7 @@ test('Three notebook sections, subject notes, scoped publication and cloud save'
  await page.locator('#nb-visibility').selectOption('faculty');await expect(page.locator('#dp-nb')).toContainText('Побачать усі курси');
  page.once('dialog',d=>d.accept());await page.locator('[data-action="note-save"]').click();
  await expect.poll(()=>calls.some(c=>c.path==='notes/save'&&c.data.visibility==='faculty'&&c.data.body==='Закон Ома')).toBeTruthy();
+ await page.screenshot({path:'test-results/notebook-editor.png',fullPage:true});
  expect(errors).toEqual([]);
 });
 test('Chat author labels, draft send and no stale form data',async({page})=>{
