@@ -1,8 +1,0 @@
-DePara production release: promote tested REBORN weekly schedule image sharing and production bot deep link.
-Source branch: cloudflare-worker-setup
-Worker: depara-api
-Database: depara-db
-
-Release request: 2026-10-21
-Change: verified @DeParra_bot/app?startapp=shared_schedule deep link for newly shared schedule images.
-Reviewed source merge: f321fb01770627c5438edf671632bc594c42f6a0
