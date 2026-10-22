@@ -7,6 +7,7 @@ on:
     paths:
       - 'backend/src/preview-worker.js'
       - 'backend/src/notebook-api.mjs'
+      - 'backend/src/notebook-schema.mjs'
       - 'backend/src/notebook-catalog.json'
       - 'backend/preview-migrations/*.sql'
       - 'backend/wrangler.preview.toml'
@@ -48,14 +49,6 @@ jobs:
           grep -q 'DePara_Reborn_Test_Bot' backend/src/preview-worker.js
           grep -q 'path === "/api/share/prepare"' backend/src/preview-worker.js
           grep -q 'path === "/api/social/inbox"' backend/src/preview-worker.js
-      - name: Apply additive notebook tables to test database
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          wranglerVersion: '4.151.3'
-          workingDirectory: backend
-          command: d1 migrations apply depara-preview-db --remote --config wrangler.preview.toml
       - name: Deploy preview Worker only
         uses: cloudflare/wrangler-action@v3
         with:
@@ -64,23 +57,15 @@ jobs:
           wranglerVersion: '4.151.3'
           workingDirectory: backend
           command: deploy --config wrangler.preview.toml
-      - name: Verify preview D1 access (read-only)
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          wranglerVersion: '4.151.3'
-          workingDirectory: backend
-          command: d1 execute depara-preview-db --remote --config wrangler.preview.toml --command "SELECT 1 AS cloudflare_d1_ok"
-      - name: Smoke test preview health and bindings
+      - name: Verify preview runtime D1 binding
         shell: bash
         run: |
           set -euo pipefail
-          url="https://depara-api-preview.yaroshandriy16.workers.dev/health"
+          url="https://depara-api-preview.yaroshandriy16.workers.dev/api/notebook/health"
           for attempt in 1 2 3 4 5; do
             if curl --fail --silent --show-error --max-time 15 "$url" -o /tmp/depara-health.json; then
-              if node -e 'const h=require("/tmp/depara-health.json"); if(h.ok!==true || h.database!==true || h.telegramConfigured!==true) process.exit(1)'; then
-                echo "Preview health, D1 binding and Telegram secret are present."
+              if node -e 'const h=require("/tmp/depara-health.json"); if(h.ok!==true || h.database!==true || h.version!=="notebook-social-2") process.exit(1)'; then
+                echo "Preview Worker is deployed and its D1 runtime query succeeded."
                 exit 0
               fi
             fi

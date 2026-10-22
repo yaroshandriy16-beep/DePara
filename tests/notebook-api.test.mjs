@@ -5,15 +5,16 @@ import { createHmac } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { notebookApi } from '../backend/src/notebook-api.mjs';
 import catalog from '../backend/src/notebook-catalog.json' with { type:'json' };
+import schema from '../backend/src/notebook-schema.mjs';
 
 const TOKEN='test-token-not-a-real-bot-secret';
 const home=catalog['3641'];
 const otherGroup=Object.values(catalog).find(g=>g.id!==home.id&&g.facultyId===home.facultyId&&g.course===home.course);
 const otherCourse=Object.values(catalog).find(g=>g.facultyId===home.facultyId&&g.course!==home.course);
 const otherFaculty=Object.values(catalog).find(g=>g.facultyId!==home.facultyId);
-function fixture(){
+function fixture(empty=false){
  const db=new DatabaseSync(':memory:');
- db.exec(readFileSync(new URL('../backend/preview-migrations/0002_notebook_social.sql',import.meta.url),'utf8'));
+ if(!empty)db.exec(readFileSync(new URL('../backend/preview-migrations/0002_notebook_social.sql',import.meta.url),'utf8'));
  const DB={prepare(sql){let args=[];return{bind(...values){args=values;return this},first(){return Promise.resolve(db.prepare(sql).get(...args)||null)},all(){return Promise.resolve({results:db.prepare(sql).all(...args)})},run(){const r=db.prepare(sql).run(...args);return Promise.resolve({meta:{changes:Number(r.changes),last_row_id:Number(r.lastInsertRowid)}})},sql,args:()=>args}},async batch(statements){db.exec('BEGIN');try{const results=[];for(const s of statements)results.push(await s.run());db.exec('COMMIT');return results}catch(e){db.exec('ROLLBACK');throw e}}};
  const env={DB,TELEGRAM_BOT_TOKEN:TOKEN};
  function signed(userId,extra={}){const p=new URLSearchParams({auth_date:String(Math.floor(Date.now()/1000)),user:JSON.stringify({id:Number(userId),first_name:'User '+userId}),...extra});const text=[...p].sort(([a],[b])=>a<b?-1:1).map(([k,v])=>k+'='+v).join('\n');const key=createHmac('sha256','WebAppData').update(TOKEN).digest();p.set('hash',createHmac('sha256',key).update(text).digest('hex'));return 'tma '+p;}
@@ -23,6 +24,18 @@ function fixture(){
  const save=(who,id,visibility='private',more={})=>call(who,'notes/save',{id,title:'Конспект',subject:'Електротехніка',body:'Важливий приватний текст',visibility,audience:[],attachments:[],...more});
  return {db,env,call,profile,signed,becomeFriends,save};
 }
+
+test('Authenticated additive runtime bootstrap preserves existing data and health never creates tables',async()=>{
+ const f=fixture(true);f.db.exec("CREATE TABLE existing_data(value TEXT); INSERT INTO existing_data VALUES('preserve')");
+ const sql=readFileSync(new URL('../backend/preview-migrations/0002_notebook_social.sql',import.meta.url),'utf8');
+ assert.deepEqual(schema,sql.split(';').map(s=>s.trim()).filter(Boolean));
+ const r=await notebookApi(new Request('https://worker.test/api/notebook/health'),f.env);assert.equal((await r.json()).schemaReady,false);
+ assert.equal(f.db.prepare("SELECT count(*) AS n FROM sqlite_master WHERE name='nb_profiles'").get().n,0);
+ const denied=await f.call(100,'profile',{groupId:home.id},{Authorization:'tma invalid'});assert.equal(denied.status,401);
+ assert.equal(f.db.prepare("SELECT count(*) AS n FROM sqlite_master WHERE name='nb_profiles'").get().n,0);
+ await f.profile(100);assert.equal(f.db.prepare('SELECT value FROM existing_data').get().value,'preserve');
+ assert.equal(f.db.prepare('SELECT count(*) AS n FROM nb_profiles').get().n,1);
+});
 
 test('Telegram signature, expiry, duplicate keys and origin checks',async()=>{
  const f=fixture();

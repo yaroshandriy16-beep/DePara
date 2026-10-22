@@ -1,4 +1,7 @@
 import catalog from './notebook-catalog.json' with { type: 'json' };
+import schema from './notebook-schema.mjs';
+const schemaPromises=new WeakMap();
+async function ensureSchema(db){if(!schemaPromises.has(db)){const pending=db.batch(schema.map(sql=>db.prepare(sql))).catch(e=>{schemaPromises.delete(db);throw e});schemaPromises.set(db,pending)}await schemaPromises.get(db);}
 
 const VERSION = 'notebook-social-2';
 const PREFIX = '/api/notebook/';
@@ -125,9 +128,10 @@ export async function notebookApi(request,env) {
   if(request.headers.get('Origin')&&request.headers.get('Origin')!==ALLOWED) return reply({ok:false,error:'FORBIDDEN'},403);
   try {
     if(url.pathname===PREFIX+'health'){
-      await one(env.DB,'SELECT id FROM nb_profiles LIMIT 1');return reply({ok:true,version:VERSION,database:true});
+      await one(env.DB,'SELECT 1 AS connected');let schemaReady=false;try{await one(env.DB,'SELECT id FROM nb_profiles LIMIT 1');schemaReady=true}catch{}return reply({ok:true,version:VERSION,database:true,schemaReady});
     }
     const user=await authenticate(request,env.TELEGRAM_BOT_TOKEN),db=env.DB;
+    await ensureSchema(db);
     const b=request.method==='POST'?await body(request):{};
     const route=url.pathname.slice(PREFIX.length),method=request.method;
     let me=await one(db,'SELECT * FROM nb_profiles WHERE id=?',user.id);

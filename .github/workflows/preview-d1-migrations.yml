@@ -1,11 +1,6 @@
 name: Apply Safe DePara Preview D1 Migrations
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'backend/preview-migrations/*.sql'
-      - '.github/workflows/preview-d1-migrations.yml'
   workflow_dispatch:
 
 permissions:
