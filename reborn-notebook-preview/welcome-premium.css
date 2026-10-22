@@ -1,0 +1,48 @@
+/* Isolated preview welcome. One scroll surface, no artificial splash delay. */
+html.dp-resume #dp-onboarding{display:none!important}
+html.dp-resume[data-dp-resume-role=teacher]>.app,html.dp-resume[data-dp-resume-role=teacher] body>.app{visibility:hidden}
+#dp-onboarding{--welcome-bg:#0b1916;--welcome-panel:#142821;--welcome-ink:#f3f3e9;--welcome-muted:#a6b9ae;--welcome-line:#c9d5bb26;--welcome-accent:#dcc487;background:radial-gradient(ellipse at 90% 0%,#27513a55,transparent 55%),var(--welcome-bg);color:var(--welcome-ink);padding:calc(env(safe-area-inset-top) + 28px) 24px calc(env(safe-area-inset-bottom) + 24px)!important;box-sizing:border-box;overflow-y:auto!important;align-items:flex-start!important;transition:opacity .18s ease,visibility .18s ease}
+#dp-onboarding *,#dp-onboarding *:before,#dp-onboarding *:after{box-sizing:border-box}
+#dp-onboarding .dp-onboarding-inner{width:100%;max-width:420px;margin:auto;padding:0;position:relative}
+#dp-onboarding .dp-onboarding-logo{width:64px;height:64px;margin:0 auto 12px;border:0;background:none;box-shadow:none;animation:none;border-radius:18px}
+#dp-onboarding .dp-onboarding-logo img{width:100%;height:100%;display:block}
+#dp-onboarding .dp-onboarding-logo:before,#dp-onboarding .dp-onboarding-logo:after{display:none}
+#dp-onboarding .dp-onboarding-brand{font-size:32px;letter-spacing:-1.5px;line-height:1.1;animation:none;color:var(--welcome-ink)}
+#dp-onboarding .dp-onboarding-brand span{color:var(--welcome-accent)}
+#dp-onboarding .dp-onboarding-sub{font-size:12px;color:var(--welcome-muted);margin:8px 0 32px;animation:none}
+#dp-onboarding .dp-step{font-size:10px;letter-spacing:1.7px;font-weight:650;color:var(--welcome-accent);margin:0 0 16px}
+#dp-onboarding .dp-onboarding-roles{transition:opacity .22s,transform .22s;transform:translateY(8px)}
+#dp-onboarding .dp-roles-visible{transform:none}
+#dp-onboarding .dp-onboarding-roles h2{font-size:clamp(36px,10vw,44px);font-weight:650;line-height:1.07;letter-spacing:-1.8px;margin:0 0 16px;color:var(--welcome-ink)}
+#dp-onboarding .dp-onboarding-roles>p{font-size:14px;line-height:1.6;color:var(--welcome-muted);margin:0 0 26px}
+#dp-onboarding .dp-onboarding-roles button{display:grid;grid-template-columns:44px 1fr 16px;grid-template-rows:auto auto;gap:5px 14px;align-items:center;padding:21px 18px;min-height:98px;margin:12px 0;border:1px solid var(--welcome-line);border-radius:20px;background:var(--welcome-panel);box-shadow:0 8px 28px #00000010;color:var(--welcome-ink);transition:border-color .15s,transform .15s}
+#dp-onboarding .dp-onboarding-roles button:first-of-type{border-color:#cdb57a88}
+#dp-onboarding .dp-onboarding-roles button .dp-role-icon{grid-row:1/3;grid-column:1;display:grid;place-items:center;width:44px;height:48px;border-radius:13px;color:var(--welcome-accent);background:#cbb7770d}
+#dp-onboarding .dp-role-icon svg{width:28px;height:28px}
+#dp-onboarding .dp-onboarding-roles button strong{grid-column:2;font-size:17px;font-weight:650}
+#dp-onboarding .dp-onboarding-roles button small{grid-column:2;font-size:12px;line-height:1.4;color:var(--welcome-muted)}
+#dp-onboarding .dp-onboarding-roles button i{grid-column:3;grid-row:1/3;font-style:normal;color:var(--welcome-accent);font-size:19px}
+#dp-onboarding .dp-onboarding-roles .dp-welcome-foot{font-size:11px;margin:24px 0 0;color:var(--welcome-muted)}
+#dp-onboarding[data-step=setup] .dp-onboarding-logo{width:38px;height:38px;margin-bottom:8px;display:block}
+#dp-onboarding[data-step=setup] .dp-onboarding-brand{font-size:25px}
+#dp-onboarding[data-step=setup] .dp-onboarding-sub{margin:6px 0 24px}
+#dp-onboarding .dp-v50-step{padding:0;max-height:none;overflow:visible;text-align:left}
+#dp-onboarding .dp-setup-head{margin:0 0 20px;text-align:left}
+#dp-onboarding .dp-setup-head>span{display:none}
+#dp-onboarding .dp-v50-step h2{font-size:28px;letter-spacing:-.8px;line-height:1.2;font-weight:650;color:var(--welcome-ink);margin:0 0 8px}
+#dp-onboarding .dp-v50-step p{font-size:13px;line-height:1.5;color:var(--welcome-muted)}
+#dp-onboarding .dp-v50-step label{color:var(--welcome-muted);font-size:12px!important;font-weight:600!important;margin:16px 0 8px!important}
+#dp-onboarding .dp-v50-step input,#dp-onboarding .dp-v50-step select,#dp-onboarding .dp-teacher-step #dp-teacher-search{width:100%;min-height:52px!important;padding:13px 14px!important;font-size:16px!important;border:1px solid var(--welcome-line)!important;border-radius:14px!important;background:var(--welcome-panel)!important;color:var(--welcome-ink)!important}
+#dp-onboarding input::placeholder{color:var(--welcome-muted)!important;opacity:.8}
+#dp-onboarding .dp-search-results{max-height:220px;overscroll-behavior:contain}
+#dp-onboarding .dp-search-result,#dp-onboarding .dp-teacher-step #dp-teacher-search-results .dp-search-result{background:var(--welcome-panel)!important;border-color:var(--welcome-line)!important;color:var(--welcome-ink)!important;min-height:52px;border-radius:12px!important}
+#dp-onboarding #dp-setup-done,#dp-onboarding #dp-success-enter,#dp-onboarding .dp-teacher-step #dp-teacher-enter{min-height:54px!important;background:var(--welcome-accent)!important;border:0;border-radius:14px!important;color:#14251c!important;font-size:15px!important;box-shadow:none!important}
+#dp-onboarding #dp-setup-back,#dp-onboarding .dp-teacher-step #dp-teacher-back{color:var(--welcome-muted)!important;min-height:48px}
+#dp-onboarding #dp-setup-error{color:#e6a48e;min-height:0}
+#dp-onboarding .dp-success-step{text-align:center;padding:28px 0}
+#dp-onboarding .dp-success-icon{width:64px;height:64px;font-size:30px;border:1px solid var(--welcome-line);background:var(--welcome-panel);box-shadow:none;animation:none;color:var(--welcome-accent);margin:24px auto}
+#dp-onboarding #dp-success-group{font-size:17px;color:var(--welcome-ink);font-weight:600}
+#dp-onboarding :is(button,input,select):focus-visible{outline:2px solid var(--welcome-accent);outline-offset:3px}
+body.light #dp-onboarding{--welcome-bg:#f5f4ed;--welcome-panel:#fffef8;--welcome-ink:#173c2c;--welcome-muted:#65776b;--welcome-line:#2c54352b;--welcome-accent:#c9ae6c;background:radial-gradient(ellipse at 90% 0%,#dce5cf99,transparent 55%),var(--welcome-bg)}
+@media(max-height:600px){#dp-onboarding .dp-onboarding-sub{margin-bottom:18px}#dp-onboarding[data-step=setup] .dp-onboarding-logo,#dp-onboarding[data-step=setup] .dp-onboarding-sub{display:none}#dp-onboarding[data-step=setup] .dp-onboarding-brand{margin-bottom:20px}#dp-onboarding .dp-onboarding-roles h2{font-size:32px}}
+@media(prefers-reduced-motion:reduce){#dp-onboarding,#dp-onboarding *{animation:none!important;transition:none!important;scroll-behavior:auto!important}}

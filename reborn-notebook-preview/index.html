@@ -12,7 +12,16 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta name="theme-color" content="#080e0e">
 
   <title>ДеПара? · Тест зошита</title>
-  <meta name="depara-build" content="notebook-upgrade-5">
+  <meta name="depara-build" content="premium-welcome-6">
+  <script>
+    // Decide before first paint so returning users never see the role picker flash.
+    try {
+      const role=localStorage.getItem('dp_reborn2_role');
+      const student=role==='student'&&localStorage.getItem('dp_reborn2_student_setup')==='1'&&localStorage.getItem('dp_reborn2_group');
+      const teacher=role==='teacher'&&JSON.parse(localStorage.getItem('dp_reborn2_teacher_v1')||'null')?.teacherId;
+      if(student||teacher){document.documentElement.classList.add('dp-resume');document.documentElement.dataset.dpResumeRole=role;}
+    } catch {}
+  </script>
 
   <link rel="stylesheet" href="../production-v49/style-reborn49.css?v=49-prod2">
   <link rel="stylesheet" href="../production-v50/onboarding-base.css?v=50-prod1">
@@ -32,6 +41,7 @@
   <link rel="stylesheet" href="schedule-polish-v38.css?v=40">
   <style>#nav{grid-template-columns:repeat(4,minmax(0,1fr))}</style>
   <link rel="stylesheet" href="notebook-social.css?v=notebook-upgrade-5">
+  <link rel="stylesheet" href="welcome-premium.css?v=premium-welcome-6">
 </head>
 
 <body>
@@ -88,13 +98,13 @@
   <!-- Основний застосунок -->
   <script src="notebook-editor.js?v=notebook-upgrade-5"></script>
   <script src="notebook-social.js?v=notebook-upgrade-5"></script>
-  <script src="app-reborn46.js?v=notebook-fresh-1"></script>
+  <script src="app-reborn46.js?v=premium-welcome-6"></script>
   <script src="polish-reborn43.js?v=cleanup-20261022"></script>
   <script src="countdown-live.js?v=32-bugfix1"></script>
-  <script src="onboarding-v50.js?v=23-catalog-race"></script>
+  <script src="onboarding-v50.js?v=premium-welcome-6"></script>
   <script src="settings-v50.js?v=notebook-social-2"></script>
   <script src="../production-v50/lesson-detail.js?v=1"></script>
-  <script src="teacher-v1.js?v=cleanup-20261022"></script>
+  <script src="teacher-v1.js?v=premium-welcome-6"></script>
   <script src="ui-revolution22.js?v=22-1"></script>
   <script src="ui-revolution23.js?v=32-hiddenfix4"></script>
   <script src="ultimate-v30.js?v=30-1"></script>

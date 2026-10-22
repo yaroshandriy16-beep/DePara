@@ -2,7 +2,7 @@ name: Notebook social checks
 on:
   push:
     branches: [notebook-social-v1, main]
-    paths: ['backend/src/notebook*', 'backend/preview-migrations/**', 'reborn-notebook-preview/**', 'tests/notebook*', '.github/workflows/notebook-checks.yml']
+    paths: ['backend/src/notebook*', 'backend/preview-migrations/**', 'reborn-notebook-preview/**', 'tests/notebook*', 'tests/premium-welcome.spec.cjs', '.github/workflows/notebook-checks.yml']
   pull_request:
 permissions:
   contents: read
@@ -29,7 +29,7 @@ jobs:
       - name: Start site
         run: python3 -m http.server 8765 --bind 127.0.0.1 > /tmp/notebook-site.log 2>&1 &
       - name: Test notebook and preserved schedule
-        run: npx playwright test tests/reborn.spec.cjs tests/notebook-ui.spec.cjs --config=playwright.config.cjs --reporter=line --workers=1
+        run: npx playwright test tests/reborn.spec.cjs tests/notebook-ui.spec.cjs tests/premium-welcome.spec.cjs --config=playwright.config.cjs --reporter=line --workers=1
       - uses: actions/upload-artifact@v4
         if: always()
         with:

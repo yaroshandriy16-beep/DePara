@@ -54,5 +54,5 @@ window.DeParaOpenTeacher=function(id){const chosen=read();state.teacherId=String
 window.addEventListener('depara:teacher-open',e=>window.DeParaOpenTeacher(e.detail?.id));
 document.addEventListener('click',e=>{if(e.target.closest('[data-dp-role="teacher"]'))setTimeout(()=>{visible()},100);if(e.target.id==='dp-teacher-enter')setTimeout(()=>{visible()},100);if(e.target.closest('[data-dp-role="student"]'))setTimeout(visible,100);if(e.target.id==='dp-success-enter')setTimeout(visible,100)});
 const ob=document.querySelector('#dp-onboarding');if(ob)new MutationObserver(()=>{const on=localStorage.getItem(roleKey)==='teacher';if(root.hidden===on)visible()}).observe(ob,{attributes:true,attributeFilter:['style','class','hidden']});
-setTimeout(()=>{visible();catalog();if(localStorage.getItem(roleKey)==='teacher')refresh()},1250);
+visible();if(localStorage.getItem(roleKey)==='teacher'){catalog();refresh()}
 })();

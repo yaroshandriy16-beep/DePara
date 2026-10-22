@@ -1,0 +1,47 @@
+const {test,expect}=require('@playwright/test');
+test.use({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
+test.beforeEach(async({page})=>{
+ await page.route('https://telegram.org/js/telegram-web-app.js',r=>r.fulfill({contentType:'text/javascript',body:'window.Telegram={WebApp:{ready(){},expand(){},onEvent(){}}};'}));
+});
+test('Welcome, student selection, back navigation and immediate cached return',async({page})=>{
+ await page.goto('/reborn-notebook-preview/');
+ await expect(page.locator('[data-dp-role]')).toHaveCount(2);
+ await page.screenshot({path:'/tmp/depara-welcome-dark.png',animations:'disabled'});
+ await page.locator('[data-dp-role=student]').click();
+ await page.locator('#dp-group-search').fill('ЕІ-23-1');
+ await page.locator('#dp-search-results button').first().click();
+ await page.locator('#dp-setup-back').click();
+ await page.locator('[data-dp-role=student]').click();
+ await page.locator('#dp-group-search').fill('ЕІ-23-1');
+ await page.locator('#dp-search-results button').first().click();
+ await page.screenshot({path:'/tmp/depara-welcome-setup.png'});
+ await page.locator('#dp-setup-done').click();
+ await expect(page.locator('#dp-success-group')).toContainText('ЕІ-23-1');
+ await page.locator('#dp-success-enter').click();
+ await expect(page.locator('#dp-onboarding')).toBeHidden();
+ await expect(page.locator('#nav [data-page=today]')).toHaveClass(/active/);
+ await expect.poll(()=>page.evaluate(()=>!!localStorage.getItem('dp_reborn2_cachedSchedule_3641'))).toBeTruthy();
+ await page.route('**/data/**',r=>r.abort());
+ await page.reload({waitUntil:'domcontentloaded'});
+ expect(await page.locator('#dp-onboarding').isVisible()).toBe(false);
+ await expect(page.locator('#connection')).toContainText('Офлайн');
+ await page.evaluate(()=>window.DeParaChangeGroup());
+ await expect(page.locator('#dp-group')).toHaveValue('3641');
+ await expect(page.locator('#dp-setup-done')).toBeEnabled();
+});
+test('Light welcome fits a small phone and teacher returns directly to dashboard',async({page})=>{
+ await page.addInitScript(()=>localStorage.setItem('dp_reborn2_theme',JSON.stringify('light')));
+ await page.setViewportSize({width:320,height:568});
+ await page.goto('/reborn-notebook-preview/');
+ await expect(page.locator('body')).toHaveClass(/light/);
+ expect(await page.locator('#dp-onboarding').evaluate(e=>e.scrollWidth<=e.clientWidth)).toBe(true);
+ await page.screenshot({path:'/tmp/depara-welcome-light.png',animations:'disabled'});
+ await page.locator('[data-dp-role=teacher]').click();
+ await page.locator('#dp-teacher-search').fill('Ков');
+ await page.locator('#dp-teacher-search-results button').first().click();
+ await page.locator('#dp-teacher-enter').click();
+ await expect(page.locator('#dp-teacher-app')).toBeVisible();
+ await page.reload({waitUntil:'domcontentloaded'});
+ expect(await page.locator('#dp-onboarding').isVisible()).toBe(false);
+ await expect(page.locator('#dp-teacher-app')).toBeVisible();
+});
