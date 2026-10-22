@@ -36,4 +36,3 @@ jobs:
           name: notebook-browser-results
           path: test-results/
           if-no-files-found: ignore
-
