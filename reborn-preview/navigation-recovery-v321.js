@@ -2,7 +2,7 @@
 (()=>{'use strict';
 const root=document.querySelector('#screen'),main=document.querySelector('#nav');if(!root||!main)return;
 let profile='identity',schedule='lessons',study='tasks',busy=false;
-const valid={profile:['identity','study','settings'],schedule:['lessons','calendar','insights','changes'],study:['tasks','session','notes','grades','attendance','focus']};
+const valid={profile:['identity','settings'],schedule:['lessons','calendar','insights','changes'],study:['tasks','session','notes','grades','attendance','focus']};
 const active=()=>main.querySelector('button.active')?.dataset.page;
 function setTabs(page,tab){
  const id=page==='profile'?'rb43-profile-tabs':'rb45-'+page,bar=document.getElementById(id);

@@ -1,6 +1,6 @@
 (()=>{'use strict';
 const $=s=>document.querySelector(s),P='dp_reborn2_';
-const items=[['role','🎓','Змінити роль','Студент або викладач'],['group','▦','Змінити факультет і групу','Без видалення завдань і нотаток'],['home','⌂','На головний екран','Швидкий запуск ДеПара? через Telegram'],['welcome','✦','Повторити привітання','Переглянути заставку ще раз'],['export','↓','Зберегти резервну копію','Завантажити JSON з локальними даними'],['import','↑','Відновити з копії','Імпортувати раніше збережені дані'],['reset','↺','Повне скидання','Очистити локальні дані та почати заново']];
+const items=[['role','🎓','Змінити роль','Студент або викладач'],['group','▦','Змінити факультет і групу','Без втрати налаштувань'],['home','⌂','На головний екран','Швидкий запуск ДеПара? через Telegram'],['welcome','✦','Повторити привітання','Переглянути заставку ще раз'],['export','↓','Зберегти резервну копію','Завантажити JSON з локальними даними'],['import','↑','Відновити з копії','Імпортувати раніше збережені дані'],['reset','↺','Повне скидання','Очистити локальні дані та почати заново']];
 let running=false;
 function profile(){if(document.querySelector('nav button.active')?.dataset.page!=='profile')return;const root=$('#screen'),tabs=$('#rb43-profile-tabs');if(!root||!tabs||$('#dp-v50-settings'))return;
 const section=document.createElement('section');section.id='dp-v50-settings';section.className='card dp-v50-settings';section.dataset.rb43Section='settings';

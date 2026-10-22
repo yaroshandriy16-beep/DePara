@@ -15,30 +15,9 @@ let y=288;for(const day of days){rounded(ctx,38,y,W-76,64,14,'#244734');ctx.fill
 ctx.fillStyle='#8caf9a';ctx.font='21px system-ui';ctx.fillText('ДеПара? • ВНАУ',48,height-42);
 return new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(Error('Не вдалося створити зображення')),'image/png'))}
 let url=null;async function show(){try{const btn=screen.querySelector('#dp40-share');if(btn)btn.disabled=true;currentBlob=await make();if(url)URL.revokeObjectURL(url);url=URL.createObjectURL(currentBlob);dialog.querySelector('img').src=url;dialog.showModal()}catch(e){alert(e.message||'Помилка створення розкладу')}finally{const btn=screen.querySelector('#dp40-share');if(btn)btn.disabled=false}}
-const SHARE_API=location.pathname.includes('/reborn-preview/')?'https://depara-api-preview.yaroshandriy16.workers.dev':'https://depara-api.yaroshandriy16.workers.dev';
-dialog.querySelector('#dp40-bot').onclick=async()=>{
- const button=dialog.querySelector('#dp40-bot'),tg=window.Telegram?.WebApp;
- if(!tg?.initData||typeof tg.shareMessage!=='function'){alert('Відкрий ДеПара? у тестовому Telegram-боті, щоб надіслати розклад від імені бота. Картинкою можна поділитися тут.');return}
- button.disabled=true;
- try{
-  const p=screen.querySelector('#dp35-schedule'),chosen=p?.querySelector('.dp35-days button.selected')?.dataset.dp35Date;
-  const selected=chosen?new Date(chosen+'T12:00:00'):new Date(),monday=add(selected,-((selected.getDay()+6)%7));
-  const response=await fetch('../data/groups/'+encodeURIComponent(String(group()))+'.json');
-  if(!response.ok)throw Error('Не вдалося отримати розклад');
-  const data=await response.json(),all=Array.isArray(data.lessons)?data.lessons:[];
-  const lines=Array.from({length:7},(_,i)=>{const d=add(monday,i),ls=all.filter(l=>l.date===iso(d)).sort((a,b)=>(a.start||'').localeCompare(b.start||''));return fmt(d,{weekday:'long',day:'numeric',month:'short'})+'\n'+(ls.length?ls.map(l=>(l.start||'—')+' '+(l.subject||'Заняття')).join('\n'):'Пар немає')}).join('\n\n');
-  const title='Розклад '+String(data.meta?.group||data.group_name||data.group||group())+' · '+iso(monday);
-  if(lines.length>3200)throw Error('Розклад завеликий для текстового повідомлення. Скористайся кнопкою «Картинкою».');
-  let imageBase64=null;
-  if(currentBlob&&currentBlob.size<=2800000){
-    try{const encoded=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(Error('image read failed'));reader.readAsDataURL(currentBlob)});imageBase64=String(encoded).split(',')[1]||null}catch(e){console.warn('Image share fallback',e)}
-  }
-  const prepared=await fetch(SHARE_API+'/api/share/prepare',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'tma '+tg.initData},body:JSON.stringify({title,schedule:lines,imageBase64})});
-  const result=await prepared.json();if(!prepared.ok||!result.ok||!result.id)throw Error('Не вдалося підготувати повідомлення Telegram');
-  if(result.mode!=='photo')alert('Telegram надіслав текст замість картинки: '+(result.photoError||'зображення недоступне')+'. Перевіримо причину.');
-  tg.shareMessage(result.id,()=>{});
- }catch(e){alert(e.message||'Помилка надсилання через бота')}finally{button.disabled=false}
-};
+// Native sharing and local PNG download; no server.
+dialog.querySelector('#dp40-bot').textContent='↓ Зберегти картинку';
+dialog.querySelector('#dp40-bot').onclick=()=>{if(!currentBlob)return;const link=document.createElement('a'),url=URL.createObjectURL(currentBlob);link.href=url;link.download='depara-rozklad.png';document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),30000)};
 async function shareImage(){if(!currentBlob)return false;const file=new File([currentBlob],'depara-week.png',{type:'image/png'});if(!navigator.canShare?.({files:[file]}))return false;try{await navigator.share({files:[file],title:'Розклад ДеПара?'});return true}catch(e){if(e.name==='AbortError')return true;console.warn('Image share unavailable',e);return false}}
 dialog.querySelector('#dp40-native').onclick=async()=>{if(!currentBlob)return;const file=new File([currentBlob],'depara-week.png',{type:'image/png'});if(navigator.canShare?.({files:[file]})){try{await navigator.share({files:[file],title:'Розклад ДеПара?'})}catch(e){if(e.name!=='AbortError')alert('Не вдалося поділитися. Спробуй «Зберегти».')}}else{alert('На цьому пристрої обмін файлами недоступний. Спробуй відкрити розклад у Safari.')}};
 let pending=false;function mount(){pending=false;if(document.querySelector('#nav button.active')?.dataset.page!=='schedule')return;const panel=screen.querySelector('#dp35-schedule');if(!panel)return;let b=panel.querySelector('#dp40-share');if(!b){b=document.createElement('button');b.id='dp40-share';b.textContent='↗ Поділитися тижневим розкладом';b.onclick=show}if(panel.lastElementChild!==b)panel.append(b);b.onclick=show}
