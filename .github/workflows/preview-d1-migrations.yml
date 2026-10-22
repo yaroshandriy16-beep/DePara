@@ -12,7 +12,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: depara-preview-d1-migrations
+  group: depara-preview-api
   cancel-in-progress: false
 
 jobs:

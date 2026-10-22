@@ -1,3 +1,4 @@
+import { notebookApi } from './notebook-api.mjs';
 var __defProp = Object.defineProperty;
 
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
@@ -1625,6 +1626,7 @@ __name(prepareScheduleShare, "prepareScheduleShare");
 var worker_default = {
 
   async fetch(request, env) {
+    if (new URL(request.url).pathname.startsWith("/api/notebook/")) return notebookApi(request, env);
 
     if (request.method === "OPTIONS")
 

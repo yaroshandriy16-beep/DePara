@@ -6,6 +6,9 @@ on:
     branches: [main]
     paths:
       - 'backend/src/preview-worker.js'
+      - 'backend/src/notebook-api.mjs'
+      - 'backend/src/notebook-catalog.json'
+      - 'backend/preview-migrations/*.sql'
       - 'backend/wrangler.preview.toml'
       - '.github/workflows/deploy-preview.yml'
 
@@ -42,6 +45,13 @@ jobs:
           grep -q 'DePara_Reborn_Test_Bot' backend/src/preview-worker.js
           grep -q 'path === "/api/share/prepare"' backend/src/preview-worker.js
           grep -q 'path === "/api/social/inbox"' backend/src/preview-worker.js
+      - name: Apply additive notebook tables to test database
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: backend
+          command: d1 migrations apply depara-preview-db --remote --config wrangler.preview.toml
       - name: Deploy preview Worker only
         uses: cloudflare/wrangler-action@v3
         with:
