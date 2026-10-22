@@ -26,6 +26,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
       - name: Verify reviewed preview source exists
         shell: bash
         run: |
@@ -50,6 +53,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: '4.151.3'
           workingDirectory: backend
           command: d1 migrations apply depara-preview-db --remote --config wrangler.preview.toml
       - name: Deploy preview Worker only
@@ -57,6 +61,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: '4.151.3'
           workingDirectory: backend
           command: deploy --config wrangler.preview.toml
       - name: Verify preview D1 access (read-only)
@@ -64,8 +69,9 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: '4.151.3'
           workingDirectory: backend
-          command: d1 execute depara-preview-db --remote --command "SELECT 1 AS cloudflare_d1_ok"
+          command: d1 execute depara-preview-db --remote --config wrangler.preview.toml --command "SELECT 1 AS cloudflare_d1_ok"
       - name: Smoke test preview health and bindings
         shell: bash
         run: |

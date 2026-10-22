@@ -1,6 +1,6 @@
 import catalog from './notebook-catalog.json' with { type: 'json' };
 
-const VERSION = 'notebook-social-1';
+const VERSION = 'notebook-social-2';
 const PREFIX = '/api/notebook/';
 const ALLOWED = 'https://yaroshandriy16-beep.github.io';
 const enc = new TextEncoder();
@@ -194,9 +194,16 @@ export async function notebookApi(request,env) {
       return reply({ok:true,privacy:level,busy:!!current,ends:current?.end||null,nextStart:later?.start||null,subject:level==='subject'||level==='room'?current?.subject||null:null,room:level==='room'?current?.room||null:null,common:common.filter(w=>minutes(w.end)>minutes(w.start)),date,notice:'За розкладом, не фактичне місцеперебування'});
     }
     if(route==='notes'&&method==='GET'){
-      const candidates=await all(db,"SELECT n.*,p.name AS author FROM nb_notes n JOIN nb_profiles p ON p.id=n.owner_id WHERE n.deleted_at=0 AND (n.owner_id=? OR n.visibility<>'private') ORDER BY n.updated_at DESC LIMIT 500",me.id);
-      const notes=[];for(const n of candidates)if(await canRead(db,n,me))notes.push({...n,attachments:parse(n.attachments),audience:parse(n.audience)});
+      const fields='n.id,n.owner_id,n.subject,n.title,n.body,n.kind,n.due,n.done,n.visibility,n.audience,n.group_id,n.lesson,n.revision,n.created_at,n.updated_at,n.deleted_at,json_array_length(n.attachments) AS attachment_count,p.name AS author';
+      const own=await all(db,`SELECT ${fields} FROM nb_notes n JOIN nb_profiles p ON p.id=n.owner_id WHERE n.deleted_at=0 AND n.owner_id=? ORDER BY n.updated_at DESC LIMIT 500`,me.id);
+      const shared=await all(db,`SELECT ${fields} FROM nb_notes n JOIN nb_profiles p ON p.id=n.owner_id WHERE n.deleted_at=0 AND n.owner_id<>? AND n.visibility<>'private' ORDER BY n.updated_at DESC LIMIT 500`,me.id);
+      const notes=[];for(const n of [...own,...shared])if(await canRead(db,n,me))notes.push({...n,audience:parse(n.audience)});
       return reply({ok:true,notes});
+    }
+    if(route==='notes/get'&&method==='GET'){
+      const n=await one(db,'SELECT n.*,p.name AS author FROM nb_notes n JOIN nb_profiles p ON p.id=n.owner_id WHERE n.id=?',url.searchParams.get('id')||'');
+      if(!await canRead(db,n,me))fail('FORBIDDEN',403);
+      return reply({ok:true,note:{...n,audience:parse(n.audience),attachments:parse(n.attachments)}});
     }
     if(route==='notes/save'&&method==='POST'){
       const noteId=clean(b.id,80,true),existing=await one(db,'SELECT * FROM nb_notes WHERE id=?',noteId);
