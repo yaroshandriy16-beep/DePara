@@ -49,6 +49,13 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: backend
           command: deploy --config wrangler.preview.toml
+      - name: Verify preview D1 access (read-only)
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: backend
+          command: d1 execute depara-preview-db --remote --command "SELECT 1 AS cloudflare_d1_ok"
       - name: Smoke test preview health and bindings
         shell: bash
         run: |
