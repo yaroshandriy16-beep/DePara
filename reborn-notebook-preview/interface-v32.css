@@ -1,0 +1,24 @@
+/* REBORN 3.2 — coherent mobile experience, preview only */
+:root{--dp32-space:12px;--dp32-radius:18px}
+#screen{display:flow-root}
+#screen>*+*{margin-top:var(--dp32-space)}
+#screen .card,#screen .rb40-card{box-shadow:0 3px 16px rgba(0,0,0,.055);border-radius:var(--dp32-radius)}
+#screen .card:empty,#screen .rb40-card:empty{display:none}
+#screen .dp32-section-title{display:flex;align-items:center;gap:9px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;opacity:.72;margin:18px 2px 10px}
+#screen .dp32-section-title:before{content:'';width:4px;height:17px;border-radius:6px;background:var(--rb43-accent,#e9c478)}
+#screen .dp32-quickbar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:12px 0 16px}
+#screen .dp32-quickbar button{min-width:0;min-height:54px;border:1px solid var(--rb43-border,rgba(180,180,180,.25));border-radius:15px;background:var(--rb43-card-soft,rgba(16,43,39,.7));color:inherit;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:650;font-size:13px}
+#screen .dp32-quickbar button:active{transform:scale(.98)}
+#screen .dp32-quickbar button span{font-size:19px}
+#screen :is(.lesson,.schedule-item,.task,.rb40-notice){border-radius:14px}
+#screen .daystrip{display:flex;gap:7px;overflow-x:auto;scroll-snap-type:x proximity;padding:5px 0 10px}
+#screen .daystrip button{scroll-snap-align:start;flex-shrink:0}
+#screen :is(.card,.rb40-card) :is(button,input,select,textarea){max-width:100%}
+#screen #rb43-profile-tabs,#screen #rb45-study,#screen #rb45-schedule{position:relative;z-index:1}
+#screen #rb43-profile-tabs button.active,#screen #rb45-study button.active,#screen #rb45-schedule button.active{font-weight:750}
+#screen #rb40-slot[hidden],#screen #dp31-planner[hidden]{display:none!important}
+#screen .dp32-empty{padding:20px 12px;text-align:center;opacity:.7}
+#nav{backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+#nav button.active{font-weight:750}
+@media(max-width:360px){#screen .dp32-quickbar{gap:7px}#screen .dp32-quickbar button{font-size:12px;padding:7px}}
+@media(prefers-reduced-motion:no-preference){#screen .dp32-quickbar button{transition:transform .15s ease}#nav button{transition:background-color .2s ease,color .2s ease}}
