@@ -1,0 +1,59 @@
+name: Apply Safe DePara Preview D1 Migrations
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'backend/preview-migrations/*.sql'
+      - '.github/workflows/preview-d1-migrations.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: depara-preview-d1-migrations
+  cancel-in-progress: false
+
+jobs:
+  preview-migrations:
+    runs-on: ubuntu-latest
+    environment: depara-preview
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify only preview database is targeted
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q '^name = "depara-api-preview"$' backend/wrangler.preview.toml
+          grep -q '^database_name = "depara-preview-db"$' backend/wrangler.preview.toml
+          grep -q '^migrations_dir = "preview-migrations"$' backend/wrangler.preview.toml
+      - name: Validate migration SQL safety
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const dir = 'backend/preview-migrations';
+          const files = fs.readdirSync(dir).filter(x => x.endsWith('.sql')).sort();
+          if (!files.length) { console.log('No SQL migrations yet; nothing to apply.'); process.exit(0); }
+          for (const file of files) {
+            if (!/^\d{4}_[a-z0-9_]+\.sql$/.test(file)) throw Error('Invalid migration filename: ' + file);
+            const sql = fs.readFileSync(dir + '/' + file, 'utf8');
+            const cleaned = sql.replace(/--[^\n]*/g, '').replace(/\/\*[\s\S]*?\*\//g, '').trim();
+            if (!cleaned) throw Error('Empty migration: ' + file);
+            if (/\b(DROP|DELETE|UPDATE|INSERT|REPLACE|TRUNCATE|ATTACH|DETACH|PRAGMA|VACUUM|REINDEX|GRANT|REVOKE|RENAME)\b/i.test(cleaned)) throw Error('Unsafe SQL in ' + file);
+            const statements = cleaned.split(';').map(x => x.trim()).filter(Boolean);
+            for (const stmt of statements) {
+              if (!/^(CREATE\s+TABLE\s+IF\s+NOT\s+EXISTS|CREATE\s+(?:UNIQUE\s+)?INDEX\s+IF\s+NOT\s+EXISTS|ALTER\s+TABLE\s+[a-z_][\w]*\s+ADD\s+COLUMN)\b/i.test(stmt)) throw Error('Only additive schema statements are allowed: ' + file);
+            }
+          }
+          console.log('Validated ' + files.length + ' preview-only migration files.');
+          NODE
+      - name: Apply tracked migrations to preview D1 only
+        if: hashFiles('backend/preview-migrations/*.sql') != ''
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: backend
+          command: d1 migrations apply depara-preview-db --remote --config wrangler.preview.toml
