@@ -5,7 +5,7 @@
   "endPair": 5,
   "structureId": "0",
   "corpusId": "",
-  "fetchedAt": "2026-10-22T04:39:13.343580+00:00",
+  "fetchedAt": "2026-10-22T10:40:20.075799+00:00",
   "status": "official-site-snapshot",
   "rooms": [
     {
@@ -68,7 +68,7 @@
       "id": "56",
       "name": "1108",
       "capacity": 50,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=56"
     },
@@ -100,7 +100,7 @@
       "id": "73",
       "name": "1207",
       "capacity": 28,
-      "available": false,
+      "available": true,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=73"
     },

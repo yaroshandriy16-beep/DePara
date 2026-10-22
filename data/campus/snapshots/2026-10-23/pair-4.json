@@ -5,7 +5,7 @@
   "endPair": 4,
   "structureId": "0",
   "corpusId": "",
-  "fetchedAt": "2026-10-22T04:38:58.848888+00:00",
+  "fetchedAt": "2026-10-22T10:40:06.107247+00:00",
   "status": "official-site-snapshot",
   "rooms": [
     {
@@ -356,7 +356,7 @@
       "id": "538",
       "name": "2317",
       "capacity": 18,
-      "available": true,
+      "available": false,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=538"
     },
