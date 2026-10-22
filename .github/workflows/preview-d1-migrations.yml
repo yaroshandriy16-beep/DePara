@@ -56,4 +56,5 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: backend
+          wranglerVersion: '4.151.3'
           command: d1 migrations apply depara-preview-db --remote --config wrangler.preview.toml
