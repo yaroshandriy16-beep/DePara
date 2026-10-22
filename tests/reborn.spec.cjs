@@ -10,6 +10,7 @@ test('Student schedule, countdown, settings',async({page})=>{
  await page.locator('#dp-setup-done').click();
  await page.locator('#dp-success-enter').click();
  await expect(page.locator('#nav button')).toHaveCount(3);
+ await page.locator('#nav button[data-page="today"]').click();
  await expect(page.locator('#dp-live-lesson-clock')).toBeAttached();
  await page.locator('#nav button[data-page="schedule"]').click();
  await expect(page.locator('#screen')).toContainText('Розклад');
@@ -24,7 +25,7 @@ test('Teacher timetable and three navigation tabs',async({page})=>{
  const teacher=page.locator('#dp-teacher-app');
  await expect(teacher).toBeVisible();
  await expect(teacher.locator('.dp-t-nav button')).toHaveCount(3);
- await teacher.locator('[data-t-page="schedule"]').click();
+ await teacher.locator('.dp-t-nav [data-t-page="schedule"]').click();
  await expect(teacher.locator('#dp-t-refresh')).toBeVisible();
  await teacher.locator('#dp-t-next').click();
  await teacher.locator('[data-t-view="week"]').click();
