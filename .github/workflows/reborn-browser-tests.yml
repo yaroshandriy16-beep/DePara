@@ -1,12 +1,13 @@
 name: DePara REBORN browser checks
 on:
   push:
-    branches: [main]
+    branches: [main, cleanup-remove-cloudflare-20261022]
     paths:
       - 'reborn-preview/**'
       - 'data/**'
       - 'tests/**'
       - '.github/workflows/reborn-browser-tests.yml'
+  pull_request:
   workflow_dispatch:
 concurrency:
   group: depara-browser-${{ github.ref }}
