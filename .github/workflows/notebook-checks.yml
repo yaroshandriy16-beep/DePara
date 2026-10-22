@@ -1,0 +1,36 @@
+name: Notebook social checks
+on:
+  push:
+    branches: [notebook-social-v1, main]
+    paths: ['backend/src/notebook*', 'backend/preview-migrations/**', 'reborn-notebook-preview/**', 'tests/notebook*', '.github/workflows/notebook-checks.yml']
+  pull_request:
+permissions:
+  contents: read
+concurrency:
+  group: notebook-checks-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  api-and-mobile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Test signed authentication and access controls against SQLite
+        run: node --test tests/notebook-api.test.mjs
+      - name: Install mobile browser
+        run: |
+          npm install --no-save @playwright/test
+          npx playwright install --with-deps chromium
+      - name: Start site
+        run: python3 -m http.server 8765 --bind 127.0.0.1 > /tmp/notebook-site.log 2>&1 &
+      - name: Test notebook and preserved schedule
+        run: npx playwright test tests/reborn.spec.cjs tests/notebook-ui.spec.cjs --config=playwright.config.cjs --reporter=line --workers=1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: notebook-browser-results
+          path: test-results/
+          if-no-files-found: ignore
