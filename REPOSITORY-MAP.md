@@ -1,45 +1,30 @@
-# ДеПара? — карта репозиторію (2026-10-21)
+# ДеПара? REBORN — карта репозиторію (22.10.2026)
 
-## Активні частини
-- `index.html`: головна сторінка GitHub Pages; використовує файли з `reborn-preview/` та `production-v49/`, `production-v50/`.
-- `reborn-preview/index.html`: тестова сторінка. Обидві сторінки посилаються на спільні файли, тому не можна масово видаляти старі назви лише за номером версії.
-- `cloudflare/production/`: код основного Telegram Worker; реліз тільки через `.github/depara-production-release.txt`.
-- `data/groups/`, `data/teachers/`, `data/campus/`: актуальні та історичні дані університету.
-- `parser.py`, `scripts/`, `.github/workflows/update-*.yml`, `sync-teachers.yml`: регулярне оновлення даних.
+## Робочі сторінки
+- `index.html` — головна сторінка GitHub Pages, база ресурсів `reborn-preview/`.
+- `reborn-preview/index.html` — тестова сторінка з тими самими основними модулями.
+- `reborn-preview/app-reborn46.js` — базовий інтерфейс, локальні налаштування і студентський розклад.
+- `reborn-preview/teacher-v1.js` — кабінет викладача.
+- `reborn-preview/schedule-v42.js`, `schedule-share-v43.js`, `countdown-live.js` — розклад, PNG-поширення та відлік.
+- `production-v49/`, `production-v50/` — спільні стилі та компоненти; не видаляти за номером версії.
 
-## Архівні / експериментальні частини
-- `preview-r2-silent-share-20261021`: відхилений експеримент із R2; PR #5 закритий без злиття.
-- `reborn-preview/`: містить численні історичні файли `app-reborn*.js`, `schedule-v*.js`, `style-reborn*.css`. Видаляти лише після перевірки посилань у двох HTML-сторінках, тестах і JavaScript.
-- Резервні гілки `backup-*`: залишені для відновлення; не впливають на опублікований сайт.
+## Дані та оновлення
+- `data/catalog.json`, `data/groups/` — студентські групи.
+- `data/teachers/` — каталог і розклади викладачів.
+- `data/campus/` — вільні аудиторії та знімки.
+- `parser.py`, `scripts/` і workflow `update-schedule.yml`, `sync-teachers.yml`, `update-free-classrooms.yml` — отримання й оновлення даних.
 
-## Зроблене прибирання
-1. Повернено стабільний Telegram image-sharing JavaScript у тестову сторінку.
-2. Оновлено cache-busting URL для тестової сторінки.
-3. Із ручного preview deployment прибрано R2 bucket creation/verification та автоматичний запуск; checkout повернено до `cloudflare-worker-setup`.
-4. PR #5 закрито без злиття.
-5. Робочі дані та production Worker не видалялися.
+## Очищення (гілка cleanup-remove-cloudflare-20261022)
+- Видалено Cloudflare Worker, D1-міграції та workflows їхнього деплою.
+- Відключено API-авторизацію, D1 sync, чати, зайві навчальні вкладки й аналітичні інжектори.
+- Поширення розкладу працює через локальний PNG та стандартні можливості пристрою, без Worker.
+- Студентська та викладацька навігація скорочена до головного екрана, розкладу і профілю.
+- Зошити та інші експериментальні файли залишені як резерв, але не підключені до основного HTML.
+- Оновлено `README.md`, `tests/reborn.spec.cjs`; додано `scripts/audit-static.cjs` і `static-audit.yml`.
 
-## Правила наступних змін
-- Не видаляти `data/` автоматично: багато файлів використовуються для розкладу, викладачів та вільних аудиторій.
-- Не зливати тестовий код у production Worker без тестування.
-- Перш ніж видалити застарілий JS/CSS, перевірити всі імпорти/посилання, у тому числі в `index.html` і `reborn-preview/index.html`.
-- Не вмикати R2 знову без окремого рішення про оплату.
-
-## Оновлення після аудиту автоматизацій
-- Студентський workflow комітить лише `schedule.json`, `data/catalog.json`, `data/groups/`, `data/sync-students-status.json`, не торкаючись даних викладачів та аудиторій.
-- Preview workflow запускається лише вручну, без R2; повідомлення про збої централізовано, дублікати за посиланням на запуск відсікаються.
-- У `reborn-preview/` виявлено близько 45 файлів, що не підключені безпосередньо в HTML. Це лише **кандидати** на архівацію: перед видаленням треба перевірити динамічні посилання, тести та інші файли.
-
-## Очищення 2026-10-21 (другий етап)
-- Резервна гілка: `backup-before-repository-cleanup-20261021`.
-- Видалено 4 старі автономні HTML-сторінки тестів розкладу: `schedule-test-24.html`, `schedule-test-25.html`, `schedule-test-26.html`, `schedule-check-38.html` з `reborn-preview/`. Їхні попередні версії збережені у резервній гілці та історії Git.
-- Активні `index.html` і `reborn-preview/index.html` не змінювалися на цьому етапі.
-
-## Очищення 2026-10-21 (третій етап)
-- Після перевірки прямих посилань у двох HTML, основних скриптах і workflow видалено 9 історичних файлів: `app-reborn3.js`, `app-reborn31.js`, `app-reborn40.js`, `app-reborn42.js`, `app-reborn45.js`, `schedule-v34.js`, `schedule-v34.css`, `schedule-v35.js`, `schedule-v35.css` (усі з `reborn-preview/`).
-- Повний пошук по всіх можливих динамічних посиланнях і браузерні тести ще не завершені. За потреби файли відновлюються з `backup-before-repository-cleanup-20261021`.
-
-## Очищення 2026-10-21 (четвертий етап)
-- Видалено 20 історичних файлів з `reborn-preview/`: `features-reborn40/41/42/47/48.js`, `organize-reborn44/45/47/48.js`, `style-reborn3/31/32/33/40/42/43/44/45/47/48.css`.
-- Прямих посилань на їхні імена не виявлено у двох HTML-сторінках, основних JS-модулях і `tests/reborn.spec.cjs`. Повний runtime-аудит та запуск браузерних тестів ще потрібні.
-- Оригінали доступні в `backup-before-repository-cleanup-20261021`.
+## Правила безпечної роботи
+1. Не видаляти `data/` і робочі скрипти синхронізації.
+2. Не зливати очищення в `main` до успішних браузерних перевірок.
+3. Не вважати GitHub Pages заміною серверного Telegram webhook.
+4. Для відновлення старої логіки є гілка `backup-before-cloudflare-removal-20261022`.
+5. PR №10 — чернетка для ревізії змін.
