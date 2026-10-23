@@ -243,7 +243,7 @@
  for(const x of [-25,25])for(let z=12;z<160;z+=24){box(x,0,z,.6,9,.6,'#5d7678','#4d676c','#759c98');box(x-1,9,z-1,2.6,1.4,2.6,'#fff0cb','#d9c9a9','#ffffe5')}
  let eye,right,up,forward,focal;
  function project(p){const v=sub(p,eye),d=dot(v,forward);if(d<1)return null;return{x:w*.5+dot(v,right)*focal/d,y:h*.51-dot(v,up)*focal/d,d}}
- function face(points,color){let ps=points.map(project);if(ps.some(p=>!p))return;return{ps,color,d:ps.reduce((s,p)=>s+p.d,0)/ps.length}}
+ function face(points,color){let clipped=[];for(let i=0;i<points.length;i++){let a=points[i],b=points[(i+1)%points.length],da=dot(sub(a,eye),forward),db=dot(sub(b,eye),forward);if(da>=1.01)clipped.push(a);if((da>=1.01)!==(db>=1.01)){let t=(1.01-da)/(db-da);clipped.push(a.map((v,j)=>lerp(v,b[j],t)))}}if(clipped.length<3)return;let ps=clipped.map(project);if(ps.some(p=>!p))return;return{ps,color,d:ps.reduce((s,p)=>s+p.d,0)/ps.length}}
  function render(now){
   if(!document.getElementById('intro').classList.contains('active')||document.hidden){raf=0;return}
   let t=(now-start)/1000,flight=smooth((t-2.4)/6.9),land=smooth((t-8)/1.4);
