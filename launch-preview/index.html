@@ -255,7 +255,7 @@
   const sun=ctx.createRadialGradient(w*.8,h*.16,0,w*.8,h*.16,w*.6);sun.addColorStop(0,'#fff5cd99');sun.addColorStop(.3,'#fff1cb22');sun.addColorStop(1,'#fff0cb00');ctx.fillStyle=sun;ctx.fillRect(0,0,w,h);
   // Distant rolling hills stay behind the projected landscape.
   for(let k=0;k<3;k++){ctx.fillStyle=['#a7c9c2','#91b9ad','#87b39e'][k];ctx.beginPath();ctx.moveTo(0,h);for(let x=0;x<=w+10;x+=10)ctx.lineTo(x,h*(.43+k*.045)+Math.sin(x/w*6+k*1.8)*h*.035);ctx.lineTo(w,h);ctx.fill()}
-  let queue=polys.map(p=>face(p.points,p.color)).filter(Boolean);
+  let queue=polys.map((p,i)=>{const f=face(p.points,p.color);if(f&&p.points.every(v=>v[1]<=.25))f.d=1000000-i;return f}).filter(Boolean);
   trees.forEach(tr=>{const p=project([tr.x,tr.size*.6,tr.z]);if(!p)return;queue.push({tree:tr,p,d:p.d})});
   clouds.forEach((cl,i)=>{const p=project([cl.x+Math.sin(t*.2+i)*5,cl.y,cl.z+t*1.8]);if(!p)return;queue.push({cloud:cl,p,d:p.d})});
   queue.sort((a,b)=>b.d-a.d);
