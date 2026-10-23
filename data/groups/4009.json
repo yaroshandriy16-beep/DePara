@@ -6,27 +6,9 @@
     "group": "СПГ-25-1 маг.",
     "groupId": "4009",
     "source": "http://81.30.162.30/time-table/group?type=0",
-    "updatedAt": "2026-10-22T14:49:07.392057+00:00"
+    "updatedAt": "2026-10-23T02:46:01.130742+00:00"
   },
   "lessons": [
-    {
-      "date": "2026-10-22",
-      "start": "13:10",
-      "end": "14:30",
-      "subject": "Computer technologies for designing landscape objects",
-      "type": "Лк",
-      "room": "ауд. 2402",
-      "teacher": "СПГ-25-1 маг."
-    },
-    {
-      "date": "2026-10-22",
-      "start": "14:40",
-      "end": "16:00",
-      "subject": "Лісопаркове господарство",
-      "type": "Пз",
-      "room": "ауд. 3502",
-      "teacher": "СПГ-25-1 маг."
-    },
     {
       "date": "2026-10-23",
       "start": "09:30",
