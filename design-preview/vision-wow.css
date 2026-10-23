@@ -38,3 +38,7 @@ button,.card,.note,.lesson{position:relative;overflow:hidden;-webkit-tap-highlig
 /* iOS overlay safety: hidden launch must never intercept taps */
 .launch.hide{visibility:hidden;transition:opacity .6s cubic-bezier(.2,.8,.2,1),transform .6s cubic-bezier(.2,.8,.2,1),visibility 0s .65s}
 .launch.hide *{pointer-events:none!important}
+
+/* Keep every overlay inside the Telegram Mini App viewport */
+.detail-sheet,.share-sheet{left:50%;right:auto;width:min(100%,460px);transform:translateX(-50%)}
+.detail-card{width:100%;max-width:424px}
