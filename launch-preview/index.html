@@ -49,6 +49,31 @@
     /* Home destination */
     #home{background:radial-gradient(circle at 90% 8%,#8066ff35,transparent 32%),linear-gradient(160deg,#0c0e18,#17142a)}.home-head{display:flex;justify-content:space-between;align-items:center}.home-avatar{width:42px;height:42px;border-radius:15px;background:linear-gradient(145deg,var(--violet),var(--mint));display:grid;place-items:center;color:#141521;font-weight:900}.home-title{font-size:47px;line-height:.93;letter-spacing:-2.5px;margin:33px 0 10px}.daycard{margin-top:25px;border:1px solid #a98aff55;background:linear-gradient(145deg,#342c5de8,#1c2031e8);border-radius:30px;padding:23px;box-shadow:0 25px 65px #0006;position:relative;overflow:hidden}.daycard:after{content:"";position:absolute;width:160px;height:160px;border-radius:50%;right:-50px;top:-70px;background:var(--violet);opacity:.15}.daycard small{font-size:9px;letter-spacing:1.5px;color:#cfbfff;font-weight:850}.daycard h2{font-size:28px;margin:27px 0 7px}.timebox{margin-top:22px;padding:16px;border-radius:18px;background:#080b1599}.timebox b{font-size:31px}.home-actions{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:13px}.home-actions button{border:1px solid var(--line);border-radius:18px;background:#ffffff09;color:var(--text);padding:15px}.demo-note{text-align:center;color:var(--muted);font-size:11px;margin-top:20px}.short-mark{position:absolute;inset:0;display:grid;place-items:center;background:#080a12;z-index:10;opacity:0;visibility:hidden;pointer-events:none}.short-mark.show{visibility:visible;animation:shortLaunch 1.8s var(--ease)}.short-mark b{width:95px;height:95px;border-radius:30px;background:linear-gradient(145deg,var(--violet),var(--mint));display:grid;place-items:center;color:#11131b;font-size:50px;box-shadow:0 0 65px #9378ff50}@keyframes shortLaunch{0%{opacity:1}65%{opacity:1}100%{opacity:0}}
     @media(max-height:730px){.title{font-size:37px}.role{min-height:155px}.role h2{margin-top:25px}.mark{width:120px;height:120px}.intro-title{font-size:50px}.pass h1{margin-top:22px}.next{margin-top:17px}}
+    /* V7: a continuous boarding story, not a scaled illustration. */
+    .app{min-height:0}#intro{padding:0;background:#0d1421;transition:opacity .65s,transform .8s;isolation:isolate}
+    #intro .voyage{display:none}.journey{position:absolute;inset:0;overflow:hidden;background:radial-gradient(ellipse at 25% 15%,#47416b,#121e30 65%)}
+    .journey:after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse,transparent 40%,#080d1955);pointer-events:none}
+    .journey-top{position:absolute;top:calc(27px + env(safe-area-inset-top));left:25px;z-index:6;font-weight:800;letter-spacing:-.5px;font-size:20px}.journey-top span{color:#b5a2ff}
+    .cinema-skip{top:calc(24px + env(safe-area-inset-top));background:#17213677;backdrop-filter:blur(16px);border-color:#ffffff25;color:white;z-index:20;opacity:1;animation:none}
+    .journey-grid{position:absolute;inset:-50%;background-image:linear-gradient(#c7b8ff09 1px,transparent 1px),linear-gradient(90deg,#c7b8ff09 1px,transparent 1px);background-size:65px 65px;transform:rotate(-20deg);mask-image:radial-gradient(ellipse,#000,transparent 65%)}
+    .boarding{position:absolute;inset:0;display:grid;place-items:center;perspective:1100px;z-index:4;pointer-events:none}
+    .boarding-ticket{position:relative;width:78%;max-width:330px;border-radius:26px;background:#ece7fd;color:#20213d;box-shadow:0 30px 80px #0007,0 1px 0 #fff inset;overflow:hidden;transform:translateY(12px) rotate(-8deg)}
+    .ticket-head{padding:23px 24px 20px;background:#c6b5ff;display:flex;align-items:center;justify-content:space-between}.ticket-head b{font-size:24px;letter-spacing:-1px}.ticket-head span{font-size:9px;letter-spacing:2px;font-weight:800}.ticket-body{padding:24px}.ticket-eyebrow{font-size:9px;letter-spacing:2px;color:#716985;font-weight:800}.ticket-route{display:flex;justify-content:space-between;align-items:center;margin:12px 0 24px}.ticket-route strong{font-size:35px;letter-spacing:-2px}.ticket-route svg{width:30px;fill:#7666ae;transform:rotate(-15deg)}.ticket-route small{display:block;font-size:10px;color:#766d89;letter-spacing:0;font-weight:500;margin-top:5px}.ticket-perforation{height:1px;border-top:2px dashed #9f91b144;position:relative;margin:0 -24px 20px}.ticket-perforation:before,.ticket-perforation:after{content:"";position:absolute;top:-10px;width:20px;height:20px;border-radius:50%;background:#182235}.ticket-perforation:before{left:-10px}.ticket-perforation:after{right:-10px}.ticket-bottom{display:flex;align-items:center;justify-content:space-between}.ticket-bottom b{display:block;font-size:13px;margin-top:6px}.barcode{height:33px;width:80px;background:repeating-linear-gradient(90deg,#2c2944 0 2px,transparent 2px 4px,#2c2944 4px 5px,transparent 5px 8px)}
+    .boarding-note{position:absolute;bottom:19%;text-align:center;font-size:13px;color:#cbc7dd;letter-spacing:.3px}.boarding-note b{display:block;font-size:25px;letter-spacing:-.8px;color:white;margin-bottom:9px}
+    .flight-stage{position:absolute;inset:0;overflow:hidden;clip-path:inset(26% 17% 25% round 150px);opacity:0;background:#bde5f3;will-change:clip-path,opacity;z-index:2}.flight-stage canvas{width:100%;height:100%;display:block}.window-rim{position:absolute;inset:26% 17% 25%;border-radius:150px;box-shadow:0 0 0 7px #e3e1ef,0 0 0 10px #a9a8bb,0 22px 50px #0007,inset 0 0 20px #fff;z-index:3;pointer-events:none;opacity:0}
+    .flight-text{position:absolute;z-index:7;left:26px;right:26px;top:calc(100px + env(safe-area-inset-top));opacity:0;text-align:center;pointer-events:none}.flight-text small{font-size:9px;font-weight:800;letter-spacing:3px;color:#d4c6ff}.flight-text h2{font-size:35px;line-height:1.02;letter-spacing:-1.5px;margin:12px 0}.flight-text p{font-size:13px;color:#d5d5e2;margin:0}.flight-text.arrive{top:auto;bottom:18%;text-shadow:0 3px 20px #18253588}
+    .trip-progress{position:absolute;bottom:calc(34px + env(safe-area-inset-bottom));left:27px;right:27px;z-index:10}.trip-stops{display:flex;justify-content:space-between;font-size:9px;letter-spacing:1.8px;color:#d9dfec;margin-bottom:12px}.trip-line{height:2px;background:#ffffff30;overflow:hidden}.trip-line i{display:block;height:100%;width:100%;background:#c9bbff;transform:scaleX(0);transform-origin:left}.trip-stops span:last-child{color:#b4f5dc}
+    .arrival-card{position:absolute;z-index:8;left:9%;right:9%;top:32%;padding:28px;border-radius:27px;background:#eef3eafa;color:#243c35;box-shadow:0 25px 90px #091e3c55;opacity:0;transform:translateY(50px) rotate(5deg);text-align:left}.arrival-card small{font-size:9px;letter-spacing:2px;font-weight:800;color:#668076}.arrival-card h2{font-size:38px;line-height:1;letter-spacing:-2px;margin:18px 0 12px}.arrival-card p{font-size:13px;color:#6a7e75;line-height:1.5;margin:0;max-width:190px}.arrival-stamp{position:absolute;right:20px;bottom:21px;border:2px solid #4a8c73;border-radius:50%;width:78px;height:78px;display:grid;place-content:center;text-align:center;font-size:9px;line-height:1.6;letter-spacing:1px;transform:rotate(-17deg) scale(2.7);opacity:0}.arrival-stamp b{font-size:23px;line-height:1.1}.arrival-rule{height:1px;background:#2b614824;margin:26px 0 16px}.arrival-card .arrival-code{font-size:11px;letter-spacing:2px;color:#4c6d5d}
+    #intro.movie .boarding-ticket{animation:boardingStory 3.5s cubic-bezier(.2,.8,.2,1) both}#intro.movie .boarding-note{animation:boardingWords 2.7s both}#intro.movie .flight-stage{animation:flightOpen 10s 1.8s both}#intro.movie .window-rim{animation:rimOpen 7s 1.8s both}#intro.movie .flight-text.depart{animation:flightWords 3.9s 2.1s both}#intro.movie .flight-text.arrive{animation:flightWords 3.1s 6s both}#intro.movie .trip-line i{animation:tripFill 11.5s linear forwards}#intro.movie .arrival-card{animation:landCard 2.8s 9s both}#intro.movie .arrival-stamp{animation:landStamp .5s 9.8s both}
+    @keyframes boardingStory{0%{opacity:0;transform:translateY(110px) rotate(-16deg) rotateY(-35deg) scale(.75)}25%,63%{opacity:1;transform:translateY(-10px) rotate(-7deg) rotateY(8deg) scale(1)}100%{opacity:0;transform:translateY(-180px) rotate(12deg) rotateY(-65deg) scale(.65)}}
+    @keyframes boardingWords{0%,100%{opacity:0;transform:translateY(12px)}25%,78%{opacity:1;transform:none}}
+    @keyframes flightOpen{0%{opacity:0;clip-path:inset(42% 38% 42% round 150px)}12%,36%{opacity:1;clip-path:inset(26% 17% 25% round 150px)}63%,100%{opacity:1;clip-path:inset(-1% -1% -1% round 0px)}}
+    @keyframes rimOpen{0%{opacity:0;transform:scale(.4)}17%,51%{opacity:1;transform:scale(1)}85%,100%{opacity:0;transform:scale(2.7)}}
+    @keyframes flightWords{0%,100%{opacity:0;transform:translateY(15px)}18%,79%{opacity:1;transform:none}}@keyframes tripFill{to{transform:scaleX(1)}}
+    @keyframes landCard{0%{opacity:0;transform:translateY(70px) rotate(8deg) scale(.9)}28%,90%{opacity:1;transform:translateY(0) rotate(-3deg) scale(1)}100%{opacity:0;transform:translateY(-30px) rotate(0) scale(1.08)}}@keyframes landStamp{0%{opacity:0;transform:rotate(-17deg) scale(2.7)}65%{opacity:1;transform:rotate(-17deg) scale(.92)}100%{opacity:1;transform:rotate(-17deg) scale(1)}}
+    #roles.active .role{animation:roleEnter .8s var(--ease) both}#roles.active .teacher{animation-delay:.12s}@keyframes roleEnter{from{opacity:0;transform:translateY(55px) rotateX(12deg)}to{opacity:1;transform:none}}
+    .replay-intro{margin-top:12px;border:0;background:transparent;color:#b5aec8;font-size:12px;padding:12px 0}.preview-disclaimer{font-size:10px;color:#8d889d;margin-top:15px}
+    @media(max-height:700px){.boarding-ticket{max-width:270px}.boarding-note{bottom:13%}.flight-text{top:80px}.flight-text h2{font-size:28px}.arrival-card{top:27%}}
   </style>
 </head>
 <body>
@@ -57,6 +82,15 @@
 
   <section class="scene active" id="intro">
     <button class="cinema-skip" id="skipIntro">Пропустити</button>
+    <div class="journey">
+      <div class="journey-grid"></div><div class="journey-top">ДеПара<span>?</span></div>
+      <div class="boarding"><div class="boarding-ticket"><div class="ticket-head"><b>ДеПара?</b><span>КВИТОК У ТВІЙ ДЕНЬ</span></div><div class="ticket-body"><div class="ticket-eyebrow">ОДНА МАЛЕНЬКА ПОДОРОЖ</div><div class="ticket-route"><strong>ТИ<small>тут і зараз</small></strong><svg viewBox="0 0 24 24"><path d="m21 16-8-5V4.5a1.5 1.5 0 0 0-3 0V11l-8 5v2l8-2.5V20l-2 1v1l3.5-1 3.5 1v-1l-2-1v-4.5l8 2.5z"/></svg><strong>ВНАУ<small>твій університет</small></strong></div><div class="ticket-perforation"></div><div class="ticket-bottom"><div><span class="ticket-eyebrow">НАПРЯМОК</span><b>Усе на своїх місцях</b></div><div class="barcode"></div></div></div></div><div class="boarding-note"><b>Твій день починається.</b>Знайдемо, де твоя наступна пара.</div></div>
+      <div class="flight-stage"><canvas id="flightCanvas" aria-label="Анімований політ над хмарами до стилізованого університету"></canvas></div><div class="window-rim"></div>
+      <div class="flight-text depart"><small>ДЕПАРА AIR · ПЕРШИЙ ЗАПУСК</small><h2>Залишаємо хаос<br>під хмарами.</h2><p>Попереду — твій університет.</p></div>
+      <div class="flight-text arrive"><small>УЖЕ ЗОВСІМ ПОРУЧ</small><h2>Твоє місце.<br>Твій ритм.</h2></div>
+      <div class="arrival-card"><small>ДЕПАРА? · ПРИБУТТЯ</small><h2>Ти на місці.</h2><p>Тепер знайдемо саме твій розклад.</p><div class="arrival-rule"></div><div class="arrival-code">ВНАУ / НОВИЙ ПОЧАТОК</div><div class="arrival-stamp"><b>✓</b>ПРИБУЛИ<br>DEPARA</div></div>
+      <div class="trip-progress"><div class="trip-stops"><span>ТУТ І ЗАРАЗ</span><span>ТВІЙ ДЕНЬ</span></div><div class="trip-line"><i></i></div></div>
+    </div>
     <div class="voyage">
       <div class="voyage-glyph">?</div>
       <div class="world-window">
@@ -88,6 +122,8 @@
       <button class="role student" data-role="student"><span class="role-tag">НАВЧАЮСЬ</span><span class="world-dots"><i></i><i></i><i></i></span><h2>Я студент</h2><p>Розклад, зошит і твій день</p><span class="role-arrow">›</span></button>
       <button class="role teacher" data-role="teacher"><span class="role-tag">ВИКЛАДАЮ</span><span class="world-dots"><i></i><i></i><i></i></span><h2>Я викладач</h2><p>Заняття та вільні аудиторії</p><span class="role-arrow">›</span></button>
     </div>
+    <button class="replay-intro" data-next="intro">↻ Подивитися заставку ще раз</button>
+    <p class="preview-disclaimer">Прототип запуску · дані розкладу демонстраційні</p>
   </section>
 
   <section class="scene" id="student">
@@ -144,7 +180,7 @@
   const state={role:'student',group:'ЕІ-23-1',teacher:'Васильченко Олександр Петрович'};
   let introTimer;
   function haptic(type='light'){try{const h=window.Telegram?.WebApp?.HapticFeedback;type==='success'?h?.notificationOccurred('success'):h?.impactOccurred(type)}catch{}if(!window.Telegram&&navigator.vibrate)navigator.vibrate(type==='success'?[30,35,45]:18)}
-  function runIntro(){const intro=document.getElementById('intro');clearTimeout(introTimer);intro.classList.remove('movie');void intro.offsetWidth;requestAnimationFrame(()=>requestAnimationFrame(()=>{intro.classList.add('movie');introTimer=setTimeout(()=>{if(intro.classList.contains('active'))go('roles')},9050)}))}
+  function runIntro(){const intro=document.getElementById('intro');clearTimeout(introTimer);intro.classList.remove('movie');void intro.offsetWidth;requestAnimationFrame(()=>requestAnimationFrame(()=>{intro.classList.add('movie');window.startFlight?.();introTimer=setTimeout(()=>{if(intro.classList.contains('active'))go('roles')},11800)}))}
   function go(id){if(id!=='intro')clearTimeout(introTimer);haptic();scenes.forEach(s=>s.classList.toggle('active',s.id===id));document.getElementById(id)?.scrollTo(0,0);if(id==='intro')runIntro()}
   document.querySelectorAll('[data-next]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.next)));
   document.querySelectorAll('[data-role]').forEach(b=>b.addEventListener('click',()=>{state.role=b.dataset.role;go(state.role)}));
@@ -164,6 +200,81 @@
   window.addEventListener('pageshow',()=>{if(document.getElementById('intro').classList.contains('active'))setTimeout(runIntro,180)});
   document.addEventListener('visibilitychange',()=>{if(!document.hidden&&document.getElementById('intro').classList.contains('active'))setTimeout(runIntro,180)});
   try{window.Telegram?.WebApp?.ready()}catch{}
+</script>
+<script>
+/* Dependency-free illustrated flight. Geometry is projected in perspective;
+   the camera actually travels through the scene instead of scaling a picture. */
+(()=>{
+ const canvas=document.getElementById('flightCanvas'),ctx=canvas.getContext('2d');
+ let w=0,h=0,raf=0,start=0,polys=[],clouds=[],trees=[],seed=73;
+ const rnd=()=>{seed=(seed*16807)%2147483647;return(seed-1)/2147483646};
+ const lerp=(a,b,t)=>a+(b-a)*t,clamp=x=>Math.max(0,Math.min(1,x)),smooth=x=>{x=clamp(x);return x*x*(3-2*x)};
+ const sub=(a,b)=>a.map((v,i)=>v-b[i]),dot=(a,b)=>a.reduce((v,n,i)=>v+n*b[i],0),cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],unit=a=>{let l=Math.hypot(...a);return a.map(v=>v/l)};
+ function poly(points,color){polys.push({points,color})}
+ function box(x,y,z,a,b,c,color,side,top){const X=x+a,Y=y+b,Z=z+c;poly([[x,y,Z],[X,y,Z],[X,Y,Z],[x,Y,Z]],color);poly([[X,y,z],[X,y,Z],[X,Y,Z],[X,Y,z]],side);poly([[x,y,z],[x,y,Z],[x,Y,Z],[x,Y,z]],side);poly([[x,Y,z],[X,Y,z],[X,Y,Z],[x,Y,Z]],top)}
+ function building(x,z,width,height,depth){
+  box(x,0,z,width,height,depth,'#efe0c1','#c6b69e','#fff1d7');
+  box(x-1,height,z-1,width+2,2,depth+2,'#8d82ad','#6c668d','#b7a8cc');
+  for(let floor=0;floor<Math.floor(height/7);floor++)for(let col=0;col<Math.floor(width/7);col++){
+   const wx=x+2+col*7,wy=3+floor*7,zz=z+depth+.04;
+   poly([[wx-.5,wy-.5,zz],[wx+3.5,wy-.5,zz],[wx+3.5,wy+4.5,zz],[wx-.5,wy+4.5,zz]],'#fff5e0');
+   poly([[wx,wy,zz+.02],[wx+3,wy,zz+.02],[wx+3,wy+4,zz+.02],[wx,wy+4,zz+.02]],floor===1&&col===2?'#ffe1a1':'#83b7ca');
+   poly([[wx+.3,wy+2,zz+.03],[wx+1.5,wy+2,zz+.03],[wx+2.8,wy+3.8,zz+.03],[wx+1.6,wy+3.8,zz+.03]],'#b5dce3');
+  }
+ }
+ // Landscaped campus. A stylized illustration, not a model of the real building.
+ poly([[-1200,-.2,-1000],[1200,-.2,-1000],[1200,-.2,1600],[-1200,-.2,1600]],'#83b999');
+ poly([[-80,0,-65],[80,0,-65],[80,0,25],[-80,0,25]],'#bad5b3');
+ poly([[-13,.1,-30],[13,.1,-30],[34,.1,1000],[-34,.1,1000]],'#82949c');
+ poly([[-16,.12,-30],[-13,.12,-30],[-34,.12,1000],[-37,.12,1000]],'#d9ddc9');
+ poly([[13,.12,-30],[16,.12,-30],[37,.12,1000],[34,.12,1000]],'#d9ddc9');
+ for(let z=0;z<800;z+=21)poly([[-.45,.2,z],[.45,.2,z],[.45,.2,z+9],[-.45,.2,z+9]],'#f9ebc1');
+ poly([[-55,.22,-35],[55,.22,-35],[55,.22,-14],[-55,.22,-14]],'#e2d8bd');
+ building(-43,-53,27,24,24);building(16,-53,27,24,24);building(-17,-58,34,34,29);
+ box(-20,34,-60,40,2,33,'#c6b5d4','#9d8cba','#e4d8ed');
+ poly([[-21,36,-27],[21,36,-27],[0,48,-40]],'#9d89bd');
+ poly([[21,36,-27],[21,36,-60],[0,48,-40]],'#726c9e');
+ box(-7,.2,-28,14,10,1,'#587e80','#4b6c74','#a7c4b6');
+ box(-11,10,-29,22,1.5,4,'#f8edda','#cabfa9','#fff4df');
+ for(const x of [-10,8])box(x,0,-26,2,10,2,'#fff2dd','#dbccb3','#fff7e9');
+ for(let i=0;i<3;i++)box(-12-i,0,-25+i*2,24+2*i,.4*(3-i),2,'#cec8b4','#b4b5a8','#eee7d0');
+ for(let i=0;i<85;i++){let x=(rnd()-.5)*430,z=rnd()*570-100;if(Math.abs(x)<63&&z<18)continue;if(Math.abs(x)<22)x+=x<0?-30:30;trees.push({x,z,size:5+rnd()*6,tone:rnd()})}
+ for(let i=0;i<22;i++)clouds.push({x:(rnd()-.5)*400,y:65+rnd()*100,z:rnd()*500-120,size:12+rnd()*23});
+ for(const x of [-25,25])for(let z=12;z<160;z+=24){box(x,0,z,.6,9,.6,'#5d7678','#4d676c','#759c98');box(x-1,9,z-1,2.6,1.4,2.6,'#fff0cb','#d9c9a9','#ffffe5')}
+ let eye,right,up,forward,focal;
+ function project(p){const v=sub(p,eye),d=dot(v,forward);if(d<1)return null;return{x:w*.5+dot(v,right)*focal/d,y:h*.51-dot(v,up)*focal/d,d}}
+ function face(points,color){let ps=points.map(project);if(ps.some(p=>!p))return;return{ps,color,d:ps.reduce((s,p)=>s+p.d,0)/ps.length}}
+ function render(now){
+  if(!document.getElementById('intro').classList.contains('active')||document.hidden){raf=0;return}
+  let t=(now-start)/1000,flight=smooth((t-2.4)/6.9),land=smooth((t-8)/1.4);
+  const cw=canvas.clientWidth,ch=canvas.clientHeight,dpr=Math.min(devicePixelRatio||1,2);
+  if(cw!==w||ch!==h){w=cw;h=ch;canvas.width=w*dpr;canvas.height=h*dpr;ctx.setTransform(dpr,0,0,dpr,0,0)}
+  eye=[lerp(30,4,flight)+Math.sin(t*.5)*2*(1-land),lerp(145,16,flight),lerp(260,32,flight)];
+  const target=[0,lerp(25,17,flight),-40];forward=unit(sub(target,eye));right=unit(cross(forward,[0,1,0]));up=cross(right,forward);focal=h*.78;
+  const sky=ctx.createLinearGradient(0,0,0,h);sky.addColorStop(0,'#7696d2');sky.addColorStop(.45,'#b4d9e9');sky.addColorStop(1,'#f3e6ce');ctx.fillStyle=sky;ctx.fillRect(0,0,w,h);
+  const sun=ctx.createRadialGradient(w*.8,h*.16,0,w*.8,h*.16,w*.6);sun.addColorStop(0,'#fff5cd99');sun.addColorStop(.3,'#fff1cb22');sun.addColorStop(1,'#fff0cb00');ctx.fillStyle=sun;ctx.fillRect(0,0,w,h);
+  // Distant rolling hills stay behind the projected landscape.
+  for(let k=0;k<3;k++){ctx.fillStyle=['#a7c9c2','#91b9ad','#87b39e'][k];ctx.beginPath();ctx.moveTo(0,h);for(let x=0;x<=w+10;x+=10)ctx.lineTo(x,h*(.43+k*.045)+Math.sin(x/w*6+k*1.8)*h*.035);ctx.lineTo(w,h);ctx.fill()}
+  let queue=polys.map(p=>face(p.points,p.color)).filter(Boolean);
+  trees.forEach(tr=>{const p=project([tr.x,tr.size*.6,tr.z]);if(!p)return;queue.push({tree:tr,p,d:p.d})});
+  clouds.forEach((cl,i)=>{const p=project([cl.x+Math.sin(t*.2+i)*5,cl.y,cl.z+t*1.8]);if(!p)return;queue.push({cloud:cl,p,d:p.d})});
+  queue.sort((a,b)=>b.d-a.d);
+  for(const item of queue){
+   if(item.ps){ctx.fillStyle=item.color;ctx.beginPath();item.ps.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.closePath();ctx.fill();continue}
+   let p=item.p,s=focal/p.d;
+   if(item.tree){const tr=item.tree,r=tr.size*s;ctx.fillStyle='#376e5e22';ctx.beginPath();ctx.ellipse(p.x+r*.45,p.y+r*.6,r*1.1,r*.25,0,0,Math.PI*2);ctx.fill();ctx.fillStyle='#7d7561';ctx.fillRect(p.x-r*.08,p.y,r*.16,r*.8);const gr=ctx.createLinearGradient(p.x-r,p.y-r,p.x+r,p.y+r);gr.addColorStop(0,tr.tone>.5?'#a9d19d':'#88bf9e');gr.addColorStop(1,tr.tone>.5?'#4f9474':'#387f70');ctx.fillStyle=gr;for(let j=0;j<3;j++){ctx.beginPath();ctx.ellipse(p.x+(j-1)*r*.33,p.y-(j===1?.35:0)*r,r*.57,r*.71,0,0,Math.PI*2);ctx.fill()}}
+   else{const r=item.cloud.size*s;if(r>w*3)continue;ctx.save();ctx.globalAlpha=.88;const cg=ctx.createLinearGradient(0,p.y-r,0,p.y+r*.6);cg.addColorStop(0,'#fffffff5');cg.addColorStop(1,'#dee7f7eb');ctx.fillStyle=cg;ctx.beginPath();ctx.ellipse(p.x,p.y,r*1.5,r*.47,0,0,Math.PI*2);ctx.ellipse(p.x-r*.5,p.y-r*.25,r*.65,r*.65,0,0,Math.PI*2);ctx.ellipse(p.x+r*.3,p.y-r*.43,r*.8,r*.8,0,0,Math.PI*2);ctx.fill();ctx.restore()}
+  }
+  // A discrete destination plaque stays attached to the building facade.
+  const plaque=project([0,28,-28.8]);if(plaque&&flight>.35){ctx.save();const sz=Math.min(22,5*focal/plaque.d);ctx.font='800 '+sz+'px -apple-system, sans-serif';ctx.textAlign='center';ctx.fillStyle='#645979';ctx.fillText('ВНАУ',plaque.x,plaque.y);ctx.restore()}
+  // Foreground wisps pass the window at take-off and reveal the world below.
+  let mist=1-smooth((t-4.6)/1.7);if(mist>0){ctx.save();ctx.globalAlpha=mist;for(let i=0;i<4;i++){let x=w*(i*.45-.3)-((t-2)*w*.22),y=h*(.48+Math.sin(i*2)*.22);ctx.fillStyle=i%2?'#f8fbff':'#edf4fc';ctx.beginPath();ctx.ellipse(x,y,w*.5,h*.1,0,0,Math.PI*2);ctx.ellipse(x+w*.13,y-h*.04,w*.21,h*.12,0,0,Math.PI*2);ctx.fill()}ctx.restore()}
+  const veil=smooth((t-8.8)/.8)*.22;if(veil){ctx.fillStyle='rgba(18,33,48,'+veil+')';ctx.fillRect(0,0,w,h)}
+  if(t<12)raf=requestAnimationFrame(render);else raf=0;
+ }
+ window.startFlight=()=>{cancelAnimationFrame(raf);start=performance.now();raf=requestAnimationFrame(render)};
+ document.addEventListener('visibilitychange',()=>{if(document.hidden)cancelAnimationFrame(raf)});
+})();
 </script>
 </body>
 </html>
