@@ -5,7 +5,7 @@
   "endPair": 1,
   "structureId": "0",
   "corpusId": "",
-  "fetchedAt": "2026-10-23T04:38:19.040040+00:00",
+  "fetchedAt": "2026-10-23T10:38:03.830188+00:00",
   "status": "official-site-snapshot",
   "rooms": [
     {
@@ -1260,7 +1260,7 @@
       "id": "462",
       "name": "Храм",
       "capacity": 100,
-      "available": false,
+      "available": true,
       "note": "",
       "url": "http://81.30.162.30/time-table/classroom?id=462"
     },
