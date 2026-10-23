@@ -45,14 +45,13 @@
     /* Home destination */
     #home{background:radial-gradient(circle at 90% 8%,#8066ff35,transparent 32%),linear-gradient(160deg,#0c0e18,#17142a)}.home-head{display:flex;justify-content:space-between;align-items:center}.home-avatar{width:42px;height:42px;border-radius:15px;background:linear-gradient(145deg,var(--violet),var(--mint));display:grid;place-items:center;color:#141521;font-weight:900}.home-title{font-size:47px;line-height:.93;letter-spacing:-2.5px;margin:33px 0 10px}.daycard{margin-top:25px;border:1px solid #a98aff55;background:linear-gradient(145deg,#342c5de8,#1c2031e8);border-radius:30px;padding:23px;box-shadow:0 25px 65px #0006;position:relative;overflow:hidden}.daycard:after{content:"";position:absolute;width:160px;height:160px;border-radius:50%;right:-50px;top:-70px;background:var(--violet);opacity:.15}.daycard small{font-size:9px;letter-spacing:1.5px;color:#cfbfff;font-weight:850}.daycard h2{font-size:28px;margin:27px 0 7px}.timebox{margin-top:22px;padding:16px;border-radius:18px;background:#080b1599}.timebox b{font-size:31px}.home-actions{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:13px}.home-actions button{border:1px solid var(--line);border-radius:18px;background:#ffffff09;color:var(--text);padding:15px}.demo-note{text-align:center;color:var(--muted);font-size:11px;margin-top:20px}.short-mark{position:absolute;inset:0;display:grid;place-items:center;background:#080a12;z-index:10;opacity:0;visibility:hidden;pointer-events:none}.short-mark.show{visibility:visible;animation:shortLaunch 1.8s var(--ease)}.short-mark b{width:95px;height:95px;border-radius:30px;background:linear-gradient(145deg,var(--violet),var(--mint));display:grid;place-items:center;color:#11131b;font-size:50px;box-shadow:0 0 65px #9378ff50}@keyframes shortLaunch{0%{opacity:1}65%{opacity:1}100%{opacity:0}}
     @media(max-height:730px){.title{font-size:37px}.role{min-height:155px}.role h2{margin-top:25px}.mark{width:120px;height:120px}.intro-title{font-size:50px}.pass h1{margin-top:22px}.next{margin-top:17px}}
-    @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
   </style>
 </head>
 <body>
 <div class="app" id="app">
   <div class="grain"></div>
 
-  <section class="scene active movie" id="intro">
+  <section class="scene active" id="intro">
     <button class="cinema-skip" id="skipIntro">Пропустити</button>
     <div class="space"><i class="star"></i><i class="star"></i><i class="star"></i><i class="star"></i><i class="star"></i><div class="orbit"></div></div>
     <div class="story">
@@ -133,7 +132,7 @@
   const scenes=[...document.querySelectorAll('.scene')];
   const state={role:'student',group:'ЕІ-23-1',teacher:'Васильченко Олександр Петрович'};
   function haptic(type='light'){try{const h=window.Telegram?.WebApp?.HapticFeedback;type==='success'?h?.notificationOccurred('success'):h?.impactOccurred(type)}catch{}if(!window.Telegram&&navigator.vibrate)navigator.vibrate(type==='success'?[30,35,45]:18)}
-  function runIntro(){const intro=document.getElementById('intro');intro.classList.remove('movie');void intro.offsetWidth;intro.classList.add('movie')}
+  function runIntro(){const intro=document.getElementById('intro');intro.classList.remove('movie');void intro.offsetWidth;requestAnimationFrame(()=>requestAnimationFrame(()=>intro.classList.add('movie')))}
   function go(id){haptic();scenes.forEach(s=>s.classList.toggle('active',s.id===id));document.getElementById(id)?.scrollTo(0,0);if(id==='intro')runIntro()}
   document.querySelectorAll('[data-next]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.next)));
   document.querySelectorAll('[data-role]').forEach(b=>b.addEventListener('click',()=>{state.role=b.dataset.role;go(state.role)}));
@@ -150,6 +149,9 @@
   document.getElementById('skipIntro').onclick=()=>go('roles');
   document.getElementById('replayFull').onclick=()=>go('intro');
   document.getElementById('replayShort').onclick=()=>{const e=document.getElementById('shortMark');e.classList.remove('show');void e.offsetWidth;e.classList.add('show');haptic('success');setTimeout(()=>e.classList.remove('show'),1850)};
+  window.addEventListener('pageshow',()=>{if(document.getElementById('intro').classList.contains('active'))setTimeout(runIntro,180)});
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&document.getElementById('intro').classList.contains('active'))setTimeout(runIntro,180)});
+  try{window.Telegram?.WebApp?.ready()}catch{}
 </script>
 </body>
 </html>
