@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#080a12">
+  <title>ДеПара? — запуск</title>
+  <style>
+    :root{--bg:#080a12;--panel:#171726;--panel2:#222139;--text:#f8f7ff;--muted:#a9a7b7;--violet:#a98aff;--mint:#69ead5;--line:#ffffff17;--ease:cubic-bezier(.2,.82,.2,1)}
+    *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#05060b;color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",Inter,sans-serif}button,input{font:inherit}button{-webkit-tap-highlight-color:transparent}
+    .app{width:min(100%,460px);height:100dvh;min-height:650px;margin:auto;position:relative;overflow:hidden;background:radial-gradient(circle at 82% 18%,#705cff2f,transparent 35%),radial-gradient(circle at 10% 84%,#42d8c01b,transparent 30%),linear-gradient(160deg,#0b0d17,#12101f 58%,#080a12)}
+    .grain{position:absolute;inset:0;opacity:.035;pointer-events:none;z-index:20;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+    .scene{position:absolute;inset:0;padding:calc(24px + env(safe-area-inset-top)) 20px calc(24px + env(safe-area-inset-bottom));opacity:0;visibility:hidden;pointer-events:none;transform:translateY(18px) scale(.985);transition:opacity .5s var(--ease),transform .55s var(--ease),visibility 0s .55s;overflow:auto;scrollbar-width:none}.scene::-webkit-scrollbar{display:none}.scene.active{opacity:1;visibility:visible;pointer-events:auto;transform:none;transition-delay:0s;z-index:5}
+    .topline{display:flex;align-items:center;justify-content:space-between;min-height:42px;position:relative;z-index:6}.brand{font-size:20px;font-weight:850;letter-spacing:-.6px}.brand i{font-style:normal;color:var(--violet)}.back,.ghost{border:1px solid var(--line);background:#ffffff0a;color:var(--text);height:40px;border-radius:99px;padding:0 15px}.back{width:40px;padding:0;font-size:19px}.step{font-size:10px;letter-spacing:1.8px;color:var(--mint);font-weight:800}.title{font-size:43px;line-height:.96;letter-spacing:-2px;margin:22px 0 10px;font-weight:880}.copy{font-size:15px;line-height:1.5;color:var(--muted);margin:0}.primary{width:100%;border:0;border-radius:18px;padding:17px 18px;background:linear-gradient(100deg,var(--violet),#c4a9ff);color:#171222;font-weight:850;text-align:left;box-shadow:0 15px 38px #8666ff30}.primary span{float:right}.primary:active,.choice:active,.role:active,.group:active{transform:scale(.975)}
+
+    /* Intro movie */
+    #intro{overflow:hidden;display:flex;flex-direction:column;justify-content:center;text-align:center}.space{position:absolute;inset:0;perspective:600px;overflow:hidden}.star{position:absolute;width:2px;height:80px;border-radius:4px;background:linear-gradient(transparent,#fff);opacity:.28;animation:fly 3s linear infinite}.star:nth-child(1){left:15%;top:-20%;animation-delay:-1s}.star:nth-child(2){left:78%;top:8%;animation-delay:-2.1s}.star:nth-child(3){left:34%;top:52%;animation-delay:-.3s}.star:nth-child(4){left:90%;top:64%;animation-delay:-1.6s}.star:nth-child(5){left:7%;top:76%;animation-delay:-2.7s}@keyframes fly{to{transform:translateY(1000px) scaleY(2);opacity:0}}
+    .orbit{position:absolute;width:570px;height:570px;left:50%;top:48%;transform:translate(-50%,-50%);border:1px solid #a98aff25;border-radius:50%;animation:spin 16s linear infinite}.orbit:before,.orbit:after{content:"";position:absolute;border:1px solid #69ead51d;border-radius:50%}.orbit:before{inset:58px}.orbit:after{inset:128px}@keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+    .mark{width:148px;height:148px;margin:0 auto 25px;position:relative;display:grid;place-items:center;border-radius:46px;background:linear-gradient(145deg,#b895ff,#67e9d5);color:#11131b;box-shadow:0 0 80px #9a7cff55;animation:markFloat 3s ease-in-out infinite}.mark b{font-size:78px;line-height:1;transform:translateY(-2px)}.mark:before{content:"";position:absolute;inset:-20px;border:1px solid #aa8cff4d;border-radius:60px;animation:pulse 2.4s ease-in-out infinite}.mark:after{content:"";position:absolute;right:26px;bottom:20px;width:10px;height:10px;border-radius:50%;background:#11131b;box-shadow:0 0 0 8px #11131b12}@keyframes markFloat{50%{transform:translateY(-10px) rotate(2deg)}}@keyframes pulse{50%{inset:-34px;opacity:.15}}
+    .intro-content{position:relative;z-index:2}.intro-kicker{font-size:10px;letter-spacing:2.4px;color:var(--mint);font-weight:850}.intro-title{font-size:58px;line-height:.9;letter-spacing:-3px;margin:15px 0 12px}.intro-copy{max-width:320px;margin:0 auto 28px;color:var(--muted);line-height:1.5}.intro-content .primary{max-width:270px;text-align:center}
+
+    /* Role worlds */
+    .role-list{display:grid;gap:13px;margin:25px 0}.role{border:1px solid var(--line);background:linear-gradient(145deg,#ffffff10,#ffffff06);color:var(--text);border-radius:29px;padding:21px;min-height:185px;text-align:left;position:relative;overflow:hidden;transition:.25s}.role:after{content:"";position:absolute;width:170px;height:170px;border-radius:50%;right:-58px;top:-50px;background:var(--glow);filter:blur(3px);opacity:.2}.role.student{--glow:#a98aff}.role.teacher{--glow:#69ead5}.role-tag{font-size:9px;letter-spacing:1.6px;color:var(--mint);font-weight:800}.role h2{font-size:30px;letter-spacing:-1px;margin:42px 0 5px}.role p{color:var(--muted);margin:0;font-size:13px}.role-arrow{position:absolute;right:18px;bottom:18px;width:42px;height:42px;border-radius:50%;background:#ffffff12;display:grid;place-items:center;font-size:22px}.world-dots{position:absolute;right:36px;top:23px;width:76px;height:76px}.world-dots i{position:absolute;border-radius:50%;background:var(--glow);box-shadow:0 0 25px var(--glow)}.world-dots i:nth-child(1){width:42px;height:42px;right:0;top:0}.world-dots i:nth-child(2){width:23px;height:23px;left:0;bottom:0;opacity:.7}.world-dots i:nth-child(3){width:9px;height:9px;left:13px;top:3px;opacity:.5}
+
+    /* Student finder */
+    .search{margin:22px 0 18px;position:relative}.search input{width:100%;border:1px solid var(--line);background:#ffffff0c;color:var(--text);border-radius:19px;padding:17px 18px 17px 48px;outline:0}.search input:focus{border-color:#a98aff75;box-shadow:0 0 0 4px #a98aff14}.search:before{content:"⌕";position:absolute;left:18px;top:12px;font-size:24px;color:var(--muted)}.label{font-size:10px;letter-spacing:1.6px;color:var(--muted);font-weight:800;margin:23px 2px 10px}.faculty-rail{display:flex;gap:10px;overflow:auto;margin:0 -20px;padding:4px 20px 10px;scrollbar-width:none}.faculty{min-width:145px;height:118px;border:1px solid var(--line);border-radius:23px;background:linear-gradient(145deg,#272442,#171827);color:var(--text);padding:15px;text-align:left;position:relative;overflow:hidden}.faculty.active{border-color:#a98aff8f;box-shadow:0 12px 35px #7d62ff26}.faculty b{display:block;margin-top:37px}.faculty small{color:var(--muted)}.faculty:after{content:"";position:absolute;width:70px;height:70px;border-radius:50%;right:-15px;top:-20px;background:var(--violet);opacity:.16}.groups{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.group{border:1px solid var(--line);background:#ffffff09;color:var(--text);border-radius:16px;padding:13px 5px;font-weight:780;transition:.2s}.group.selected{background:var(--violet);color:#171222;border-color:transparent}.hint{margin-top:13px;padding:14px 15px;border-radius:16px;background:#69ead511;color:#bff9ee;font-size:12px;display:none}.hint.show{display:block;animation:rise .35s var(--ease)}@keyframes rise{from{opacity:0;transform:translateY(8px)}}
+
+    /* Teacher finder */
+    .result-list{display:grid;gap:10px;margin-top:12px}.teacher-card{border:1px solid var(--line);border-radius:21px;background:#ffffff09;color:var(--text);padding:17px;display:grid;grid-template-columns:45px 1fr 24px;gap:12px;align-items:center;text-align:left}.teacher-card .avatar{width:45px;height:45px;border-radius:15px;background:linear-gradient(145deg,var(--mint),#5a99ff);display:grid;place-items:center;color:#10201e;font-weight:900}.teacher-card b,.teacher-card small{display:block}.teacher-card small{color:var(--muted);margin-top:4px}.empty{padding:30px 12px;text-align:center;color:var(--muted);font-size:13px}.confirm{margin-top:18px;border:1px solid #69ead548;background:linear-gradient(145deg,#19332e,#151c25);border-radius:27px;padding:22px;display:none}.confirm.show{display:block;animation:rise .4s var(--ease)}.confirm-badge{width:54px;height:54px;border-radius:18px;background:var(--mint);color:#12231f;display:grid;place-items:center;font-size:22px;font-weight:900}.confirm h2{font-size:28px;margin:18px 0 5px}.confirm p{color:var(--muted);margin:0 0 20px}
+
+    /* Finale */
+    #finale{overflow:hidden;display:flex;flex-direction:column;justify-content:center}.final-ring{position:absolute;width:540px;height:540px;border-radius:50%;border:1px solid #a98aff30;left:50%;top:46%;transform:translate(-50%,-50%);animation:finalPulse 3s ease-in-out infinite}.final-ring:before{content:"";position:absolute;inset:65px;border-radius:50%;border:1px dashed #69ead52b}@keyframes finalPulse{50%{transform:translate(-50%,-50%) scale(1.05);opacity:.6}}.pass{position:relative;z-index:2;border:1px solid #ffffff25;background:linear-gradient(145deg,#292546ee,#171827ee);border-radius:32px;padding:25px;box-shadow:0 35px 90px #0009,0 0 60px #8d72ff24;transform-style:preserve-3d;animation:passIn .8s var(--ease)}@keyframes passIn{from{opacity:0;transform:translateY(70px) rotateX(16deg) scale(.86)}}.pass-top{display:flex;justify-content:space-between;align-items:center}.pass-logo{width:48px;height:48px;border-radius:16px;background:linear-gradient(145deg,var(--violet),var(--mint));display:grid;place-items:center;color:#141521;font-weight:900}.pass-state{font-size:9px;letter-spacing:1.5px;color:var(--mint);font-weight:800}.pass h1{font-size:36px;line-height:1;letter-spacing:-1.6px;margin:34px 0 7px}.pass-meta{color:var(--muted);font-size:13px}.next{margin:25px 0 8px;padding:17px;border-radius:19px;background:#090b1499;border:1px solid var(--line)}.next small,.next b{display:block}.next small{color:var(--mint);font-size:9px;letter-spacing:1.3px;margin-bottom:7px}.next b{font-size:19px}.next span{display:block;color:var(--muted);font-size:12px;margin-top:5px}.stamp{position:absolute;right:18px;bottom:18px;width:94px;height:94px;border:2px solid var(--mint);border-radius:50%;display:grid;place-items:center;text-align:center;color:var(--mint);font-size:9px;font-weight:900;letter-spacing:1px;transform:rotate(-12deg) scale(0);animation:stamp .55s .75s var(--ease) forwards}@keyframes stamp{70%{transform:rotate(-12deg) scale(1.15)}to{transform:rotate(-12deg) scale(1)}}.final-action{position:relative;z-index:3;margin-top:18px}
+
+    /* Home destination */
+    #home{background:radial-gradient(circle at 90% 8%,#8066ff35,transparent 32%),linear-gradient(160deg,#0c0e18,#17142a)}.home-head{display:flex;justify-content:space-between;align-items:center}.home-avatar{width:42px;height:42px;border-radius:15px;background:linear-gradient(145deg,var(--violet),var(--mint));display:grid;place-items:center;color:#141521;font-weight:900}.home-title{font-size:47px;line-height:.93;letter-spacing:-2.5px;margin:33px 0 10px}.daycard{margin-top:25px;border:1px solid #a98aff55;background:linear-gradient(145deg,#342c5de8,#1c2031e8);border-radius:30px;padding:23px;box-shadow:0 25px 65px #0006;position:relative;overflow:hidden}.daycard:after{content:"";position:absolute;width:160px;height:160px;border-radius:50%;right:-50px;top:-70px;background:var(--violet);opacity:.15}.daycard small{font-size:9px;letter-spacing:1.5px;color:#cfbfff;font-weight:850}.daycard h2{font-size:28px;margin:27px 0 7px}.timebox{margin-top:22px;padding:16px;border-radius:18px;background:#080b1599}.timebox b{font-size:31px}.home-actions{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:13px}.home-actions button{border:1px solid var(--line);border-radius:18px;background:#ffffff09;color:var(--text);padding:15px}.demo-note{text-align:center;color:var(--muted);font-size:11px;margin-top:20px}.short-mark{position:absolute;inset:0;display:grid;place-items:center;background:#080a12;z-index:10;opacity:0;visibility:hidden;pointer-events:none}.short-mark.show{visibility:visible;animation:shortLaunch 1.8s var(--ease)}.short-mark b{width:95px;height:95px;border-radius:30px;background:linear-gradient(145deg,var(--violet),var(--mint));display:grid;place-items:center;color:#11131b;font-size:50px;box-shadow:0 0 65px #9378ff50}@keyframes shortLaunch{0%{opacity:1}65%{opacity:1}100%{opacity:0}}
+    @media(max-height:730px){.title{font-size:37px}.role{min-height:155px}.role h2{margin-top:25px}.mark{width:120px;height:120px}.intro-title{font-size:50px}.pass h1{margin-top:22px}.next{margin-top:17px}}
+    @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+  </style>
+</head>
+<body>
+<div class="app" id="app">
+  <div class="grain"></div>
+
+  <section class="scene active" id="intro">
+    <div class="space"><i class="star"></i><i class="star"></i><i class="star"></i><i class="star"></i><i class="star"></i><div class="orbit"></div></div>
+    <div class="intro-content">
+      <div class="intro-kicker">ТВІЙ УНІВЕРСИТЕТ · ТВОЄ МІСЦЕ</div>
+      <div class="mark"><b>?</b></div>
+      <h1 class="intro-title">ДеПара?</h1>
+      <p class="intro-copy">Зараз зберемо твій навчальний день і знайдемо все важливе.</p>
+      <button class="primary" data-next="roles">Розпочати <span>→</span></button>
+    </div>
+  </section>
+
+  <section class="scene" id="roles">
+    <div class="topline"><div class="brand">ДеПара<i>?</i></div><div class="step">КРОК 1 · РОЛЬ</div></div>
+    <h1 class="title">Який світ<br>відкрити тобі?</h1>
+    <p class="copy">Обери свій режим. Його завжди можна змінити пізніше.</p>
+    <div class="role-list">
+      <button class="role student" data-role="student"><span class="role-tag">НАВЧАЮСЬ</span><span class="world-dots"><i></i><i></i><i></i></span><h2>Я студент</h2><p>Розклад, зошит і твій день</p><span class="role-arrow">›</span></button>
+      <button class="role teacher" data-role="teacher"><span class="role-tag">ВИКЛАДАЮ</span><span class="world-dots"><i></i><i></i><i></i></span><h2>Я викладач</h2><p>Заняття та вільні аудиторії</p><span class="role-arrow">›</span></button>
+    </div>
+  </section>
+
+  <section class="scene" id="student">
+    <div class="topline"><button class="back" data-next="roles">‹</button><div class="step">КРОК 2 · ГРУПА</div></div>
+    <h1 class="title">Знайдемо<br>твою групу.</h1>
+    <p class="copy">Напиши групу одразу або обери факультет і переглянь доступні групи.</p>
+    <label class="search"><input id="groupSearch" placeholder="Наприклад, ЕІ-23-1" autocomplete="off"></label>
+    <div class="hint" id="groupHint">Знайдено: Інженерно-технологічний факультет · ЕІ-23-1</div>
+    <div class="label">ФАКУЛЬТЕТИ</div>
+    <div class="faculty-rail">
+      <button class="faculty active"><small>Факультет</small><b>Інженерно-технологічний</b></button>
+      <button class="faculty"><small>Факультет</small><b>Економіки та бізнесу</b></button>
+      <button class="faculty"><small>Факультет</small><b>Агрономії</b></button>
+    </div>
+    <div class="label">ГРУПИ</div>
+    <div class="groups"><button class="group">ЕІ-22-1</button><button class="group selected">ЕІ-23-1</button><button class="group">ЕІ-24-1</button><button class="group">КН-23-1</button><button class="group">АІ-23-1</button><button class="group">МЕ-23-1</button></div>
+    <button class="primary" id="studentContinue" style="margin-top:18px">Це моя група <span>→</span></button>
+  </section>
+
+  <section class="scene" id="teacher">
+    <div class="topline"><button class="back" data-next="roles">‹</button><div class="step">КРОК 2 · ВИКЛАДАЧ</div></div>
+    <h1 class="title">Знайдіть<br>себе.</h1>
+    <p class="copy">Введіть прізвище. Якщо є збіги, покажемо кілька карток.</p>
+    <label class="search"><input id="teacherSearch" placeholder="Ваше прізвище" autocomplete="off"></label>
+    <div class="result-list" id="teacherResults"><div class="empty">Результати з’являться під час введення</div></div>
+    <div class="confirm" id="teacherConfirm"><div class="confirm-badge">В</div><h2>Це ви?</h2><p>Васильченко Олександр Петрович<br>Наступне заняття · 11:20 · ауд. 3211</p><button class="primary" id="teacherContinue">Так, це я <span>→</span></button></div>
+  </section>
+
+  <section class="scene" id="finale">
+    <div class="final-ring"></div>
+    <div class="pass">
+      <div class="pass-top"><div class="pass-logo">ДП</div><div class="pass-state">ОСОБИСТИЙ ПРОСТІР ГОТОВИЙ</div></div>
+      <h1 id="finalName">Андрію,<br>твій день готовий.</h1>
+      <div class="pass-meta" id="finalMeta">ЕІ-23-1 · студент</div>
+      <div class="next"><small>НАЙБЛИЖЧА ПАРА</small><b id="finalLesson">Електротехніка</b><span id="finalLessonMeta">11:20 · аудиторія 3211</span></div>
+      <div class="stamp">РОЗКЛАД<br>ЗНАЙДЕНО</div>
+    </div>
+    <button class="primary final-action" id="toHome">У свій день <span>→</span></button>
+  </section>
+
+  <section class="scene" id="home">
+    <div class="home-head"><div class="brand">ДеПара<i>?</i></div><div class="home-avatar">А</div></div>
+    <h1 class="home-title" id="homeTitle">Привіт,<br>Андрію.</h1>
+    <p class="copy" id="homeMeta">ЕІ-23-1 · усе важливе сьогодні під рукою.</p>
+    <div class="daycard"><small>НАСТУПНА ПАРА</small><h2 id="homeLesson">Електротехніка</h2><p class="copy" id="homeLessonMeta">11:20–12:40 · аудиторія 3211</p><div class="timebox"><small>ДО ПОЧАТКУ</small><b>00:24:18</b></div></div>
+    <div class="home-actions"><button id="replayFull">↻ Повний запуск</button><button id="replayShort">✦ Швидкий запуск</button></div>
+    <div class="demo-note">Це прототип лише першого етапу запуску</div>
+  </section>
+
+  <div class="short-mark" id="shortMark"><b>?</b></div>
+</div>
+<script>
+  const scenes=[...document.querySelectorAll('.scene')];
+  const state={role:'student',group:'ЕІ-23-1',teacher:'Васильченко Олександр Петрович'};
+  function haptic(type='light'){try{const h=window.Telegram?.WebApp?.HapticFeedback;type==='success'?h?.notificationOccurred('success'):h?.impactOccurred(type)}catch{}if(!window.Telegram&&navigator.vibrate)navigator.vibrate(type==='success'?[30,35,45]:18)}
+  function go(id){haptic();scenes.forEach(s=>s.classList.toggle('active',s.id===id));document.getElementById(id)?.scrollTo(0,0)}
+  document.querySelectorAll('[data-next]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.next)));
+  document.querySelectorAll('[data-role]').forEach(b=>b.addEventListener('click',()=>{state.role=b.dataset.role;go(state.role)}));
+  document.querySelectorAll('.faculty').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.faculty').forEach(x=>x.classList.remove('active'));b.classList.add('active');haptic()}));
+  document.querySelectorAll('.group').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.group').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');state.group=b.textContent;haptic()}));
+  const groupSearch=document.getElementById('groupSearch'),groupHint=document.getElementById('groupHint');
+  groupSearch.addEventListener('input',()=>{const ok=groupSearch.value.trim().length>1;groupHint.classList.toggle('show',ok);if(ok){state.group=groupSearch.value.trim().toUpperCase();document.querySelectorAll('.group').forEach(x=>x.classList.toggle('selected',x.textContent===state.group))}});
+  document.getElementById('studentContinue').onclick=()=>prepareFinal('student');
+  const teacherSearch=document.getElementById('teacherSearch'),teacherResults=document.getElementById('teacherResults'),teacherConfirm=document.getElementById('teacherConfirm');
+  teacherSearch.addEventListener('input',()=>{const q=teacherSearch.value.trim();teacherConfirm.classList.remove('show');if(q.length<2){teacherResults.innerHTML='<div class="empty">Введіть щонайменше дві літери</div>';return}const many=q.toLowerCase().startsWith('шев');teacherResults.innerHTML=(many?[['Шевченко Олена Іванівна','10:00 · ауд. 2302'],['Шевченко Андрій Миколайович','13:00 · ауд. 1401']]:[['Васильченко Олександр Петрович','11:20 · ауд. 3211']]).map((x,i)=>`<button class="teacher-card" data-teacher="${x[0]}"><span class="avatar">${x[0][0]}</span><span><b>${x[0]}</b><small>${x[1]}</small></span><span>›</span></button>`).join('');document.querySelectorAll('[data-teacher]').forEach(b=>b.onclick=()=>{state.teacher=b.dataset.teacher;teacherResults.innerHTML='';teacherConfirm.querySelector('h2').textContent='Це ви?';teacherConfirm.querySelector('p').innerHTML=state.teacher+'<br>Наступне заняття · 11:20 · ауд. 3211';teacherConfirm.classList.add('show');haptic()})});
+  document.getElementById('teacherContinue').onclick=()=>prepareFinal('teacher');
+  function prepareFinal(role){state.role=role;const teacher=role==='teacher';document.getElementById('finalName').innerHTML=teacher?'Ваш розклад<br>готовий.':'Андрію,<br>твій день готовий.';document.getElementById('finalMeta').textContent=teacher?state.teacher+' · викладач':state.group+' · студент';document.getElementById('finalLesson').textContent=teacher?'Електричні машини':'Електротехніка';document.getElementById('homeTitle').innerHTML=teacher?'Вітаємо,<br>викладачу.':'Привіт,<br>Андрію.';document.getElementById('homeMeta').textContent=teacher?state.teacher:state.group+' · усе важливе сьогодні під рукою.';document.getElementById('homeLesson').textContent=teacher?'Електричні машини':'Електротехніка';go('finale');setTimeout(()=>haptic('success'),760)}
+  document.getElementById('toHome').onclick=()=>{haptic('success');go('home')};
+  document.getElementById('replayFull').onclick=()=>go('intro');
+  document.getElementById('replayShort').onclick=()=>{const e=document.getElementById('shortMark');e.classList.remove('show');void e.offsetWidth;e.classList.add('show');haptic('success');setTimeout(()=>e.classList.remove('show'),1850)};
+</script>
+</body>
+</html>
