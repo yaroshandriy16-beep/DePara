@@ -1,7 +1,9 @@
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import patch
 from integrations.vnau.adapter import VNAUError
-from integrations.vnau.teacher import parse_teacher_search, teacher_form_fields
+from integrations.vnau.teacher import TeacherClient, parse_teacher_search, teacher_form_fields
 
 
 class TeacherFormTests(unittest.TestCase):
@@ -31,6 +33,21 @@ class TeacherFormTests(unittest.TestCase):
         self.assertNotIn('time-table-type', fields)
         with self.assertRaises(VNAUError): teacher_form_fields(html, teacher_id='99', start='2026-11-05', end='2026-11-18')
         with self.assertRaises(VNAUError): teacher_form_fields(html, teacher_id='1847', start='2026-11-05', end='2027-01-18')
+
+    def test_fetch_posts_to_form_action_without_resetting_date_range(self):
+        html = '''<meta name="csrf-param" content="_csrf"><meta name="csrf-token" content="synthetic">
+        <form id="filter-form"><select name="TimeTableForm[teacherId]"><option value="1847" selected>Бойко Олексій Романович</option></select></form>'''
+        response = SimpleNamespace(text=html, raise_for_status=lambda: None)
+        calls = []
+        def post(*args, **kwargs):
+            calls.append(kwargs)
+            return response
+        session = SimpleNamespace(headers={}, get=lambda *a, **k: response, post=post)
+        with patch('integrations.vnau.adapter.parse_matrix', return_value=[]):
+            TeacherClient(session=session).fetch_schedule('1847', '2026-11-02', '2026-11-08')
+        self.assertEqual(calls[0]['params'], {'type': '0'})
+        self.assertEqual(calls[0]['data']['TimeTableForm[dateStart]'], '02.11.2026')
+        self.assertEqual(calls[0]['data']['TimeTableForm[dateEnd]'], '08.11.2026')
 
 class TeacherRealMatrixTests(unittest.TestCase):
     def test_teacher_matrix_uses_dates_and_owner(self):

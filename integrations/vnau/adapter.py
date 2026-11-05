@@ -219,7 +219,12 @@ def sanitized_tables(html: str) -> str:
         name = str(node.get("name", ""))
         if node.name == "input" or re.search(r"csrf|token|session", name, re.I):
             secret = str(node.get("value") or node.get("content") or "")
-            if len(secret) >= 8:
+            # Hidden date controls are public form values, not credentials. If
+            # treated as secrets, they redact matching table dates and corrupt
+            # the sanitized diagnostic fixture. All other hidden values remain
+            # redacted, including anything whose name suggests a credential.
+            public_date = name in {"TimeTableForm[dateStart]", "TimeTableForm[dateEnd]"} and re.fullmatch(r"\d{2}\.\d{2}\.\d{4}", secret)
+            if len(secret) >= 8 and not public_date:
                 secrets.add(secret)
 
     def clean(value: str) -> str:

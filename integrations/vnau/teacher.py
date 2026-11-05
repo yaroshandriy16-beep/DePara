@@ -122,7 +122,9 @@ class TeacherClient:
             response = self.session.get(TEACHER_URL, params={'id': teacher_id}, timeout=self.timeout)
             response.raise_for_status()
             payload, teacher_name = teacher_form_fields(response.text, teacher_id=str(teacher_id), start=start, end=end)
-            result = self.session.post(TEACHER_URL, params={'id': teacher_id}, data=payload, headers={'Referer': TEACHER_URL}, timeout=self.timeout)
+            # The real form submits to ?type=0. Reusing ?id=... here resets
+            # the selected date range to the source's default period.
+            result = self.session.post(TEACHER_URL, params={'type': '0'}, data=payload, headers={'Referer': TEACHER_URL}, timeout=self.timeout)
             result.raise_for_status()
             _, returned_name = teacher_form_fields(result.text, teacher_id=str(teacher_id), start=start, end=end)
             if returned_name != teacher_name:

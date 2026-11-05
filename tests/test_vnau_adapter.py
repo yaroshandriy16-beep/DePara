@@ -58,6 +58,15 @@ class AdapterTests(unittest.TestCase):
         self.assertNotIn('onclick', sample)
         self.assertNotIn('<input', sample)
 
+    def test_sanitized_keeps_public_dates_matching_hidden_date_controls(self):
+        html = '''<meta name="csrf-token" content="sensitive_token_123">
+        <input type="hidden" name="TimeTableForm[dateStart]" value="05.11.2026">
+        <input type="hidden" name="_csrf" value="sensitive_token_123">
+        <table><tr><th>05.11.2026</th><td>sensitive_token_123</td></tr></table>'''
+        sample = sanitized_tables(html)
+        self.assertIn('05.11.2026', sample)
+        self.assertNotIn('sensitive_token_123', sample)
+
     def test_form_fields_never_exposes_hidden_values_or_secrets(self):
         html = '<form><input type="hidden" name="_csrf" value="sensitive_token_123"><input name="course" value="private_value"><input type="password" name="p"><select name="group"><option value="42">Group</option></select></form>'
         fields = form_fields(html)
