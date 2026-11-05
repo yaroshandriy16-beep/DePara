@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { DEMO_FACULTIES, DEMO_TEACHERS, DEMO_UNIVERSITIES, type Role, type UserSelection } from './catalog'
+import { DEMO_FACULTIES, DEMO_TEACHERS, DEMO_UNIVERSITIES, VNAU_UNIVERSITY, type Role, type UserSelection } from './catalog'
+import { useVnauCatalog } from './useVnauCatalog'
 import './onboarding.css'
 
 type Step = 'welcome' | 'role' | 'university' | 'faculty' | 'course' | 'group' | 'teacher'
@@ -9,8 +10,12 @@ export function Onboarding({ onComplete }: { onComplete: (selection: UserSelecti
   const [role, setRole] = useState<Role>('student')
   const [university, setUniversity] = useState('')
   const [faculty, setFaculty] = useState('')
+  const [facultyId, setFacultyId] = useState('')
   const [course, setCourse] = useState('')
   const [query, setQuery] = useState('')
+  const isVnau = university === VNAU_UNIVERSITY
+  const catalogStage = step === 'faculty' || step === 'course' || step === 'group' || step === 'teacher' ? step : 'idle'
+  const realCatalog = useVnauCatalog(isVnau, catalogStage, facultyId, course, query)
 
   const titles: Record<Exclude<Step, 'welcome' | 'role'>, string> = {
     university: 'Де ти навчаєшся?', faculty: 'Обери факультет', course: 'Який у тебе курс?', group: 'Обери свою групу', teacher: 'Знайди себе в каталозі',
@@ -23,14 +28,14 @@ export function Onboarding({ onComplete }: { onComplete: (selection: UserSelecti
     if (step === 'group') setStep('course')
   }
   const chooseRole = (next: Role) => {
-    setRole(next); setUniversity(''); setFaculty(''); setCourse(''); setQuery(''); setStep('university')
+    setRole(next); setUniversity(''); setFaculty(''); setFacultyId(''); setCourse(''); setQuery(''); setStep('university')
   }
   const groups = DEMO_FACULTIES.find(item => item.name === faculty)?.groups.filter(group => group.split('-')[1]?.startsWith(course)) ?? []
   const normalizedQuery = query.trim().toLocaleLowerCase('uk')
   const teachers = normalizedQuery ? DEMO_TEACHERS.filter(name => name.toLocaleLowerCase('uk').includes(normalizedQuery)) : []
   const progress = step === 'role' ? 1 : step === 'university' ? 2 : step === 'faculty' || step === 'teacher' ? 3 : step === 'course' ? 4 : 5
   const total = role === 'teacher' && step !== 'role' ? 3 : 5
-  const complete = (extra: Partial<UserSelection>) => onComplete({ role, university, ...extra })
+  const complete = (extra: Partial<UserSelection>) => onComplete({ role, university, universityId: isVnau ? 'vsau' : 'demo', ...extra })
 
   return <main className="onb">
     <div className="onb-top"><div className="onb-brand"><span className="onb-brandmark">д<span>.</span></span><span>де<span>пара</span><small>ORIGINAL</small></span></div><span className="onb-topnote">ТВІЙ НАВЧАЛЬНИЙ ПРОСТІР</span></div>
@@ -46,13 +51,22 @@ export function Onboarding({ onComplete }: { onComplete: (selection: UserSelecti
       {step === 'role' ? <><p className="onb-kicker">ПОЧНЕМО ЗІ ЗНАЙОМСТВА</p><h1>Твоя роль<br/><em>у ДеПара</em></h1><p className="onb-description">Обери, як ти користуватимешся застосунком.</p><div className="onb-role-list"><button className="onb-choice onb-role" onClick={() => chooseRole('student')}><span className="onb-role-icon">✳</span><span><b>Студент</b><small>Мій навчальний день</small></span><span className="onb-arrow">↗</span></button><button className="onb-choice onb-role" onClick={() => chooseRole('teacher')}><span className="onb-role-icon teacher">✦</span><span><b>Викладач</b><small>Мої заняття та вільний час</small></span><span className="onb-arrow">↗</span></button></div></> : <>
         <p className="onb-kicker">{role === 'student' ? 'НАЛАШТУЄМО ТВІЙ ПРОСТІР' : 'НАЛАШТУВАННЯ ВИКЛАДАЧА'}</p><h1>{step === 'university' && role === 'teacher' ? 'Де ти викладаєш?' : titles[step]}</h1>
         <p className="onb-description">{step === 'teacher' ? 'Введи прізвище або ім’я та обери результат.' : step === 'university' ? 'Почнемо з вибору університету.' : step === 'faculty' ? 'Обери факультет із доступного списку.' : step === 'course' ? 'Обери курс, на якому навчаєшся.' : 'Залишився останній крок.'}</p>
-        <div className="onb-demo"><span aria-hidden="true">✳</span><span><b>Демонстраційний каталог</b><br/>Назви й імена вигадані та не є базою ВНАУ.</span></div>
+        {step !== 'university' && (isVnau ? <div className="onb-demo"><span aria-hidden="true">✳</span><span><b>Каталог ВНАУ</b><br/>Дані надходять із публічного розкладу МКР.</span></div> : <div className="onb-demo"><span aria-hidden="true">✳</span><span><b>Демонстраційний каталог</b><br/>Назви й імена вигадані та не є базою ВНАУ.</span></div>)}
         <div className="onb-options">
-          {step === 'university' && DEMO_UNIVERSITIES.map(item => <button key={item} className="onb-choice" onClick={() => { setUniversity(item); setStep(role === 'student' ? 'faculty' : 'teacher') }}><span className="onb-option-symbol">У</span><span><b>{item}</b><small>Тестовий варіант</small></span><span className="onb-chevron">›</span></button>)}
-          {step === 'faculty' && DEMO_FACULTIES.map(item => <button key={item.name} className="onb-choice" onClick={() => { setFaculty(item.name); setStep('course') }}><span><b>{item.name}</b></span><span className="onb-chevron">›</span></button>)}
-          {step === 'course' && ['1', '2', '3', '4'].map(item => <button key={item} className="onb-choice" onClick={() => { setCourse(item); setStep('group') }}><span><b>{item} курс</b></span><span className="onb-chevron">›</span></button>)}
-          {step === 'group' && groups.map(item => <button key={item} className="onb-choice" onClick={() => complete({ faculty, course, group: item })}><span><b>{item}</b><small>{faculty} · {course} курс</small></span><span className="onb-chevron">›</span></button>)}
-          {step === 'teacher' && <><label className="onb-search"><span aria-hidden="true">⌕</span><input value={query} onChange={event => setQuery(event.target.value)} placeholder="Прізвище або ім’я" autoComplete="off" aria-label="Пошук викладача"/></label>{normalizedQuery ? teachers.length ? teachers.map(item => <button key={item} className="onb-choice" onClick={() => complete({ teacher: item })}><span className="onb-option-symbol">{item.charAt(0)}</span><span><b>{item}</b><small>Демонстраційний профіль</small></span><span className="onb-chevron">›</span></button>) : <p className="onb-search-empty">Нічого не знайдено. Спробуй інше ім’я або прізвище.</p> : <p className="onb-search-empty">Наприклад, Коваль</p>}</>}
+          {step === 'university' && [VNAU_UNIVERSITY, ...DEMO_UNIVERSITIES].map(item => <button key={item} className="onb-choice" onClick={() => { setUniversity(item); setFaculty(''); setFacultyId(''); setCourse(''); setQuery(''); setStep(role === 'student' ? 'faculty' : 'teacher') }}><span className="onb-option-symbol">У</span><span><b>{item}</b><small>{item === VNAU_UNIVERSITY ? 'ВНАУ' : 'Тестовий варіант'}</small></span><span className="onb-chevron">›</span></button>)}
+          {isVnau && step === 'teacher' && <label className="onb-search"><span aria-hidden="true">⌕</span><input value={query} onChange={event => setQuery(event.target.value)} placeholder="Прізвище або ПІБ" autoComplete="off" aria-label="Пошук викладача"/></label>}
+          {isVnau && realCatalog.loading && <p className="onb-search-empty" role="status">Завантажуємо дані ВНАУ…</p>}
+          {isVnau && realCatalog.error && <><p className="onb-search-empty" role="alert">{realCatalog.error}</p><button className="onb-choice" onClick={realCatalog.retry}>Спробувати ще раз <span className="onb-chevron">›</span></button></>}
+          {isVnau && !realCatalog.loading && !realCatalog.error && step === 'faculty' && realCatalog.options.map(item => <button key={item.id} className="onb-choice" onClick={() => { setFaculty(item.name); setFacultyId(item.id); setCourse(''); setStep('course') }}><span><b>{item.name}</b></span><span className="onb-chevron">›</span></button>)}
+          {isVnau && !realCatalog.loading && !realCatalog.error && step === 'course' && realCatalog.options.map(item => <button key={item.id} className="onb-choice" onClick={() => { setCourse(item.id); setStep('group') }}><span><b>{item.name} курс</b></span><span className="onb-chevron">›</span></button>)}
+          {isVnau && !realCatalog.loading && !realCatalog.error && step === 'group' && realCatalog.options.map(item => <button key={item.id} className="onb-choice" onClick={() => complete({ faculty, facultyId, course, group: item.name, academicGroupId: item.id })}><span><b>{item.name}</b><small>{faculty} · {course} курс</small></span><span className="onb-chevron">›</span></button>)}
+          {isVnau && !realCatalog.loading && !realCatalog.error && step === 'teacher' && realCatalog.options.map(item => <button key={item.id} className="onb-choice" onClick={() => complete({ teacher: item.name, teacherId: item.id })}><span className="onb-option-symbol">{item.name.charAt(0)}</span><span><b>{item.name}</b><small>{item.detail || 'Викладач ВНАУ'}</small></span><span className="onb-chevron">›</span></button>)}
+          {isVnau && !realCatalog.loading && !realCatalog.error && catalogStage !== 'idle' && (step !== 'teacher' || normalizedQuery.length >= 2) && !realCatalog.options.length && <p className="onb-search-empty">Нічого не знайдено. Спробуй змінити вибір.</p>}
+          {isVnau && step === 'teacher' && normalizedQuery.length < 2 && <p className="onb-search-empty">Введи хоча б дві літери прізвища або ПІБ.</p>}
+          {!isVnau && step === 'faculty' && DEMO_FACULTIES.map(item => <button key={item.name} className="onb-choice" onClick={() => { setFaculty(item.name); setStep('course') }}><span><b>{item.name}</b></span><span className="onb-chevron">›</span></button>)}
+          {!isVnau && step === 'course' && ['1', '2', '3', '4'].map(item => <button key={item} className="onb-choice" onClick={() => { setCourse(item); setStep('group') }}><span><b>{item} курс</b></span><span className="onb-chevron">›</span></button>)}
+          {!isVnau && step === 'group' && groups.map(item => <button key={item} className="onb-choice" onClick={() => complete({ faculty, course, group: item })}><span><b>{item}</b><small>{faculty} · {course} курс</small></span><span className="onb-chevron">›</span></button>)}
+          {!isVnau && step === 'teacher' && <><label className="onb-search"><span aria-hidden="true">⌕</span><input value={query} onChange={event => setQuery(event.target.value)} placeholder="Прізвище або ім’я" autoComplete="off" aria-label="Пошук викладача"/></label>{normalizedQuery ? teachers.length ? teachers.map(item => <button key={item} className="onb-choice" onClick={() => complete({ teacher: item })}><span className="onb-option-symbol">{item.charAt(0)}</span><span><b>{item}</b><small>Демонстраційний профіль</small></span><span className="onb-chevron">›</span></button>) : <p className="onb-search-empty">Нічого не знайдено. Спробуй інше ім’я або прізвище.</p> : <p className="onb-search-empty">Наприклад, Коваль</p>}</>}
         </div>
       </>}
       <p className="onb-privacy">Обрані налаштування зберігаються на цьому пристрої.</p>

@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import type { Lesson } from '../data/schedule'
+import { useEffect, useState } from 'react'
+import { calendarDateKey, freeIntervals, kyivNow, lessonsOnDate, weekRange, type CalendarRange, type Lesson } from '../data/schedule'
 import type { TelegramDisplayProfile } from '../lib/telegram'
 import type { UserSelection } from '../onboarding/catalog'
 import './other-screens.css'
@@ -37,7 +37,7 @@ export function ProfileScreen({ selection, profile, appearance, onAppearanceChan
       <div className="other-avatar">{profile?.photoUrl && !photoFailed ? <img src={profile.photoUrl} alt="" onError={() => setPhotoFailed(true)}/> : <PersonIcon/>}</div>
       <div className="other-profile-name"><h2>{profile?.name || 'Користувач'}</h2><p>{selection.role === 'student' ? 'Студент' : 'Викладач'}</p></div>
     </div>
-    <div className="other-subheading"><h2>Навчання</h2><span className="other-demo-tag">ДЕМО</span></div>
+    <div className="other-subheading"><h2>Навчання</h2><span className="other-demo-tag">{selection.universityId === 'vsau' ? 'ВНАУ' : 'ДЕМО'}</span></div>
     <div className="other-info-card">
       <div><span>Університет</span><strong>{selection.university}</strong></div>
       {selection.role === 'student' ? <>
@@ -73,20 +73,22 @@ export function CommunitiesScreen() {
 function minutes(time: string) { const [hours, mins] = time.split(':').map(Number); return hours * 60 + mins }
 function duration(from: string, to: string) { const total = minutes(to) - minutes(from); const hours = Math.floor(total / 60); const mins = total % 60; return [hours ? `${hours} год` : '', mins ? `${mins} хв` : ''].filter(Boolean).join(' ') }
 
-export function WindowScreen({ lessons, teacher }: { lessons: Lesson[]; teacher: string }) {
-  const today = new Date()
-  const sorted = lessons.filter(lesson => lesson.day === today.getDay() && lesson.teacher === teacher).slice().sort((a, b) => minutes(a.startsAt) - minutes(b.startsAt))
-  const gaps: { start: string; end: string }[] = []
-  let end = sorted[0]?.endsAt
-  for (const lesson of sorted.slice(1)) {
-    if (minutes(lesson.startsAt) > minutes(end)) gaps.push({ start: end, end: lesson.startsAt })
-    if (minutes(lesson.endsAt) > minutes(end)) end = lesson.endsAt
-  }
-  const date = new Intl.DateTimeFormat('uk-UA', { weekday: 'long', day: 'numeric', month: 'long' }).format(today)
+export function WindowScreen({ lessons, teacher, teacherId, sourceKind = 'demo', scheduleAvailable = true, loading = false, stale = false, lastSuccessAt, coverage, onRangeChange }: { lessons: Lesson[]; teacher: string; teacherId?: string; sourceKind?: 'demo' | 'external'; scheduleAvailable?: boolean; loading?: boolean; stale?: boolean; lastSuccessAt?: string; coverage?: CalendarRange; onRangeChange?: (range: CalendarRange) => void }) {
+  const [selected, setSelected] = useState(() => kyivNow())
+  useEffect(() => { onRangeChange?.(weekRange(selected)) }, [selected, onRangeChange])
+  // Never infer a real teacher identity from a display name.
+  const ownLessons = lessons.filter(lesson => teacherId ? lesson.teacherId === teacherId : !lesson.teacherId && lesson.teacher === teacher)
+  const sorted = lessonsOnDate(ownLessons, selected)
+  const gaps = freeIntervals(sorted)
+  const requested = weekRange(selected)
+  const confirmed = scheduleAvailable && (sourceKind === 'demo' || Boolean(coverage && coverage.start <= requested.start && coverage.end >= requested.end))
+  const date = new Intl.DateTimeFormat('uk-UA', { weekday: 'long', day: 'numeric', month: 'long' }).format(selected)
+  const savedAt = lastSuccessAt ? new Intl.DateTimeFormat('uk-UA', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit', timeZone:'Europe/Kyiv' }).format(new Date(lastSuccessAt)) : ''
   return <section className="other-screen"><ScreenHeading label="ВАШ ЧАС" title="Вікно" description="Вільні проміжки між вашими заняттями."/>
-    <div className="other-notice"><span aria-hidden="true">✦</span> Демонстраційний розклад · дані вигадані</div>
-    <div className="other-subheading"><h2>Сьогодні</h2><span className="other-date">{date}</span></div>
-    {gaps.length ? <div className="other-gaps">{gaps.map(gap => <article key={`${gap.start}-${gap.end}`} className="other-gap"><span className="other-gap-icon" aria-hidden="true">◷</span><div><strong>{gap.start}–{gap.end}</strong><p>Між заняттями</p></div><span className="other-duration">{duration(gap.start, gap.end)}</span></article>)}</div> : <div className="other-empty other-empty-compact"><div className="other-empty-icon" aria-hidden="true">◷</div><h2>Вікон між парами немає</h2><p>{sorted.length < 2 ? 'У демонстраційному розкладі сьогодні менше двох занять.' : 'Сьогодні заняття йдуть без перерв між парами.'}</p></div>}
-    <p className="other-footnote">Показано тільки проміжки між заняттями на сьогодні за демонстраційними даними.</p>
+    <div className="other-notice"><span aria-hidden="true">✦</span> {sourceKind === 'demo' ? 'Демонстраційний розклад · дані вигадані' : stale ? `Збережений розклад ВНАУ · джерело недоступне${savedAt ? ` · ${savedAt}` : ''}` : 'Розклад ВНАУ · МКР'}</div>
+    <div className="other-subheading"><h2>Обраний день</h2><span className="other-date">{date}</span></div>
+    <label className="other-window-date">Дата <input type="date" aria-label="Дата для вікон" value={calendarDateKey(selected)} onChange={event => { const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(event.target.value); if (match) setSelected(new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]))) }}/></label>
+    {!confirmed ? <div className="other-empty other-empty-compact"><div className="other-empty-icon" aria-hidden="true">◷</div><h2>{loading ? 'Завантажуємо розклад…' : 'Дані розкладу недоступні'}</h2><p>Вільні проміжки можна визначити лише за підтвердженим розкладом.</p></div> : gaps.length ? <div className="other-gaps">{gaps.map(gap => <article key={`${gap.start}-${gap.end}`} className="other-gap"><span className="other-gap-icon" aria-hidden="true">◷</span><div><strong>{gap.start}–{gap.end}</strong><p>Між заняттями</p></div><span className="other-duration">{duration(gap.start, gap.end)}</span></article>)}</div> : <div className="other-empty other-empty-compact"><div className="other-empty-icon" aria-hidden="true">◷</div><h2>Вікон між парами немає</h2><p>{sorted.length < 2 ? sourceKind === 'demo' ? 'У демонстраційному розкладі на цей день менше двох занять.' : 'У розкладі на цей день менше двох занять.' : 'У цей день заняття йдуть без вікон між парами.'}</p></div>}
+    <p className="other-footnote">Показано тільки проміжки між заняттями за обраний день{sourceKind === 'demo' ? ' у демонстраційному розкладі' : ''}.</p>
   </section>
 }

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
-import { DEMO_FACULTIES, DEMO_UNIVERSITIES } from './catalog'
+import { DEMO_FACULTIES, DEMO_UNIVERSITIES, VNAU_UNIVERSITY } from './catalog'
 import { makeSavedGroup, type SavedGroup } from './groups'
+import { useVnauCatalog } from './useVnauCatalog'
 import './group-picker.css'
 
 type Step = 'university' | 'faculty' | 'course' | 'group'
@@ -16,7 +17,10 @@ export function GroupPicker({ existingGroups, onSelect, onCancel }: Props) {
   const [step, setStep] = useState<Step>('university')
   const [university, setUniversity] = useState('')
   const [faculty, setFaculty] = useState('')
+  const [facultyId, setFacultyId] = useState('')
   const [course, setCourse] = useState('')
+  const isVnau = university === VNAU_UNIVERSITY
+  const realCatalog = useVnauCatalog(isVnau, step === 'university' ? 'idle' : step, facultyId, course, '')
   const back = () => {
     if (step === 'university') onCancel()
     else if (step === 'faculty') setStep('university')
@@ -39,8 +43,15 @@ export function GroupPicker({ existingGroups, onSelect, onCancel }: Props) {
   }, [onCancel])
   const groups = DEMO_FACULTIES.find(item => item.name === faculty)?.groups.filter(item => item.split('-')[1]?.startsWith(course)) || []
   const titles = { university: 'Обери університет', faculty: 'Обери факультет', course: 'Обери курс', group: 'Обери групу' }
-  const options: { label: string; sub?: string; onClick: () => void; disabled?: boolean }[] =
-    step === 'university' ? DEMO_UNIVERSITIES.map(item => ({ label: item, sub: 'Тестовий варіант', onClick: () => { setUniversity(item); setStep('faculty') } })) :
+  const options: { key?: string; label: string; sub?: string; onClick: () => void; disabled?: boolean }[] =
+    step === 'university' ? [VNAU_UNIVERSITY, ...DEMO_UNIVERSITIES].map(item => ({ label: item, sub: item === VNAU_UNIVERSITY ? 'ВНАУ' : 'Тестовий варіант', onClick: () => { setUniversity(item); setFaculty(''); setFacultyId(''); setCourse(''); setStep('faculty') } })) :
+    isVnau && step === 'faculty' ? realCatalog.options.map(item => ({ key: item.id, label: item.name, onClick: () => { setFaculty(item.name); setFacultyId(item.id); setCourse(''); setStep('course') } })) :
+    isVnau && step === 'course' ? realCatalog.options.map(item => ({ key: item.id, label: `${item.name} курс`, onClick: () => { setCourse(item.id); setStep('group') } })) :
+    isVnau && step === 'group' ? realCatalog.options.map(item => {
+      const group = makeSavedGroup({ university, universityId: 'vsau', faculty, facultyId, course, group: item.name, academicGroupId: item.id })
+      const exists = existingGroups.some(existing => existing.id === group.id)
+      return { key: item.id, label: item.name, sub: exists ? 'Вже додано' : `${faculty} · ${course} курс`, disabled: exists, onClick: () => onSelect(group) }
+    }) :
     step === 'faculty' ? DEMO_FACULTIES.map(item => ({ label: item.name, onClick: () => { setFaculty(item.name); setStep('course') } })) :
     step === 'course' ? ['1', '2', '3', '4'].map(item => ({ label: `${item} курс`, onClick: () => { setCourse(item); setStep('group') } })) :
     groups.map(item => {
@@ -54,8 +65,11 @@ export function GroupPicker({ existingGroups, onSelect, onCancel }: Props) {
       <div className="group-picker-progress" aria-hidden="true"><span style={{ width: `${(['university', 'faculty', 'course', 'group'].indexOf(step) + 1) * 25}%` }}/></div>
       <h2 id="group-picker-title">{titles[step]}</h2>
       <p className="group-picker-subtitle">Додай розклад, щоб швидко перемикатися між групами.</p>
-      <p className="group-picker-notice"><b>Демонстраційний каталог.</b> Назви та групи вигадані й не є базою ВНАУ.</p>
-      <div className="group-picker-options">{options.map(option => <button key={option.label} type="button" onClick={option.onClick} disabled={option.disabled}><span><b>{option.label}</b>{option.sub && <small>{option.sub}</small>}</span><span aria-hidden="true">›</span></button>)}</div>
+      {step !== 'university' && (isVnau ? <p className="group-picker-notice"><b>Каталог ВНАУ.</b> Дані надходять із публічного розкладу МКР.</p> : <p className="group-picker-notice"><b>Демонстраційний каталог.</b> Назви та групи вигадані й не є базою ВНАУ.</p>)}
+      {isVnau && realCatalog.loading && <p className="group-picker-subtitle" role="status">Завантажуємо дані ВНАУ…</p>}
+      {isVnau && realCatalog.error && <><p className="group-picker-subtitle" role="alert">{realCatalog.error}</p><button type="button" onClick={realCatalog.retry}>Спробувати ще раз</button></>}
+      {isVnau && step !== 'university' && !realCatalog.loading && !realCatalog.error && !realCatalog.options.length && <p className="group-picker-subtitle">Нічого не знайдено. Спробуй змінити вибір.</p>}
+      <div className="group-picker-options">{options.map(option => <button key={option.key || option.label} type="button" onClick={option.onClick} disabled={option.disabled}><span><b>{option.label}</b>{option.sub && <small>{option.sub}</small>}</span><span aria-hidden="true">›</span></button>)}</div>
       <p className="group-picker-footnote">Твоя основна група та роль залишаться без змін.</p>
     </section>
   </div>

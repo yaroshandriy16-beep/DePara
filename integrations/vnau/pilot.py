@@ -134,7 +134,7 @@ def run_pilot(identities: Sequence[PilotIdentity], start: str, end: str, output_
             break
         try:
             lessons = fetcher(identity, start, end)
-            snapshot = success_snapshot(identity.kind, identity.id, identity.label, lessons, checked_at=now())  # type: ignore[arg-type]
+            snapshot = success_snapshot(identity.kind, identity.id, identity.label, lessons, coverage_start=start, coverage_end=end, checked_at=now())  # type: ignore[arg-type]
         except (Exception,):
             # Do not disclose exception contents, source HTML or session data.
             # The last validated successful lessons are retained on all failures.

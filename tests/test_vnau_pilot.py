@@ -55,7 +55,7 @@ class PilotTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             dest = root / 'group' / '3641.json'
-            before = success_snapshot('group', '3641', group.label, [LESSON], checked_at=TIME)
+            before = success_snapshot('group', '3641', group.label, [LESSON], coverage_start='2026-11-05', coverage_end='2026-11-18', checked_at=TIME)
             write_snapshot(dest, before, 'group', '3641')
             def fail(*_): raise RuntimeError('secret-should-never-be-persisted')
             status = run_pilot([group], '2026-11-05', '2026-11-18', root, fetcher=fail, now=lambda: '2026-11-05T13:00:00Z')

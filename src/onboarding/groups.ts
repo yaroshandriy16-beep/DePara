@@ -8,18 +8,22 @@ export interface SavedGroup {
   faculty: string
   course: string
   group: string
+  universityId?: 'vsau' | 'demo'
+  facultyId?: string
+  academicGroupId?: string
 }
 
 type Snapshot = { owner: string; groups: SavedGroup[]; activeId: string }
 const KEY_PREFIX = 'depara-saved-groups-v1:'
 
 export function makeSavedGroup(group: Omit<SavedGroup, 'id'>): SavedGroup {
-  return { ...group, id: JSON.stringify([group.university, group.faculty, group.course, group.group]) }
+  return { ...group, id: group.universityId === 'vsau' && group.academicGroupId ? `vsau:group:${group.academicGroupId}` : JSON.stringify([group.university, group.faculty, group.course, group.group]) }
 }
 
 function primaryGroup(selection: UserSelection | null): SavedGroup | null {
   if (!selection || selection.role !== 'student' || !selection.university || !selection.faculty || !selection.course || !selection.group) return null
-  return makeSavedGroup({ university: selection.university, faculty: selection.faculty, course: selection.course, group: selection.group })
+  if (selection.universityId === 'vsau' && (!selection.academicGroupId || !selection.facultyId)) return null
+  return makeSavedGroup({ university: selection.university, faculty: selection.faculty, course: selection.course, group: selection.group, universityId: selection.universityId, facultyId: selection.facultyId, academicGroupId: selection.academicGroupId })
 }
 
 function load(primary: SavedGroup | null): Snapshot {
@@ -32,6 +36,7 @@ function load(primary: SavedGroup | null): Snapshot {
       const unique = new Map<string, SavedGroup>([[primary.id, primary]])
       if (Array.isArray(value.groups)) for (const item of value.groups) {
         if (item && typeof item.university === 'string' && typeof item.faculty === 'string' && typeof item.course === 'string' && typeof item.group === 'string') {
+          if (item.universityId === 'vsau' && (!/^\d{1,12}$/.test(item.academicGroupId || '') || !/^\d{1,12}$/.test(item.facultyId || ''))) continue
           const entry = makeSavedGroup(item)
           unique.set(entry.id, entry)
         }

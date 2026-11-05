@@ -2,7 +2,12 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from integrations.vnau.cache import CacheValidationError, failure_snapshot, success_snapshot, write_snapshot
+from integrations.vnau.cache import CacheValidationError, failure_snapshot, success_snapshot as _success_snapshot, write_snapshot
+
+def success_snapshot(*args, **kwargs):
+    kwargs.setdefault('coverage_start', '2026-11-01')
+    kwargs.setdefault('coverage_end', '2026-11-14')
+    return _success_snapshot(*args, **kwargs)
 
 class CacheTests(unittest.TestCase):
     def setUp(self):
@@ -21,6 +26,13 @@ class CacheTests(unittest.TestCase):
         self.assertEqual(current['lastSuccessAt'], self.time)
         self.assertEqual(current['status'], 'error')
         self.assertEqual(current['lastCheckedAt'], '2026-11-05T11:00:00Z')
+        self.assertEqual((current['coverageStart'], current['coverageEnd']), ('2026-11-01', '2026-11-14'))
+
+    def test_success_requires_valid_coverage_and_rejects_events_outside_it(self):
+        with self.assertRaises(CacheValidationError):
+            success_snapshot('group', '3641', 'ЕІ-23-1', [self.lesson], coverage_start='2026-11-06', checked_at=self.time)
+        with self.assertRaises(CacheValidationError):
+            success_snapshot('group', '3641', 'ЕІ-23-1', [], coverage_start='2026-11-15', checked_at=self.time)
 
     def test_group_cannot_reuse_teacher_or_other_group_cache(self):
         old = success_snapshot('group', '3641', 'ЕІ-23-1', [self.lesson], checked_at=self.time)

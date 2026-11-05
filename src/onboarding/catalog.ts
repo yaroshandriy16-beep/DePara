@@ -3,13 +3,18 @@ export type Role = 'student' | 'teacher'
 export interface UserSelection {
   role: Role
   university: string
+  universityId?: 'vsau' | 'demo'
   faculty?: string
+  facultyId?: string
   course?: string
   group?: string
+  academicGroupId?: string
   teacher?: string
+  teacherId?: string
 }
 
 export const DEMO_UNIVERSITIES = ['Демонстраційний університет'] as const
+export const VNAU_UNIVERSITY = 'Вінницький національний аграрний університет'
 export const DEMO_FACULTIES = [
   { name: 'Факультет економіки', groups: ['ЕК-11', 'ЕК-21', 'ЕК-31', 'ЕК-41'] },
   { name: 'Факультет технологій', groups: ['ТХ-11', 'ТХ-21', 'ТХ-31', 'ТХ-41'] },
@@ -26,6 +31,11 @@ export function loadSelection(): UserSelection | null {
     const value: unknown = JSON.parse(raw)
     if (!value || typeof value !== 'object') return null
     const selection = value as Partial<UserSelection>
+    if (selection.universityId === 'vsau') {
+      if (selection.university !== VNAU_UNIVERSITY) return null
+      if (selection.role === 'student' && (!/^\d{1,12}$/.test(selection.academicGroupId ?? '') || !/^\d{1,12}$/.test(selection.facultyId ?? ''))) return null
+      if (selection.role === 'teacher' && !/^\d{1,12}$/.test(selection.teacherId ?? '')) return null
+    }
     if (selection.role === 'student' && selection.university && selection.faculty && selection.course && selection.group) return selection as UserSelection
     if (selection.role === 'teacher' && selection.university && selection.teacher) return selection as UserSelection
     return null

@@ -1,17 +1,24 @@
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
-import type { Lesson } from '../data/schedule'
+import { kyivNow, lessonOccursOnDate, lessonsOnDate, weekRange, type CalendarRange, type Lesson } from '../data/schedule'
 import './TodayScreen.css'
 
 export interface TodayGroup { id: string; label: string; detail?: string }
 export interface TodayScreenProps {
   lessons: Lesson[]
   activeGroup: string
+  activeGroupId?: string
   groups: TodayGroup[]
   onSelectGroup: (id: string) => void
   onAddGroup: () => void
   weatherControl: ReactNode
   statusControl: ReactNode
   scheduleAvailable: boolean
+  sourceKind?: 'demo' | 'external'
+  loading?: boolean
+  stale?: boolean
+  lastSuccessAt?: string
+  coverage?: CalendarRange
+  onRangeChange?: (range: CalendarRange) => void
 }
 const weekday = ['нд', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб']
 const fullDate = new Intl.DateTimeFormat('uk-UA', { weekday: 'short', day: 'numeric', month: 'long' })
@@ -43,7 +50,7 @@ function Glyph({name}: {name:'group'|'person'|'room'|'share'}) {
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name]}</svg>
 }
 
-export function GroupMenu({activeGroup, groups, onSelectGroup, onAddGroup}: Omit<TodayScreenProps,'lessons'|'weatherControl'|'statusControl'|'scheduleAvailable'>) {
+export function GroupMenu({activeGroup, activeGroupId, groups, onSelectGroup, onAddGroup}: Pick<TodayScreenProps, 'activeGroup'|'activeGroupId'|'groups'|'onSelectGroup'|'onAddGroup'>) {
   const [open,setOpen] = useState(false)
   const anchor = useRef<HTMLDivElement>(null)
   const trigger = useRef<HTMLButtonElement>(null)
@@ -58,11 +65,11 @@ export function GroupMenu({activeGroup, groups, onSelectGroup, onAddGroup}: Omit
   if (!groups.length) return <span className="td-teacher-label"><span className="td-group-mark"><Glyph name="group"/></span>{activeGroup}</span>
   return <div className={`td-group-anchor${open ? ' is-open' : ''}`} ref={anchor}>
     <button ref={trigger} className="td-group-trigger" aria-label={`Обрати розклад, поточний: ${activeGroup}`} aria-haspopup="menu" aria-expanded={open} aria-controls="td-group-popover" onClick={() => setOpen(v => !v)}><span className="td-group-mark"><Glyph name="group"/></span><span className="td-group-name">{activeGroup}</span><svg className="td-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-    {open && <div id="td-group-popover" className="td-group-popover" role="menu" aria-label="Мої розклади"><div className="td-groups-title">Мої розклади</div>{groups.map(group => <button key={group.id} type="button" role="menuitem" className={`td-group-option${group.label === activeGroup ? ' is-active' : ''}`} onClick={() => {onSelectGroup(group.id);setOpen(false);trigger.current?.focus()}}><span className="td-option-icon">▦</span><span className="td-option-text"><strong>{group.label}</strong><small>{group.detail || 'Демонстраційний розклад'}</small></span>{group.label === activeGroup && <span className="td-check" aria-label="Обрано">✓</span>}</button>)}<button type="button" role="menuitem" className="td-group-add" onClick={() => {setOpen(false);onAddGroup()}}><span>+</span>Додати групу</button><div className="td-group-tip">Демонстраційні розклади</div></div>}
+    {open && <div id="td-group-popover" className="td-group-popover" role="menu" aria-label="Мої розклади"><div className="td-groups-title">Мої розклади</div>{groups.map(group => { const selected = activeGroupId ? group.id === activeGroupId : group.label === activeGroup; return <button key={group.id} type="button" role="menuitem" className={`td-group-option${selected ? ' is-active' : ''}`} onClick={() => {onSelectGroup(group.id);setOpen(false);trigger.current?.focus()}}><span className="td-option-icon">▦</span><span className="td-option-text"><strong>{group.label}</strong><small>{group.detail || 'Розклад групи'}</small></span>{selected && <span className="td-check" aria-label="Обрано">✓</span>}</button> })}<button type="button" role="menuitem" className="td-group-add" onClick={() => {setOpen(false);onAddGroup()}}><span>+</span>Додати групу</button><div className="td-group-tip">{groups.some(group => group.id.startsWith('vsau:group:')) ? 'Вибір змінює лише розклад' : 'Демонстраційні розклади'}</div></div>}
   </div>
 }
 
-function Timeline({lessons, selected, now}: {lessons: Lesson[]; selected: Date; now: Date}) {
+function Timeline({lessons, selected, now, isDemo}: {lessons: Lesson[]; selected: Date; now: Date; isDemo: boolean}) {
   const timeline = useRef<HTMLDivElement>(null)
   const [position, setPosition] = useState<number | null>(null)
   const min = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60
@@ -80,7 +87,7 @@ function Timeline({lessons, selected, now}: {lessons: Lesson[]; selected: Date; 
     window.addEventListener('resize',update)
     return () => window.removeEventListener('resize',update)
   },[lessons, selected, now, min])
-  if (!lessons.length) return <div className="td-empty">У демонстраційному розкладі на цей день занять немає.</div>
+  if (!lessons.length) return <div className="td-empty">{isDemo ? 'У демонстраційному розкладі на цей день занять немає.' : 'На цей день занять немає.'}</div>
   return <div ref={timeline} className="td-timeline"><div className="td-rail"><div className="td-rail-progress" style={{height:position === null ? 0 : Math.max(position - 9,0)}}/></div>{position !== null && <div className="td-now-bead" style={{top: position - 8}} aria-label="Поточний час"/>}{lessons.map(item => {
     const past = selected < new Date(now.getFullYear(),now.getMonth(),now.getDate()) || (sameDate(selected,now) && min >= toMinutes(item.endsAt))
     const active = sameDate(selected,now) && min >= toMinutes(item.startsAt) && min < toMinutes(item.endsAt)
@@ -88,25 +95,30 @@ function Timeline({lessons, selected, now}: {lessons: Lesson[]; selected: Date; 
   })}</div>
 }
 
-function SharePreview({date,lessons,onClose,scheduleAvailable}: {date:Date; lessons:Lesson[]; onClose:()=>void; scheduleAvailable:boolean}) {
+function SharePreview({date,lessons,onClose,scheduleAvailable,isDemo,stale,savedAt}: {date:Date; lessons:Lesson[]; onClose:()=>void; scheduleAvailable:boolean; isDemo:boolean; stale:boolean; savedAt:string}) {
   useEffect(() => { const key=(event:KeyboardEvent)=>{if(event.key==='Escape') onClose()}; window.addEventListener('keydown',key); return ()=>window.removeEventListener('keydown',key) },[onClose])
-  return <div className="td-modalback" onClick={onClose}><section className="td-sheet" role="dialog" aria-modal="true" aria-label="Попередній перегляд розкладу" onClick={event=>event.stopPropagation()}><div className="td-handle"/><h3>Поділитися розкладом</h3><p>Попередній перегляд · демонстраційний розклад</p><div className="td-share-preview"><strong>{fullDate.format(date)}</strong>{lessons.length ? lessons.map(item=><div className="td-share-row" key={item.id}><b>{item.startsAt}</b><span>{item.title}<small>{item.location} · {item.teacher}</small></span></div>) : <p>{scheduleAvailable ? 'Занять немає' : 'Дані розкладу недоступні'}</p>}</div><p>Нічого не надіслано.</p><button className="td-close" onClick={onClose}>Зрозуміло</button></section></div>
+  return <div className="td-modalback" onClick={onClose}><section className="td-sheet" role="dialog" aria-modal="true" aria-label="Попередній перегляд розкладу" onClick={event=>event.stopPropagation()}><div className="td-handle"/><h3>Поділитися розкладом</h3><p>Попередній перегляд · {isDemo ? 'демонстраційний розклад' : 'розклад ВНАУ'}{stale ? ` · збережені дані${savedAt ? ` від ${savedAt}` : ''}` : ''}</p><div className="td-share-preview"><strong>{fullDate.format(date)}</strong>{lessons.length ? lessons.map(item=><div className="td-share-row" key={item.id}><b>{item.startsAt}</b><span>{item.title}<small>{item.location} · {item.teacher}</small></span></div>) : <p>{scheduleAvailable ? 'Занять немає' : 'Дані розкладу недоступні'}</p>}</div><p>Нічого не надіслано.</p><button className="td-close" onClick={onClose}>Зрозуміло</button></section></div>
 }
 
-export function TodayScreen({lessons, activeGroup, groups, onSelectGroup, onAddGroup, weatherControl, statusControl, scheduleAvailable}: TodayScreenProps) {
-  const [now,setNow] = useState(() => new Date())
-  const [selected,setSelected] = useState(() => new Date())
+export function TodayScreen({lessons, activeGroup, activeGroupId, groups, onSelectGroup, onAddGroup, weatherControl, statusControl, scheduleAvailable, sourceKind = 'demo', loading = false, stale = false, lastSuccessAt, coverage, onRangeChange}: TodayScreenProps) {
+  const [now,setNow] = useState(() => kyivNow())
+  const [selected,setSelected] = useState(() => kyivNow())
   const [share,setShare] = useState(false)
-  useEffect(()=>{const id=window.setInterval(()=>setNow(new Date()), 10000);return ()=>window.clearInterval(id)},[])
-  const dayLessons = lessons.filter(item=>item.day===selected.getDay()).sort((a,b)=>a.startsAt.localeCompare(b.startsAt))
-  const status = scheduleAvailable ? getTodayStatus(dayLessons,now,selected) : { phrase: 'Дані розкладу недоступні', minutes: null, hint: '' }
+  useEffect(()=>{const id=window.setInterval(()=>setNow(kyivNow()), 10000);return ()=>window.clearInterval(id)},[])
+  useEffect(() => { onRangeChange?.(weekRange(selected)) }, [selected, onRangeChange])
+  const dayLessons = lessonsOnDate(lessons, selected)
+  const requested = weekRange(selected)
+  const confirmed = scheduleAvailable && (sourceKind === 'demo' || Boolean(coverage && coverage.start <= requested.start && coverage.end >= requested.end))
+  const status = confirmed ? getTodayStatus(dayLessons,now,selected) : { phrase: loading ? 'Завантажуємо розклад' : 'Дані розкладу недоступні', minutes: null, hint: '' }
+  const isDemo = sourceKind === 'demo'
+  const savedAt = lastSuccessAt ? new Intl.DateTimeFormat('uk-UA', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit', timeZone:'Europe/Kyiv' }).format(new Date(lastSuccessAt)) : ''
   const monday = addDays(now,-(now.getDay()+6)%7)
   const week = Array.from({length:7},(_,i)=>addDays(monday,i))
   return <div className="td-screen">
-    <header className="td-topbar"><GroupMenu activeGroup={activeGroup} groups={groups} onSelectGroup={onSelectGroup} onAddGroup={onAddGroup}/>{weatherControl}</header>
+    <header className="td-topbar"><GroupMenu activeGroup={activeGroup} activeGroupId={activeGroupId} groups={groups} onSelectGroup={onSelectGroup} onAddGroup={onAddGroup}/>{weatherControl}</header>
     <section className="td-scene" aria-label="Поточне або наступне заняття"><div className="td-countdown" aria-label={status.minutes === null ? 'Немає зворотного відліку' : `${status.minutes} хвилин ${status.hint}`}><div className="td-countdown-num">{status.minutes ?? '—'}</div>{status.minutes !== null && <><div className="td-countdown-unit">хв</div><div className="td-countdown-hint">{status.hint}</div></>}</div><div className="td-scene-foot" aria-live="polite" aria-atomic="true"><span key={status.phrase} className="td-live-phrase">{status.phrase}</span></div></section>
-    <section aria-label="Дні тижня"><div className="td-section-top"><div>Цього тижня</div><span>{monthDate.format(now)}</span></div><div className="td-week">{week.map(date=>{const count=lessons.filter(item=>item.day===date.getDay()).length;return <button key={date.toISOString()} className={`td-day${sameDate(date,selected)?' is-selected':''}`} aria-label={fullDate.format(date)} aria-pressed={sameDate(date,selected)} onClick={()=>setSelected(date)}><span className="td-dow">{weekday[date.getDay()]}</span><span className="td-daynum">{date.getDate()}</span><span className="td-dots">{Array.from({length:Math.min(count,3)},(_,i)=><i key={i}/>)}</span></button>})}</div></section>
-    <section aria-label="Розклад на обраний день"><div className="td-schedule-head"><div className="td-title-with-status"><h2>Розклад</h2>{statusControl}</div><span>{fullDate.format(selected)}</span></div><p className="td-demo-label">Демонстраційний розклад · заняття вигадані</p>{scheduleAvailable ? <Timeline lessons={dayLessons} selected={selected} now={now}/> : <div className="td-empty">Дані демонстраційного розкладу для цієї групи недоступні.</div>}<button className="td-share" onClick={()=>setShare(true)}><Glyph name="share"/>Поділитися розкладом</button></section>
-    {share && <SharePreview date={selected} lessons={dayLessons} scheduleAvailable={scheduleAvailable} onClose={()=>setShare(false)}/>}
+    <section aria-label="Дні тижня"><div className="td-section-top"><div>Цього тижня</div><span>{monthDate.format(now)}</span></div><div className="td-week">{week.map(date=>{const count=lessons.filter(item=>lessonOccursOnDate(item,date)).length;return <button key={date.toISOString()} className={`td-day${sameDate(date,selected)?' is-selected':''}`} aria-label={fullDate.format(date)} aria-pressed={sameDate(date,selected)} onClick={()=>setSelected(date)}><span className="td-dow">{weekday[date.getDay()]}</span><span className="td-daynum">{date.getDate()}</span><span className="td-dots">{Array.from({length:Math.min(count,3)},(_,i)=><i key={i}/>)}</span></button>})}</div></section>
+    <section aria-label="Розклад на обраний день"><div className="td-schedule-head"><div className="td-title-with-status"><h2>Розклад</h2>{statusControl}</div><span>{fullDate.format(selected)}</span></div><p className="td-demo-label">{isDemo ? 'Демонстраційний розклад · заняття вигадані' : stale ? `Збережений розклад ВНАУ · джерело тимчасово недоступне${savedAt ? ` · ${savedAt}` : ''}` : 'Розклад ВНАУ · МКР'}</p>{confirmed ? <Timeline lessons={dayLessons} selected={selected} now={now} isDemo={isDemo}/> : <div className="td-empty">{loading ? 'Завантажуємо розклад…' : isDemo ? 'Дані демонстраційного розкладу для цієї групи недоступні.' : 'Дані ВНАУ тимчасово недоступні.'}</div>}<button className="td-share" onClick={()=>setShare(true)}><Glyph name="share"/>Поділитися розкладом</button></section>
+    {share && <SharePreview date={selected} lessons={confirmed ? dayLessons : []} scheduleAvailable={confirmed} isDemo={isDemo} stale={stale} savedAt={savedAt} onClose={()=>setShare(false)}/>}
   </div>
 }

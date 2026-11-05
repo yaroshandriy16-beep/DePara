@@ -18,7 +18,7 @@ SourceKind = Literal['group', 'teacher']
 _VALID_ID = re.compile(r'^[A-Za-z0-9_-]{1,128}$')
 _TIME = re.compile(r'^(?:[01]\d|2[0-3]):[0-5]\d$')
 _TIMESTAMP = re.compile(r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$')
-_META_FIELDS = {'schemaVersion', 'source', 'sourceKind', 'universityId', 'timeZone', 'groupId', 'teacherId', 'groupName', 'teacherName', 'status', 'lastCheckedAt', 'lastSuccessAt', 'lessons'}
+_META_FIELDS = {'schemaVersion', 'source', 'sourceKind', 'universityId', 'timeZone', 'groupId', 'teacherId', 'groupName', 'teacherName', 'status', 'lastCheckedAt', 'lastSuccessAt', 'coverageStart', 'coverageEnd', 'lessons'}
 _LESSON_FIELDS = {'sourceId', 'date', 'startTime', 'endTime', 'subject', 'shortSubject', 'type', 'room', 'group', 'teacher', 'academicGroupId', 'teacherId', 'subgroup', 'lessonNumber', 'addedDate', 'updatedIndicator'}
 
 class CacheValidationError(ValueError):
@@ -43,6 +43,14 @@ def _instant(value: str) -> str:
 def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec='seconds').replace('+00:00', 'Z')
 
+def _calendar_date(value: Any) -> str:
+    try:
+        if not isinstance(value, str) or date.fromisoformat(value).isoformat() != value:
+            raise ValueError('invalid date')
+    except ValueError as exc:
+        raise CacheValidationError('Invalid coverage date') from exc
+    return value
+
 def validate_snapshot(value: Any, kind: SourceKind, source_id: str) -> dict[str, Any]:
     key, source_id = _identity(kind, source_id)
     if not isinstance(value, dict) or any(value.get(k) != v for k, v in {
@@ -66,6 +74,14 @@ def validate_snapshot(value: Any, kind: SourceKind, source_id: str) -> dict[str,
         raise CacheValidationError('Invalid lessons')
     if (status == 'success' or lessons) and not value.get('lastSuccessAt'):
         raise CacheValidationError('Confirmed data requires a success timestamp')
+    # A confirmed empty list means "no classes" only inside this checked range.
+    coverage_start, coverage_end = value.get('coverageStart'), value.get('coverageEnd')
+    if status == 'success' or lessons or value.get('lastSuccessAt'):
+        coverage_start, coverage_end = _calendar_date(coverage_start), _calendar_date(coverage_end)
+        if coverage_start > coverage_end:
+            raise CacheValidationError('Invalid coverage range')
+    elif coverage_start is not None or coverage_end is not None:
+        raise CacheValidationError('Unconfirmed data cannot claim coverage')
     ids = set()
     for lesson in lessons:
         if not isinstance(lesson, dict):
@@ -81,6 +97,8 @@ def validate_snapshot(value: Any, kind: SourceKind, source_id: str) -> dict[str,
                 raise ValueError('invalid date')
         except ValueError as exc:
             raise CacheValidationError('Invalid calendar date') from exc
+        if coverage_start is None or coverage_end is None or not coverage_start <= day <= coverage_end:
+            raise CacheValidationError('Lesson is outside confirmed coverage')
         if not isinstance(start, str) or not isinstance(end, str) or not _TIME.fullmatch(start) or not _TIME.fullmatch(end) or start >= end:
             raise CacheValidationError('Invalid lesson time')
         if not isinstance(subject, str) or not subject.strip() or len(subject) > 1024:
@@ -105,7 +123,7 @@ def validate_snapshot(value: Any, kind: SourceKind, source_id: str) -> dict[str,
                 raise CacheValidationError('Invalid addition date') from exc
     return value
 
-def success_snapshot(kind: SourceKind, source_id: str, label: str, lessons: list[dict[str, Any]], *, checked_at: str | None = None) -> dict[str, Any]:
+def success_snapshot(kind: SourceKind, source_id: str, label: str, lessons: list[dict[str, Any]], *, coverage_start: str, coverage_end: str, checked_at: str | None = None) -> dict[str, Any]:
     """Build a success only after the caller has confirmed the parsed response.
 
     An empty list can be passed only when the calling parser has recognized and
@@ -118,7 +136,8 @@ def success_snapshot(kind: SourceKind, source_id: str, label: str, lessons: list
     snapshot = {'schemaVersion': 1, 'source': 'vnau-mkr', 'sourceKind': kind,
                 'universityId': 'vsau', 'timeZone': 'Europe/Kyiv', key: source_id,
                 ('groupName' if kind == 'group' else 'teacherName'): label, 'status': 'success', 'lastCheckedAt': checked,
-                'lastSuccessAt': checked, 'lessons': lessons}
+                'lastSuccessAt': checked, 'coverageStart': coverage_start, 'coverageEnd': coverage_end,
+                'lessons': lessons}
     return validate_snapshot(snapshot, kind, source_id)
 
 def failure_snapshot(kind: SourceKind, source_id: str, label: str, previous: dict[str, Any] | None, *, checked_at: str | None = None) -> dict[str, Any]:
@@ -136,6 +155,8 @@ def failure_snapshot(kind: SourceKind, source_id: str, label: str, previous: dic
                 'lessons': keep['lessons'] if keep else []}
     if keep:
         snapshot['lastSuccessAt'] = keep['lastSuccessAt']
+        snapshot['coverageStart'] = keep['coverageStart']
+        snapshot['coverageEnd'] = keep['coverageEnd']
     return validate_snapshot(snapshot, kind, source_id)
 
 def write_snapshot(path: Path, snapshot: dict[str, Any], kind: SourceKind, source_id: str) -> None:
