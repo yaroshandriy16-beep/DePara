@@ -1,0 +1,135 @@
+name: VNAU manual diagnostic (safe)
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Inspect form first. Use fetch after verifying real VNAU IDs.'
+        type: choice
+        required: true
+        default: inspect
+        options:
+          - inspect
+          - inspect-teachers
+          - fetch
+          - fetch-teacher
+          - pilot
+      structure_id:
+        description: 'Actual TimeTableForm[structureId] (fetch mode)'
+        required: false
+        type: string
+      faculty_id:
+        description: 'Actual TimeTableForm[facultyId] (fetch mode)'
+        required: false
+        type: string
+      course:
+        description: 'Actual TimeTableForm[course] (fetch mode)'
+        required: false
+        type: string
+      group_id:
+        description: 'Actual TimeTableForm[groupId] (fetch mode)'
+        required: false
+        type: string
+      pilot_group_id:
+        description: 'Verified pilot group ID (3641 or 3878; optional)'
+        required: false
+        type: string
+      pilot_teacher_id:
+        description: 'Verified pilot teacher ID (1847 or 2264; optional)'
+        required: false
+        type: string
+      teacher_id:
+        description: 'Verified public teacher ID (fetch-teacher mode)'
+        required: false
+        type: string
+      group_label:
+        description: 'Readable group, e.g. ЕІ-23-1 (fetch mode)'
+        required: false
+        type: string
+      date_start:
+        description: 'DD.MM.YYYY, blank = today (fetch mode)'
+        required: false
+        type: string
+      date_end:
+        description: 'DD.MM.YYYY, blank = 7 days after today (fetch mode)'
+        required: false
+        type: string
+
+  push:
+    branches: [main]
+    paths: ['.github/vnau-diagnostic-trigger']
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install minimal parser dependencies
+        run: pip install -r requirements-vnau.txt
+      - name: Run offline tests
+        run: python -m unittest discover -s tests -p 'test_vnau_*.py' -v
+      - name: Probe the public VNAU group schedule (one GET or one GET + one POST)
+        shell: bash
+        env:
+          MODE: ${{ inputs.mode || 'pilot' }}
+          STRUCTURE_ID: ${{ inputs.structure_id }}
+          FACULTY_ID: ${{ inputs.faculty_id }}
+          COURSE: ${{ inputs.course }}
+          GROUP_ID: ${{ inputs.group_id }}
+          TEACHER_ID: ${{ inputs.teacher_id }}
+          PILOT_GROUP_ID: ${{ inputs.pilot_group_id || '3641' }}
+          PILOT_TEACHER_ID: ${{ inputs.pilot_teacher_id || '1847' }}
+          GROUP_LABEL: ${{ inputs.group_label }}
+          DATE_START: ${{ inputs.date_start }}
+          DATE_END: ${{ inputs.date_end }}
+        run: |
+          set -euo pipefail
+          if [[ "$MODE" == 'inspect' ]]; then
+            python -m integrations.vnau.cli --inspect --output out/vnau-public-form-fields.json
+          elif [[ "$MODE" == 'inspect-teachers' ]]; then
+            python -m integrations.vnau.cli --inspect-teachers --output out/vnau-teacher-public-form-fields.json
+          elif [[ "$MODE" == 'fetch' ]]; then
+            [[ -n "$FACULTY_ID" && -n "$COURSE" && -n "$GROUP_ID" && -n "$GROUP_LABEL" ]] || { echo 'Missing real IDs; first use inspect'; exit 2; }
+            DATE_START="${DATE_START:-$(TZ=Europe/Kyiv date +%d.%m.%Y)}"
+            DATE_END="${DATE_END:-$(TZ=Europe/Kyiv date -d '+7 days' +%d.%m.%Y)}"
+            python -m integrations.vnau.cli --fetch \
+              --structure-id "$STRUCTURE_ID" --faculty-id "$FACULTY_ID" \
+              --course "$COURSE" --group-id "$GROUP_ID" \
+              --group-label "$GROUP_LABEL" --start "$DATE_START" --end "$DATE_END" \
+              --output out/vnau-schedule.json --sample out/vnau-sanitized-tables.html
+          elif [[ "$MODE" == 'fetch-teacher' ]]; then
+            [[ "$TEACHER_ID" =~ ^[0-9]+$ ]] || { echo 'Missing verified teacher ID'; exit 2; }
+            DATE_START="${DATE_START:-$(TZ=Europe/Kyiv date +%d.%m.%Y)}"
+            DATE_END="${DATE_END:-$(TZ=Europe/Kyiv date -d '+7 days' +%d.%m.%Y)}"
+            python -m integrations.vnau.cli --fetch-teacher \
+              --teacher-id "$TEACHER_ID" --start "$DATE_START" --end "$DATE_END" \
+              --output out/vnau-teacher-schedule.json
+          elif [[ "$MODE" == 'pilot' ]]; then
+            [[ -n "$PILOT_GROUP_ID" || -n "$PILOT_TEACHER_ID" ]] || { echo 'Choose a verified pilot group or teacher ID'; exit 2; }
+            DATE_START="${DATE_START:-$(TZ=Europe/Kyiv date +%d.%m.%Y)}"
+            DATE_END="${DATE_END:-$(TZ=Europe/Kyiv date -d '+7 days' +%d.%m.%Y)}"
+            START_ISO="$(date -d "${DATE_START:6:4}-${DATE_START:3:2}-${DATE_START:0:2}" +%F)"
+            END_ISO="$(date -d "${DATE_END:6:4}-${DATE_END:3:2}-${DATE_END:0:2}" +%F)"
+            args=(--start "$START_ISO" --end "$END_ISO" --output-dir out/vnau-pilot)
+            [[ -z "$PILOT_GROUP_ID" ]] || args+=(--group "$PILOT_GROUP_ID")
+            [[ -z "$PILOT_TEACHER_ID" ]] || args+=(--teacher "$PILOT_TEACHER_ID")
+            python -m integrations.vnau.pilot "${args[@]}"
+          else
+            echo 'Invalid mode'; exit 2
+          fi
+      - name: Upload sanitized diagnostic (never raw source, CSRF, or cookies)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vnau-safe-diagnostic
+          path: out/
+          if-no-files-found: ignore
+          retention-days: 2
+# Deliberately no cron until a live source and a working parser are verified.
