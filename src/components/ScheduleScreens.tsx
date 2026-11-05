@@ -1,60 +1,75 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import type { Lesson } from '../data/schedule'
 import './ScheduleScreens.css'
 
-// University-specific academic week rules will belong to a future schedule source.
+/** A real academic calendar will determine this value when a source provides it. */
 export type AcademicWeek = 'numerator' | 'denominator' | 'unknown'
+export type ScheduleViewMode = 'week' | 'month'
+interface ScheduleScreenProps {
+  lessons: Lesson[]
+  scheduleAvailable?: boolean
+  topbar: ReactNode
+  statusControl: ReactNode
+  shareControl: (selected: Date, mode: ScheduleViewMode) => ReactNode
+}
 
-const dayNames = ['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'нд']
+const weekdayNames = ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'НД']
 const fullDate = new Intl.DateTimeFormat('uk-UA', { day: 'numeric', month: 'long', weekday: 'long' })
-const monthName = new Intl.DateTimeFormat('uk-UA', { month: 'long', year: 'numeric' })
+const monthDate = new Intl.DateTimeFormat('uk-UA', { month: 'long', year: 'numeric' })
 const shortDate = new Intl.DateTimeFormat('uk-UA', { day: 'numeric', month: 'long' })
 const sameDay = (a: Date, b: Date) => a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate()
 const addDays = (date: Date, amount: number) => new Date(date.getFullYear(), date.getMonth(), date.getDate() + amount)
-const startOfWeek = (date: Date) => addDays(date, -(date.getDay() + 6) % 7)
-const lessonsForDate = (lessons: Lesson[], date: Date) => lessons.filter(lesson => lesson.day === date.getDay()).sort((a, b) => a.startsAt.localeCompare(b.startsAt))
+const startOfWeek = (date: Date) => addDays(date, -((date.getDay() + 6) % 7))
 const minutes = (time: string) => { const [hours, mins] = time.split(':').map(Number); return hours * 60 + mins }
+const lessonCount = (count: number) => `${count} ${count === 1 ? 'пара' : count >= 2 && count <= 4 ? 'пари' : 'пар'}`
 
-function Icon({ name, size = 17 }: { name: 'pin' | 'person' | 'share' | 'calendar' | 'sun' | 'left' | 'right' | 'close'; size?: number }) {
-  const paths = {
-    pin: <><path d="M19 10c0 5-7 10-7 10s-7-5-7-10a7 7 0 1 1 14 0Z"/><circle cx="12" cy="10" r="2"/></>,
-    person: <><circle cx="12" cy="8" r="3.3"/><path d="M5.5 20a6.5 6.5 0 0 1 13 0"/></>,
-    share: <><path d="M12 15V3m-4 4 4-4 4 4"/><path d="M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></>,
-    calendar: <><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v4m10-4v4M3 10h18"/></>,
-    sun: <><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.4 1.4m11.2 11.2L19 19M19 5l-1.4 1.4M6.4 17.6 5 19"/></>,
-    left: <path d="m15 6-6 6 6 6"/>, right: <path d="m9 6 6 6-6 6"/>, close: <path d="M6 6l12 12M18 6 6 18"/>,
-  }
-  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name]}</svg>
-}
+function InfoIcon() { return <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8v1"/></svg> }
 
-function LessonList({ lessons, currentDate, now }: { lessons: Lesson[]; currentDate: Date; now: Date }) {
-  const currentMinute = now.getHours() * 60 + now.getMinutes()
-  return <div className="sc-lessons">{lessons.map(lesson => {
-    const active = sameDay(currentDate, now) && minutes(lesson.startsAt) <= currentMinute && currentMinute < minutes(lesson.endsAt)
-    return <article key={lesson.id} className={`sc-lesson${active ? ' sc-lesson-active' : ''}`}>
-      <div className="sc-time"><strong>{lesson.startsAt}</strong><span>{lesson.endsAt}</span></div>
-      <div className={`sc-line sc-line-${lesson.color}`}/>
-      <div className="sc-lesson-main"><div className="sc-lesson-top"><span className="sc-type">{lesson.type}</span>{active && <span className="sc-now"><i/> ЗАРАЗ</span>}</div><h3>{lesson.title}</h3><div className="sc-details"><span><Icon name="person" size={14}/>{lesson.teacher}</span><span><Icon name="pin" size={14}/>{lesson.location}</span></div></div>
-    </article>
-  })}</div>
-}
-
-function EmptyDay({ onOpenSchedule }: { onOpenSchedule?: () => void }) {
-  return <div className="sc-empty"><span className="sc-empty-icon"><Icon name="calendar" size={23}/></span><h3>На цей день занять немає</h3><p>У демонстраційному розкладі тут вільно.</p>{onOpenSchedule && <button onClick={onOpenSchedule}>Переглянути інші дні <span aria-hidden="true">→</span></button>}</div>
-}
-
-export function ScheduleScreen({ lessons, scheduleAvailable = true }: { lessons: Lesson[]; scheduleAvailable?: boolean }) {
+export function ScheduleScreen({ lessons, scheduleAvailable = true, topbar, statusControl, shareControl }: ScheduleScreenProps) {
   const [selected, setSelected] = useState(() => new Date())
-  const [mode, setMode] = useState<'week' | 'month'>('week')
+  const [mode, setMode] = useState<ScheduleViewMode>('week')
   const [now, setNow] = useState(() => new Date())
   useEffect(() => { const timer = window.setInterval(() => setNow(new Date()), 30000); return () => window.clearInterval(timer) }, [])
+
   const weekStart = startOfWeek(selected)
   const monthStart = new Date(selected.getFullYear(), selected.getMonth(), 1)
   const monthEnd = new Date(selected.getFullYear(), selected.getMonth() + 1, 0)
   const gridStart = startOfWeek(monthStart)
-  const gridLength = Math.ceil(((monthStart.getDay() + 6) % 7 + monthEnd.getDate()) / 7) * 7
+  const gridLength = Math.max(35, Math.ceil(((monthStart.getDay() + 6) % 7 + monthEnd.getDate()) / 7) * 7)
   const shownDays = mode === 'week' ? Array.from({ length: 7 }, (_, i) => addDays(weekStart, i)) : Array.from({ length: gridLength }, (_, i) => addDays(gridStart, i))
   const shift = (amount: number) => setSelected(current => mode === 'week' ? addDays(current, amount * 7) : new Date(current.getFullYear(), current.getMonth() + amount, 1))
-  const dayLessons = lessonsForDate(lessons, selected)
-  return <div className="sc-page"><div className="sc-heading"><div><span className="sc-kicker">ТВІЙ НАВЧАЛЬНИЙ ЧАС</span><h1>Розклад</h1><p>Обери день, щоб побачити заняття</p></div></div><div className="sc-calendar"><div className="sc-calendar-top"><div className="sc-segment" aria-label="Вигляд календаря"><button className={mode === 'week' ? 'sc-segment-active' : ''} aria-pressed={mode === 'week'} onClick={() => setMode('week')}>Тиждень</button><button className={mode === 'month' ? 'sc-segment-active' : ''} aria-pressed={mode === 'month'} onClick={() => setMode('month')}>Місяць</button></div><button className="sc-today-button" onClick={() => setSelected(new Date())}>Сьогодні</button></div><div className="sc-month-bar"><button className="sc-icon-button" aria-label={mode === 'week' ? 'Попередній тиждень' : 'Попередній місяць'} onClick={() => shift(-1)}><Icon name="left"/></button><strong>{mode === 'week' && weekStart.getMonth() !== addDays(weekStart, 6).getMonth() ? `${shortDate.format(weekStart)} – ${shortDate.format(addDays(weekStart, 6))}` : monthName.format(selected)}</strong><button className="sc-icon-button" aria-label={mode === 'week' ? 'Наступний тиждень' : 'Наступний місяць'} onClick={() => shift(1)}><Icon name="right"/></button></div><div className="sc-weekdays" aria-hidden="true">{dayNames.map(day => <span key={day}>{day}</span>)}</div><div className={`sc-dates sc-dates-${mode}`}>{shownDays.map(day => <button key={day.toISOString()} className={`${sameDay(day, selected) ? 'sc-date-selected' : ''} ${day.getMonth() !== selected.getMonth() && mode === 'month' ? 'sc-date-outside' : ''} ${sameDay(day, now) ? 'sc-date-today' : ''}`} onClick={() => setSelected(day)} aria-label={fullDate.format(day)} aria-pressed={sameDay(day, selected)}><span>{day.getDate()}</span>{lessons.some(lesson => lesson.day === day.getDay()) && <i/>}</button>)}</div><div className="sc-week-info">Чисельник / знаменник <span>не налаштовано</span></div></div><div className="sc-section-title"><div><h2>{fullDate.format(selected)}</h2><p>Демонстраційні заняття</p></div><span className="sc-count">{dayLessons.length}</span></div>{!scheduleAvailable ? <div className="sc-empty"><h3>Дані недоступні</h3><p>Демонстраційного розкладу для цієї групи поки немає.</p></div> : dayLessons.length ? <LessonList lessons={dayLessons} currentDate={selected} now={now}/> : <EmptyDay/>}<p className="sc-demo-foot">Заняття вигадані та повторюються за днями тижня. Це не розклад ВНАУ.</p></div>
+  const dayLessons = lessons.filter(lesson => lesson.day === selected.getDay()).sort((a, b) => a.startsAt.localeCompare(b.startsAt))
+  const minute = now.getHours() * 60 + now.getMinutes()
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const rangeTitle = mode === 'month' ? monthDate.format(selected) : `${shortDate.format(weekStart)} — ${shortDate.format(addDays(weekStart, 6))}`
+
+  return <div className="td-screen planner-screen">
+    {topbar}
+    <section className="planner-heading" aria-label="Розклад">
+      <div className="planner-title-row"><h1>Розклад</h1>{statusControl}</div>
+    </section>
+    <div className="planner-switch" role="group" aria-label="Режим календаря">
+      <button type="button" className={mode === 'week' ? 'active' : ''} aria-pressed={mode === 'week'} onClick={() => setMode('week')}>Тиждень</button>
+      <button type="button" className={mode === 'month' ? 'active' : ''} aria-pressed={mode === 'month'} onClick={() => setMode('month')}>Місяць</button>
+    </div>
+    <section aria-label="Календар розкладу">
+      <div className="planner-range">
+        <div><strong>{rangeTitle}</strong><small>{mode === 'month' ? 'Перегляд усього місяця' : 'Перегляд тижня'}</small></div>
+        <div className="planner-arrows"><button type="button" aria-label={mode === 'week' ? 'Попередній тиждень' : 'Попередній місяць'} onClick={() => shift(-1)}>‹</button><button type="button" aria-label={mode === 'week' ? 'Наступний тиждень' : 'Наступний місяць'} onClick={() => shift(1)}>›</button></div>
+      </div>
+      <div className="planner-days-label" aria-hidden="true">{weekdayNames.map(day => <span key={day}>{day}</span>)}</div>
+      <div className="planner-days">{shownDays.map(day => <button key={`${day.getFullYear()}-${day.getMonth()}-${day.getDate()}`} type="button" className={`planner-date${sameDay(day, selected) ? ' selected' : ''}${sameDay(day, now) ? ' today' : ''}${mode === 'month' && day.getMonth() !== selected.getMonth() ? ' outside' : ''}`} aria-label={fullDate.format(day)} aria-pressed={sameDay(day, selected)} onClick={() => setSelected(day)}><em>{day.getDate()}</em>{scheduleAvailable && lessons.some(lesson => lesson.day === day.getDay()) && <span className="planner-dot"/>}</button>)}</div>
+    </section>
+    <div className="planner-hint"><InfoIcon/><span>Заняття демонстраційні. Чисельник, знаменник і зміни розкладу — недоступно до підключення розкладу.</span></div>
+    <section aria-label="Заняття на вибраний день">
+      <div className="planner-lesson-head"><div><h2>Заняття</h2><p>{fullDate.format(selected)}</p></div><span className="pill">{scheduleAvailable ? lessonCount(dayLessons.length) : '—'}</span></div>
+      {!scheduleAvailable ? <div className="planner-empty"><strong>Дані недоступні</strong>Демонстраційного розкладу для цієї групи поки немає.</div> : !dayLessons.length ? <div className="planner-empty"><strong>На цей день занять немає</strong>У демонстраційному розкладі тут вільно.</div> : <div className="planner-list">{dayLessons.map(lesson => {
+        const active = sameDay(selected, now) && minutes(lesson.startsAt) <= minute && minute < minutes(lesson.endsAt)
+        const past = selected < startOfToday || (sameDay(selected, now) && minutes(lesson.endsAt) <= minute)
+        return <article key={lesson.id} className={`planner-item${active ? ' active' : past ? ' past' : ''}`}><div className="planner-lesson"><div className="planner-time"><span>{lesson.startsAt} — {lesson.endsAt}</span>{active && <span className="now-tag">ЗАРАЗ</span>}</div><h3>{lesson.title}</h3><div className="planner-details"><span>{lesson.type}</span><span>{lesson.teacher}</span><span>{lesson.location}</span></div></div></article>
+      })}</div>}
+      {shareControl(selected, mode)}
+      <div className="planner-legend">Можна поділитися цілим тижнем або місяцем</div>
+    </section>
+  </div>
 }
