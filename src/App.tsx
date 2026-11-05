@@ -4,7 +4,9 @@ import { getTelegramProfile, initTelegram } from './lib/telegram'
 import { Onboarding } from './onboarding/Onboarding'
 import { clearSelection, loadSelection, saveSelection, type UserSelection } from './onboarding/catalog'
 import { ScheduleScreen } from './components/ScheduleScreens'
-import { TodayScreen } from './components/TodayScreen'
+import { TodayScreen, GroupMenu } from './components/TodayScreen'
+import { SyncStatus } from './components/SyncStatus'
+import { ScheduleShare } from './components/ScheduleShare'
 import { useWeather, WeatherBackdrop, WeatherControl } from './components/Weather'
 import { useSavedGroups } from './onboarding/groups'
 import { GroupPicker } from './onboarding/GroupPicker'
@@ -50,14 +52,18 @@ function App() {
   const tabs = selection?.role === 'teacher' ? teacherTabs : studentTabs
   const visibleLessons = selection?.role === 'teacher' ? lessons.filter(lesson => lesson.teacher === selection.teacher) : lessons.filter(lesson => lesson.group === activeGroup?.group)
   const scheduleAvailable = selection?.role === 'teacher' || lessons.some(lesson => lesson.group === activeGroup?.group)
-  const isToday = Boolean(selection && tab === 'today')
+  const isToday = Boolean(selection && (tab === 'today' || tab === 'schedule'))
+  const selectedGroup = selection?.role === 'student' ? activeGroup?.group || '' : selection?.teacher || 'Викладач'
+  const groupProps = { activeGroup: selectedGroup, groups: groups.map(group => ({id:group.id,label:group.group,detail:group.university})), onSelectGroup: selectGroup, onAddGroup: () => setShowGroupPicker(true) }
+  const statusControl = <SyncStatus sourceKind={demoSchedule.kind} groupId={activeGroup?.id || selectedGroup}/>
+  const weatherControl = <WeatherControl weather={weather} effects={appearance.weather} animations={appearance.animations} onEffectsChange={weatherEffects => updateAppearance({...appearance, weather:weatherEffects})} onAnimationsChange={animations => updateAppearance({...appearance, animations})}/>
   return <div className={`app theme-${appearance.theme} style-${appearance.style} ${appearance.animations ? '' : 'reduce-motion'} ${isToday ? 'is-today' : ''}`}>
     {isToday && <WeatherBackdrop weather={weather} effects={appearance.weather} animations={appearance.animations}/>}
     {!selection ? <Onboarding onComplete={complete}/> : <>
       <main className="content">
-        {tab !== 'today' && <header className="app-header"><div className="brand"><span className="brand-mark">д<span>.</span></span><span>де<span className="brand-accent">пара</span><small>{appearance.style === 'strict' ? 'ТВІЙ НАВЧАЛЬНИЙ ПРОСТІР' : 'ORIGINAL'}</small></span></div><button className="avatar" onClick={() => setTab('profile')} aria-label="Відкрити профіль">{profile?.photoUrl ? <img src={profile.photoUrl} alt=""/> : <Icon name="profile"/>}</button></header>}
-        {tab === 'today' && <TodayScreen lessons={visibleLessons} scheduleAvailable={scheduleAvailable} activeGroup={selection.role === 'student' ? activeGroup?.group || '' : selection.teacher || 'Викладач'} groups={groups.map(group => ({id:group.id,label:group.group,detail:group.university}))} onSelectGroup={selectGroup} onAddGroup={() => setShowGroupPicker(true)} weatherControl={<WeatherControl weather={weather} effects={appearance.weather} animations={appearance.animations} onEffectsChange={weatherEffects => updateAppearance({...appearance, weather:weatherEffects})} onAnimationsChange={animations => updateAppearance({...appearance, animations})}/>}/>}
-        {tab === 'schedule' && <ScheduleScreen lessons={visibleLessons} scheduleAvailable={scheduleAvailable}/>}
+        {!isToday && <header className="app-header"><div className="brand"><span className="brand-mark">д<span>.</span></span><span>де<span className="brand-accent">пара</span><small>{appearance.style === 'strict' ? 'ТВІЙ НАВЧАЛЬНИЙ ПРОСТІР' : 'ORIGINAL'}</small></span></div><button className="avatar" onClick={() => setTab('profile')} aria-label="Відкрити профіль">{profile?.photoUrl ? <img src={profile.photoUrl} alt=""/> : <Icon name="profile"/>}</button></header>}
+        {tab === 'today' && <TodayScreen lessons={visibleLessons} scheduleAvailable={scheduleAvailable} {...groupProps} weatherControl={weatherControl} statusControl={statusControl}/>}
+        {tab === 'schedule' && <ScheduleScreen lessons={visibleLessons} scheduleAvailable={scheduleAvailable} topbar={<header className="td-topbar"><GroupMenu {...groupProps}/>{weatherControl}</header>} statusControl={statusControl} shareControl={(selected) => <ScheduleShare lessons={visibleLessons} group={selectedGroup} selectedDate={selected} scheduleAvailable={scheduleAvailable}/>}/>}
         {tab === 'notebook' && <NotebookScreen/>}
         {tab === 'communities' && <CommunitiesScreen/>}
         {tab === 'window' && <WindowScreen lessons={lessons} teacher={selection.teacher ?? ""}/>}
