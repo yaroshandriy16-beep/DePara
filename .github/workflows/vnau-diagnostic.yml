@@ -55,10 +55,6 @@ on:
         required: false
         type: string
 
-  push:
-    branches: [main]
-    paths: ['.github/vnau-diagnostic-trigger']
-
 permissions:
   contents: read
 
@@ -78,14 +74,14 @@ jobs:
       - name: Probe the public VNAU group schedule (one GET or one GET + one POST)
         shell: bash
         env:
-          MODE: ${{ inputs.mode || 'pilot' }}
+          MODE: ${{ inputs.mode }}
           STRUCTURE_ID: ${{ inputs.structure_id }}
           FACULTY_ID: ${{ inputs.faculty_id }}
           COURSE: ${{ inputs.course }}
           GROUP_ID: ${{ inputs.group_id }}
           TEACHER_ID: ${{ inputs.teacher_id }}
-          PILOT_GROUP_ID: ${{ inputs.pilot_group_id || '3641' }}
-          PILOT_TEACHER_ID: ${{ inputs.pilot_teacher_id || '1847' }}
+          PILOT_GROUP_ID: ${{ inputs.pilot_group_id }}
+          PILOT_TEACHER_ID: ${{ inputs.pilot_teacher_id }}
           GROUP_LABEL: ${{ inputs.group_label }}
           DATE_START: ${{ inputs.date_start }}
           DATE_END: ${{ inputs.date_end }}
