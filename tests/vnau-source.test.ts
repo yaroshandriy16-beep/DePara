@@ -9,7 +9,13 @@ const originalFetch = globalThis.fetch
 const originalStorage = Object.getOwnPropertyDescriptor(globalThis, 'localStorage')
 function setup() {
   const storage = new Map<string, string>()
-  Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: { getItem: (key: string) => storage.get(key) ?? null, setItem: (key: string, value: string) => storage.set(key, value) } })
+  Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: {
+    get length() { return storage.size },
+    key: (index: number) => [...storage.keys()][index] ?? null,
+    getItem: (key: string) => storage.get(key) ?? null,
+    setItem: (key: string, value: string) => storage.set(key, value),
+    removeItem: (key: string) => storage.delete(key),
+  } })
   return new VnauScheduleSource(group, 'https://example.test/group-42.json')
 }
 afterEach(() => {
@@ -151,4 +157,59 @@ test('lesson metadata is preserved and invalid source metadata is rejected', asy
   const rejected = await source.load()
   assert.equal(rejected.status, 'error')
   assert.equal(rejected.lessons[0].updatedIndicator, true)
+})
+
+test('old schedule copies are bounded without deleting profile settings or the current copy', async () => {
+  const source = setup(), now = Date.now()
+  localStorage.setItem('depara-selection-v2', 'profile selection')
+  for (let i = 0; i < 25; i++) localStorage.setItem(`depara-vnau-v1:group:${100 + i}`, JSON.stringify({version: 1, snapshot, lastUsedAt: now - (i + 1) * 86400000}))
+  localStorage.setItem('depara-vnau-v1:group:999', JSON.stringify({version: 1, snapshot, lastUsedAt: now - 31 * 86400000}))
+  globalThis.fetch = async () => new Response(JSON.stringify(snapshot))
+  assert.equal((await source.load()).hasConfirmedData, true)
+  const keys = Array.from({length: localStorage.length}, (_, index) => localStorage.key(index)!).filter(key => key.startsWith('depara-vnau-v1:'))
+  assert.ok(keys.length <= 20)
+  assert.ok(keys.includes('depara-vnau-v1:group:42'))
+  assert.ok(!keys.includes('depara-vnau-v1:group:999'))
+  assert.equal(localStorage.getItem('depara-selection-v2'), 'profile selection')
+  globalThis.fetch = async () => { throw new Error('offline') }
+  assert.equal((await source.load()).lessons.length, 2)
+})
+
+test('an old confirmed schedule remains available when the source is offline', async () => {
+  const source = setup()
+  globalThis.fetch = async () => new Response(JSON.stringify(snapshot))
+  await source.load()
+  const cacheKey = 'depara-vnau-v1:group:42'
+  const entry = JSON.parse(localStorage.getItem(cacheKey)!)
+  entry.lastUsedAt = Date.now() - 40 * 86400000
+  localStorage.setItem(cacheKey, JSON.stringify(entry))
+  globalThis.fetch = async () => { throw new Error('offline') }
+  const cached = await source.load()
+  assert.equal(cached.status, 'error')
+  assert.equal(cached.lessons.length, 2)
+  assert.ok(localStorage.getItem(cacheKey))
+})
+
+test('daily usage sampling does not expire a schedule before 30 days of inactivity', async () => {
+  const source = setup(), now = Date.now()
+  const retained = 'depara-vnau-v1:group:100', expired = 'depara-vnau-v1:group:101'
+  localStorage.setItem(retained, JSON.stringify({version: 1, snapshot, lastUsedAt: now - 30.5 * 86400000}))
+  localStorage.setItem(expired, JSON.stringify({version: 1, snapshot, lastUsedAt: now - 32 * 86400000}))
+  globalThis.fetch = async () => new Response(JSON.stringify(snapshot))
+  await source.load()
+  assert.ok(localStorage.getItem(retained))
+  assert.equal(localStorage.getItem(expired), null)
+})
+
+test('an oversized result does not replace the last confirmed offline copy', async () => {
+  const source = setup()
+  globalThis.fetch = async () => new Response(JSON.stringify(snapshot))
+  await source.load()
+  const bigLessons = Array.from({length: 1100}, (_, index) => ({...lesson, sourceId: `large-${index}`, subject: 'x'.repeat(1000)}))
+  globalThis.fetch = async () => new Response(JSON.stringify({...snapshot, lessons: bigLessons}))
+  assert.equal((await source.load()).lessons.length, 1100)
+  globalThis.fetch = async () => { throw new Error('offline') }
+  const cached = await source.load()
+  assert.equal(cached.status, 'error')
+  assert.equal(cached.lessons.length, 2)
 })

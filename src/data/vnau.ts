@@ -25,7 +25,7 @@ export interface VnauResult {
 }
 
 type RecordValue = Record<string, unknown>
-type CacheEntry = { version: 1; snapshot: VnauSnapshot }
+type CacheEntry = { version: 1; snapshot: VnauSnapshot; lastUsedAt?: number }
 type VnauSnapshot = {
   schemaVersion: 1
   source: 'vnau-mkr'
@@ -44,6 +44,11 @@ type VnauSnapshot = {
   lessons: Lesson[]
 }
 const CACHE_PREFIX = 'depara-vnau-v1:'
+// These are limits for disposable schedule copies, never for profile settings.
+const CACHE_MAX_ENTRIES = 20
+const CACHE_MAX_BYTES = 1024 * 1024
+const CACHE_IDLE_MS = 30 * 24 * 60 * 60 * 1000
+const CACHE_TOUCH_MS = 24 * 60 * 60 * 1000
 const sourceKinds = ['success', 'loading', 'error', 'unknown'] as const
 const own = (value: unknown): value is RecordValue => typeof value === 'object' && value !== null && !Array.isArray(value)
 const text = (value: unknown): value is string => typeof value === 'string' && value.trim().length > 0 && value.length <= 1024
@@ -130,19 +135,68 @@ function parseSnapshot(value: unknown, selection: VnauSelection, range?: VnauDat
 
 function loadCached(selection: VnauSelection, range?: VnauDateRange): VnauSnapshot | null {
   try {
-    const data: unknown = JSON.parse(localStorage.getItem(key(selection, range)) || 'null')
+    const cacheKey = key(selection, range)
+    const data: unknown = JSON.parse(localStorage.getItem(cacheKey) || 'null')
     if (!own(data) || data.version !== 1 || !own(data.snapshot)) return null
     // Cached lessons use the app model: validate by converting back to the raw format.
     const s = data.snapshot
     if (!Array.isArray(s.lessons)) return null
     const normalized = { ...s, lessons: s.lessons.map(item => own(item) ? { ...item, startTime: item.startsAt, endTime: item.endsAt, subject: item.title, room: item.location } : item) }
     const parsed = parseSnapshot(normalized, selection, range)
-    return parsed?.status === 'success' && parsed.lastSuccessAt ? parsed : null
+    if (parsed?.status !== 'success' || !parsed.lastSuccessAt) return null
+    const now = Date.now()
+    if (typeof data.lastUsedAt !== 'number' || now - data.lastUsedAt >= CACHE_TOUCH_MS) {
+      // Updating usage is optional; a full or unavailable browser store must
+      // never prevent the previously confirmed schedule from being displayed.
+      try { localStorage.setItem(cacheKey, JSON.stringify({ ...data, lastUsedAt: now })) } catch { /* optional */ }
+    }
+    return parsed
   } catch { return null }
 }
+
+function pruneCached(protectedKey: string, now: number): void {
+  try {
+    const entries: { key: string; used: number; bytes: number }[] = []
+    const encoder = new TextEncoder()
+    // Gather keys before deletion; localStorage indexes change on removal.
+    for (let index = 0; index < localStorage.length; index++) {
+      const cacheKey = localStorage.key(index)
+      if (!cacheKey?.startsWith(CACHE_PREFIX)) continue
+      const raw = localStorage.getItem(cacheKey)
+      if (raw === null) continue
+      let used = 0
+      try {
+        const data: unknown = JSON.parse(raw)
+        if (own(data) && typeof data.lastUsedAt === 'number' && Number.isFinite(data.lastUsedAt)) used = data.lastUsedAt
+        else if (own(data) && own(data.snapshot) && instant(data.snapshot.lastSuccessAt)) used = Date.parse(data.snapshot.lastSuccessAt)
+      } catch { /* malformed entries can be discarded */ }
+      entries.push({ key: cacheKey, used, bytes: encoder.encode(cacheKey).byteLength + encoder.encode(raw).byteLength })
+    }
+    let remaining = entries.length
+    let bytes = entries.reduce((sum, entry) => sum + entry.bytes, 0)
+    for (const entry of entries.sort((a, b) => a.used - b.used)) {
+      if (entry.key === protectedKey) continue
+      // Usage updates are sampled daily, so leave a day's margin before expiry.
+      const expired = now >= entry.used && now - entry.used >= CACHE_IDLE_MS + CACHE_TOUCH_MS
+      if (!expired && remaining <= CACHE_MAX_ENTRIES && bytes <= CACHE_MAX_BYTES) continue
+      localStorage.removeItem(entry.key)
+      remaining--
+      bytes -= entry.bytes
+    }
+  } catch { /* best effort; never interfere with showing a schedule */ }
+}
+
 function saveCached(selection: VnauSelection, snapshot: VnauSnapshot, range?: VnauDateRange): void {
   if (snapshot.status !== 'success' || !snapshot.lastSuccessAt) return
-  try { localStorage.setItem(key(selection, range), JSON.stringify({ version: 1, snapshot } satisfies CacheEntry)) } catch { /* Storage is optional. */ }
+  const cacheKey = key(selection, range), now = Date.now()
+  const data = JSON.stringify({ version: 1, snapshot, lastUsedAt: now } satisfies CacheEntry)
+  // Do not evict useful previous data to make room for one oversized result.
+  if (new TextEncoder().encode(cacheKey).byteLength + new TextEncoder().encode(data).byteLength > CACHE_MAX_BYTES) return
+  try {
+    // Store first: if the browser rejects the write, older confirmed copies stay intact.
+    localStorage.setItem(cacheKey, data)
+    pruneCached(cacheKey, now)
+  } catch { /* Storage is optional. */ }
 }
 
 /**
