@@ -36,15 +36,6 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Clear the previous stalled Pages deployment
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          if gh api --method POST "repos/$GITHUB_REPOSITORY/pages/deployments/e219e340607e31235dea087ef7eba47d8663bce9/cancel" >/dev/null; then
-            echo "Requested cancellation of the stalled deployment."
-          else
-            echo "The cancellation request was not accepted; continuing to check Pages."
-          fi
       - id: deployment
         uses: actions/deploy-pages@v4
         with:
