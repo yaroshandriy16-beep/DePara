@@ -24,7 +24,8 @@ jobs:
       - run: npm ci
       - run: npm run build
         env:
-          VITE_VNAU_API_ORIGIN: ${{ vars.VITE_VNAU_API_ORIGIN }}
+          # Public test API origin; this is not a token or secret.
+          VITE_VNAU_API_ORIGIN: https://depara-vnau-test.yaroshandriy16.workers.dev
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
