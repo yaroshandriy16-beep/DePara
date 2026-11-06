@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { calendarDateKey, freeIntervals, kyivNow, lessonsOnDate, weekRange, type CalendarRange, type Lesson } from '../data/schedule'
 import type { TelegramDisplayProfile } from '../lib/telegram'
 import type { UserSelection } from '../onboarding/catalog'
+import type { VnauIdentity } from '../data/vnauApi'
+import { NotificationSettings } from './NotificationSettings'
 import './other-screens.css'
 
 export type Appearance = {
@@ -18,6 +20,7 @@ type ProfileProps = {
   appearance: Appearance
   onAppearanceChange: (next: Appearance) => void
   onChangeSelection: () => void
+  identity: VnauIdentity | null
 }
 
 function ScreenHeading({ label, title, description }: { label: string; title: string; description: string }) {
@@ -28,7 +31,7 @@ function PersonIcon() {
   return <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden="true"><circle cx="12" cy="8" r="3.6"/><path d="M4.7 20a7.3 7.3 0 0 1 14.6 0"/></svg>
 }
 
-export function ProfileScreen({ selection, profile, appearance, onAppearanceChange, onChangeSelection }: ProfileProps) {
+export function ProfileScreen({ selection, profile, appearance, onAppearanceChange, onChangeSelection, identity }: ProfileProps) {
   const update = (change: Partial<Appearance>) => onAppearanceChange({ ...appearance, ...change })
   const [photoFailed, setPhotoFailed] = useState(false)
   return <section className="other-screen">
@@ -54,6 +57,7 @@ export function ProfileScreen({ selection, profile, appearance, onAppearanceChan
       <label className="other-setting"><span><b>Сезонні ефекти</b><small>Для майбутніх ефектів</small></span><input type="checkbox" checked={appearance.seasonal} onChange={event => update({ seasonal: event.target.checked })}/></label>
       <label className="other-setting"><span><b>Анімації</b><small>Плавні переходи</small></span><input type="checkbox" checked={appearance.animations} onChange={event => update({ animations: event.target.checked })}/></label>
     </div>
+    <NotificationSettings identity={identity}/>
     <p className="other-footnote">Ім’я та фото Telegram використовуються лише для відображення. Налаштування зберігаються на цьому пристрої.</p>
   </section>
 }

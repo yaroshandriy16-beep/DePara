@@ -16,7 +16,7 @@ await mkdir(out, {recursive: true});
 await writeFile(path.join(out, 'preview.html'), page);
 await copyFile(path.join(dist, script), path.join(out, 'preview-js.txt'));
 await copyFile(path.join(dist, style), path.join(out, 'preview-css.txt'));
-for (const name of ['preview.mjs', 'worker.mjs', 'upstream.mjs', 'forms.mjs', 'matrix.mjs']) await copyFile(path.join(root, 'integrations', 'vnau', 'cloudflare', name), path.join(out, name));
+for (const name of ['preview.mjs', 'worker.mjs', 'upstream.mjs', 'forms.mjs', 'matrix.mjs', 'notifications.mjs']) await copyFile(path.join(root, 'integrations', 'vnau', 'cloudflare', name), path.join(out, name));
 // Reviewed deployment metadata only: preparing this file does not upload it.
 // Migrations are for a new test Worker and must not be reused to overwrite an existing Worker.
 const metadata = {
@@ -26,11 +26,15 @@ const metadata = {
     {type: 'durable_object_namespace', name: 'MKR_CACHE', class_name: 'SourceCache'},
     {type: 'durable_object_namespace', name: 'MKR_GATE', class_name: 'RateGate'},
   ],
+  // Do not erase the separately configured bot secret when uploading an update.
+  keep_bindings: ['secret_text'],
   migrations: {new_tag: 'v1', new_sqlite_classes: ['SourceCache', 'RateGate']},
   observability: {
     enabled: true, redact_query_string: true,
-    logs: {enabled: true, invocation_logs: true, head_sampling_rate: 0.1},
-    traces: {enabled: true, head_sampling_rate: 0.1},
+    // Telegram puts bot tokens in the outbound URL path; automatic traces
+    // capture full URLs, so disable tracing and request metadata in this test.
+    logs: {enabled: true, invocation_logs: false, head_sampling_rate: 0.1},
+    traces: {enabled: false},
   },
 };
 await writeFile(path.join(out, 'metadata.json'), `${JSON.stringify(metadata, null, 2)}\n`);

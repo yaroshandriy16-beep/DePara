@@ -18,7 +18,7 @@ const paths = new Map([
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
-    if (url.pathname.startsWith('/api/vnau/') || url.pathname === '/healthz') return api.fetch(request, env, ctx);
+    if (url.pathname.startsWith('/api/vnau/') || url.pathname.startsWith('/api/notifications/') || url.pathname === '/healthz') return api.fetch(request, env, ctx);
     if (!['GET', 'HEAD'].includes(request.method)) return new Response('Method not allowed', {status: 405});
     const asset = paths.get(url.pathname);
     if (!asset) return new Response('Not found', {status: 404});
@@ -27,5 +27,6 @@ export default {
       'Cache-Control': url.pathname === '/' ? 'no-store' : 'public, max-age=3600',
       'X-Content-Type-Options': 'nosniff',
     }});
-  }
+  },
+  scheduled(event, env, ctx) {return api.scheduled(event, env, ctx)}
 };

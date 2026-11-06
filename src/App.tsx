@@ -103,7 +103,7 @@ function App() {
         {tab === 'notebook' && <NotebookScreen/>}
         {tab === 'communities' && <CommunitiesScreen/>}
         {tab === 'window' && <WindowScreen lessons={visibleLessons} teacher={selection.teacher ?? ''} teacherId={selection.teacherId} sourceKind={sourceKind} scheduleAvailable={scheduleAvailable} loading={loading} stale={stale} lastSuccessAt={result?.lastSuccessAt} coverage={coverage} onRangeChange={onRangeChange}/>}
-        {tab === 'profile' && <ProfileScreen selection={selection} profile={profile} appearance={appearance} onAppearanceChange={updateAppearance} onChangeSelection={reset}/>}
+        {tab === 'profile' && <ProfileScreen selection={selection} profile={profile} appearance={appearance} onAppearanceChange={updateAppearance} onChangeSelection={reset} identity={identity}/>}
       </main>
       {showGroupPicker && <GroupPicker existingGroups={groups} onSelect={group => { addGroup(group); setShowGroupPicker(false) }} onCancel={() => setShowGroupPicker(false)}/>}
       <nav className="bottom-nav" aria-label="Основна навігація">{tabs.map(item => <button key={item.id} className={tab === item.id ? 'active' : ''} onClick={() => setTab(item.id)} aria-current={tab === item.id ? 'page' : undefined}><span className="nav-icon"><Icon name={item.id}/></span><span>{item.label}</span></button>)}</nav>

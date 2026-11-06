@@ -1,7 +1,8 @@
-/** Read-only VNAU API for Cloudflare Workers. No bot or cron is enabled here. */
+/** VNAU API and opt-in test-bot notifications for Cloudflare Workers. */
 import {DurableObject} from 'cloudflare:workers';
 import {SourceError} from './matrix.mjs';
 import {MkrSession, faculties, courses, groups, teachers, groupSchedule, teacherSchedule} from './upstream.mjs';
+import {NotificationError, NotificationStore, tokenFor, verifyTelegramInitData, verifyTestBot} from './notifications.mjs';
 
 const TWO_HOURS = 2 * 60 * 60 * 1000, ERROR_TTL = 10 * 60 * 1000;
 const CACHE_RETENTION = 30 * 24 * 60 * 60 * 1000, TOUCH_INTERVAL = 24 * 60 * 60 * 1000;
@@ -103,6 +104,7 @@ export class SourceCache extends DurableObject {
     super(ctx, env);
     this.inflight = new Map();
     this.ctx.storage.sql.exec('CREATE TABLE IF NOT EXISTS cache (key TEXT PRIMARY KEY, value TEXT NOT NULL, checked INTEGER NOT NULL, used INTEGER NOT NULL)');
+    this.notificationStore = new NotificationStore(ctx, env);
   }
   cacheKey(detail) {
     const owner = objectName(detail);
@@ -143,19 +145,32 @@ export class SourceCache extends DurableObject {
     const next = this.ctx.storage.sql.exec('SELECT MIN(used) AS oldest FROM cache').one().oldest;
     if (next !== null) await this.ctx.storage.setAlarm(Math.max(now + 60000, next + CACHE_RETENTION + TOUCH_INTERVAL));
   }
-  async get(detail) {
-    try {return {ok: true, value: await this.read(detail)}}
+  async get(detail, minimumCheckedAt = 0) {
+    try {return {ok: true, value: await this.read(detail, minimumCheckedAt)}}
     catch (error) {
       if (error instanceof ApiError) return {ok: false, status: error.status, message: error.message, retryAfter: error.retryAfter};
       if (error instanceof SourceError && error.message.startsWith('Забагато результатів.')) return {ok: false, status: 503, message: error.message};
       return {ok: false, status: 503, message: 'Джерело ВНАУ тимчасово недоступне.'};
     }
   }
-  async read(detail) {
+  async notification(action, userId, identity) {
+    try {
+      if (action === 'status') return {ok: true, value: this.notificationStore.status(userId)};
+      if (action === 'enable') return {ok: true, value: await this.notificationStore.enable(userId, identity)};
+      if (action === 'disable') return {ok: true, value: this.notificationStore.disable(userId)};
+      if (action === 'test') return {ok: true, value: await this.notificationStore.testMessage(userId)};
+      return {ok: false, status: 404, message: 'Адресу не знайдено.'};
+    } catch (error) {
+      if (error instanceof NotificationError) return {ok: false, status: error.status, message: error.message};
+      return {ok: false, status: 503, message: 'Сповіщення тимчасово недоступні.'};
+    }
+  }
+  async checkNotifications() {await this.notificationStore.tick()}
+  async read(detail, minimumCheckedAt = 0) {
     const key = this.cacheKey(detail), now = Date.now(), cached = this.entry(key);
     if (detail.type === 'schedule' && cached?.value?.sourceKind === 'group' && cached.value.groupName !== detail.name) throw new ApiError(400, 'Назва групи не відповідає ID.');
     const ttl = detail.type === 'schedule' ? (cached?.value?.status === 'success' ? TWO_HOURS : ERROR_TTL) : detail.type === 'teachers' ? 15 * 60 * 1000 : 6 * 60 * 60 * 1000;
-    if (cached && now >= cached.checked && now - cached.checked < ttl) {
+    if (cached && cached.checked >= minimumCheckedAt && now >= cached.checked && now - cached.checked < ttl) {
       await this.touched(key, cached, now);
       return cached.value;
     }
@@ -246,15 +261,51 @@ function objectName(detail) {
   return 'faculties';
 }
 
+async function notificationBody(request) {
+  if (!String(request.headers.get('content-type') || '').toLowerCase().startsWith('application/json')) throw new ApiError(400, 'Некоректний запит.');
+  const size = Number(request.headers.get('content-length'));
+  if (Number.isFinite(size) && size > 16384) throw new ApiError(413, 'Запит завеликий.');
+  if (!request.body) throw new ApiError(400, 'Некоректний запит.');
+  const reader = request.body.getReader(), chunks = [];
+  let length = 0;
+  try {
+    while (true) {
+      const {done, value} = await reader.read();
+      if (done) break;
+      length += value.byteLength;
+      if (length > 16384) {await reader.cancel(); throw new ApiError(413, 'Запит завеликий.')}
+      chunks.push(value);
+    }
+  } finally {reader.releaseLock()}
+  const bytes = new Uint8Array(length); let offset = 0;
+  for (const chunk of chunks) {bytes.set(chunk, offset); offset += chunk.byteLength}
+  try {
+    const value = JSON.parse(new TextDecoder('utf-8', {fatal: true}).decode(bytes));
+    if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('Invalid body');
+    return value;
+  } catch {throw new ApiError(400, 'Некоректний запит.')}
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url), origin = request.headers.get('Origin');
     const allowed = !origin || origin === SITE_ORIGIN || origin === url.origin;
     const headers = new Headers({'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff', 'Vary': 'Origin'});
-    if (origin && allowed) {headers.set('Access-Control-Allow-Origin', origin); headers.set('Access-Control-Allow-Methods', 'GET, OPTIONS'); headers.set('Access-Control-Expose-Headers', 'Retry-After')}
+    if (origin && allowed) {headers.set('Access-Control-Allow-Origin', origin); headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS'); headers.set('Access-Control-Allow-Headers', 'Content-Type'); headers.set('Access-Control-Expose-Headers', 'Retry-After')}
     try {
       if (!allowed) throw new ApiError(403, 'Джерело запиту не дозволене.');
       if (request.method === 'OPTIONS') return new Response(null, {status: 204, headers});
+      const notificationRoute = url.pathname.match(/^\/api\/notifications\/(status|enable|disable|test)$/);
+      if (notificationRoute) {
+        if (request.method !== 'POST') throw new ApiError(405, 'Дозволений лише POST-запит.');
+        const body = await notificationBody(request), token = tokenFor(env);
+        const userId = await verifyTelegramInitData(body.initData, token);
+        // Opting out and checking status must still work if Telegram is down.
+        if (notificationRoute[1] === 'enable' || notificationRoute[1] === 'test') await verifyTestBot(env);
+        const result = await env.MKR_CACHE.getByName('vnau-notifications').notification(notificationRoute[1], userId, body.identity);
+        if (!result.ok) throw new ApiError(result.status, result.message);
+        return Response.json(result.value, {headers});
+      }
       if (request.method !== 'GET') throw new ApiError(405, 'Дозволені лише запити на читання.');
       if (url.pathname === '/healthz') return Response.json({status: 'ok'}, {headers});
       const detail = route(url), cache = env.MKR_CACHE.getByName('vnau-shared-cache');
@@ -264,10 +315,14 @@ export default {
     } catch (error) {
       // RPC exceptions can cross a Durable Object boundary as ordinary Errors;
       // only fixed public messages are ever returned to the browser.
-      const status = error instanceof ApiError ? error.status : 503;
-      const message = error instanceof ApiError ? error.message : error instanceof SourceError && error.message.startsWith('Забагато результатів.') ? error.message : 'Джерело ВНАУ тимчасово недоступне.';
+      const status = error instanceof ApiError || error instanceof NotificationError ? error.status : 503;
+      const message = error instanceof ApiError || error instanceof NotificationError ? error.message : error instanceof SourceError && error.message.startsWith('Забагато результатів.') ? error.message : 'Джерело ВНАУ тимчасово недоступне.';
       if (error instanceof ApiError && error.retryAfter) headers.set('Retry-After', String(Math.min(120, error.retryAfter)));
       return Response.json({error: message}, {status, headers});
     }
+  },
+  scheduled(_controller, env, ctx) {
+    // No source request is made if nobody has enabled notifications.
+    ctx.waitUntil(env.MKR_CACHE.getByName('vnau-notifications').checkNotifications());
   }
 };

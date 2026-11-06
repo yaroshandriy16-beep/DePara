@@ -7,7 +7,13 @@ interface TelegramUser {
 interface TelegramWebApp {
   ready(): void
   expand(): void
+  initData?: string
   initDataUnsafe?: { user?: TelegramUser }
+}
+
+/** Sent to the server for signature verification; never use it as proof locally. */
+export function getTelegramInitData(): string {
+  return window.Telegram?.WebApp?.initData || ''
 }
 
 declare global {
