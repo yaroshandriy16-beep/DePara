@@ -38,3 +38,6 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          # Allow more time if GitHub Pages is processing a deployment slowly.
+          timeout: 1200000
