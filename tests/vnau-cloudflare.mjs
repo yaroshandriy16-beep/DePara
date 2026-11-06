@@ -1,6 +1,7 @@
 import {parseMatrix} from './matrix.mjs';
 import {options, readForm, readTeacherSearch, selected} from './forms.mjs';
 import {SourceCache} from './worker.mjs';
+import {MkrSession, verifyMkrAddress} from './upstream.mjs';
 
 const assert = (condition, message) => {if (!condition) throw new Error(message)};
 const equal = (actual, expected, message) => assert(JSON.stringify(actual) === JSON.stringify(expected), message);
@@ -64,6 +65,14 @@ export default {
     assert(selected(form, 'facultyId').id === '7' && form.fields._csrf === 'synthetic-token', 'Form selection failed');
     await rejects(() => readForm(formHtml.replace('/time-table/group?type=0', 'https://example.invalid/'), 'group'), 'Invalid form action was accepted');
     await rejects(() => readForm(formHtml.replace('name="csrf-token"', 'name="missing"'), 'group'), 'Missing CSRF was accepted');
+    const goodDns = async () => Response.json({Status: 0, Answer: [{type: 1, data: '81.30.162.30', TTL: 120}]});
+    assert(await verifyMkrAddress(goodDns) === 60, 'DNS verification exceeded its cache lifetime');
+    await rejects(() => verifyMkrAddress(async () => Response.json({Status: 0, Answer: [{type: 1, data: '192.0.2.1', TTL: 60}]})), 'Changed source address was accepted');
+    let target = '';
+    const session = new MkrSession(async function(url) {assert(this === undefined, 'Fetch was invoked with a session receiver'); target = url; return new Response(formHtml, {headers: {'content-type': 'text/html'}})});
+    await session.request('/time-table/group', {query: {type: '0'}});
+    assert(new URL(target).hostname === '81.30.162.30.sslip.io', 'Source transport was not pinned to the university IP');
+    await rejects(() => session.request('https://example.invalid/'), 'Unexpected source URL was accepted');
 
     const search = `<form action="/site/search-teacher"></form><table><tr><th>Викладач</th></tr>
       <tr><td>1</td><td>Іваненко Іван</td><td>Кафедра А</td><td><a href="/time-table/teacher?id=1847">Вибрати</a></td></tr>

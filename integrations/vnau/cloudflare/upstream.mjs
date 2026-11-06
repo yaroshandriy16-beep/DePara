@@ -3,10 +3,41 @@ import {parseMatrix, SourceError} from './matrix.mjs';
 import {readForm, options, selected, readTeacherSearch} from './forms.mjs';
 
 const BASE = 'http://mkr.vsau.org';
+// The university publishes this IP for MKR. Workers fetch may fail to resolve
+// the university host even when public DNS works; sslip.io is DNS only and
+// resolves the embedded IP. Verify both DNS answers before using this route.
+const SOURCE_IP = '81.30.162.30';
+const TRANSPORT_HOST = '81.30.162.30.sslip.io';
+const TRANSPORT_BASE = `http://${TRANSPORT_HOST}`;
 const MAX_HTML_BYTES = 2 * 1024 * 1024;
 const ID = /^\d{1,12}$/;
 const normalized = value => String(value).replace(/\s+/g, ' ').trim().toLocaleLowerCase('uk');
 const uiDate = value => `${value.slice(8, 10)}.${value.slice(5, 7)}.${value.slice(0, 4)}`;
+let dnsVerifiedUntil = 0, dnsVerification = null;
+
+/** Fail closed if the university changes its IP or the DNS alias changes. */
+export async function verifyMkrAddress(dnsFetch = fetch) {
+  const lookup = async name => {
+    const url = new URL('https://cloudflare-dns.com/dns-query');
+    url.searchParams.set('name', name); url.searchParams.set('type', 'A');
+    const r = await dnsFetch(url.href, {headers: {'Accept': 'application/dns-json'}, signal: AbortSignal.timeout(7000)});
+    if (!r.ok) throw new SourceError('Unable to verify source address');
+    const text = await r.text();
+    if (text.length > 16384) throw new SourceError('Unable to verify source address');
+    let result;
+    try {result = JSON.parse(text)} catch {throw new SourceError('Unable to verify source address')}
+    const answers = Array.isArray(result.Answer) ? result.Answer.filter(item => item?.type === 1) : [];
+    if (result.Status !== 0 || answers.length !== 1 || answers[0].data !== SOURCE_IP) throw new SourceError('Source address changed');
+    return typeof answers[0].TTL === 'number' ? Math.max(0, Math.min(60, answers[0].TTL)) : 0;
+  };
+  const ttls = await Promise.all([lookup('mkr.vsau.org'), lookup(TRANSPORT_HOST)]);
+  return Math.min(...ttls);
+}
+async function ensureMkrAddress() {
+  if (Date.now() < dnsVerifiedUntil) return;
+  if (!dnsVerification) dnsVerification = verifyMkrAddress().then(ttl => {dnsVerifiedUntil = Date.now() + ttl * 1000}).finally(() => {dnsVerification = null});
+  await dnsVerification;
+}
 
 async function readBounded(response) {
   const declared = Number(response.headers.get('Content-Length'));
@@ -30,11 +61,12 @@ async function readBounded(response) {
 }
 
 export class MkrSession {
-  constructor(fetcher = fetch) {this.fetcher = fetcher; this.cookies = new Map()}
+  constructor(fetcher = fetch) {this.fetcher = fetcher; this.verifyAddress = fetcher === fetch; this.cookies = new Map()}
   async request(path, {query = {}, data = null, xhr = false} = {}) {
     const url = new URL(path, BASE);
     if (url.origin !== BASE || !['/time-table/group', '/time-table/teacher', '/site/search-teacher'].includes(url.pathname)) throw new SourceError('Invalid source address');
     for (const [key, value] of Object.entries(query)) url.searchParams.set(key, String(value));
+    const transport = new URL(`${url.pathname}${url.search}`, TRANSPORT_BASE);
     const headers = new Headers({'Accept': 'text/html', 'User-Agent': 'DeParaVNAU/1.0 (public schedule; low-volume)'});
     if (this.cookies.size) headers.set('Cookie', [...this.cookies].map(([key, value]) => `${key}=${value}`).join('; '));
     if (xhr) headers.set('X-Requested-With', 'XMLHttpRequest');
@@ -45,9 +77,19 @@ export class MkrSession {
       body = new URLSearchParams(data).toString();
     }
     let response;
-    try {response = await this.fetcher(url.href, {method: data === null ? 'GET' : 'POST', headers, body, redirect: 'manual', signal: AbortSignal.timeout(25000)})}
-    catch {throw new SourceError('Source request failed')}
-    if (!response.ok || response.status >= 300 || !String(response.headers.get('Content-Type') || '').toLowerCase().includes('text/html')) throw new SourceError('Unexpected source response');
+    // Log only the failed stage and status, never source pages, names, cookies,
+    // CSRF values, request parameters or exception messages.
+    try {if (this.verifyAddress) await ensureMkrAddress()}
+    catch {console.warn('MKR address verification failed'); throw new SourceError('Source request failed')}
+    // Calling a stored native fetch as a method gives it the session object as
+    // `this`, which the deployed Workers runtime may reject.
+    const requestSource = this.fetcher;
+    try {response = await requestSource(transport.href, {method: data === null ? 'GET' : 'POST', headers, body, redirect: 'manual', signal: AbortSignal.timeout(25000)})}
+    catch {console.warn('MKR connection failed'); throw new SourceError('Source request failed')}
+    if (!response.ok || response.status >= 300 || !String(response.headers.get('Content-Type') || '').toLowerCase().includes('text/html')) {
+      console.warn('MKR unexpected response status', response.status);
+      throw new SourceError('Unexpected source response');
+    }
     for (const raw of response.headers.getSetCookie()) {
       const [pair, ...attributes] = raw.split(';'), divider = pair.indexOf('=');
       if (divider < 1) continue;
